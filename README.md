@@ -68,7 +68,7 @@ School managment system feature list
 ** First git clone
 
 ```
- http://devel.ictinnovations.com/git/ict/school.git
+ https://github.com/ictinnovations/ICTSchool.git
 ```
 **Change configuration according your need and create Database**
 
