@@ -1,53 +1,130 @@
-<p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
+School managment system feature list
+====================================
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+#### Dasboard
+-------------
+* __Total classes__
+* __Number of students__
+* __number of subjects__
+* __show attendence__
+* __exams__
 
-## About Laravel
+#### Student admission system 
+-----------------------------
+* __Fully functional and automated admission form for student enrolment__
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as:
+* __Enroll students to a specific class and section for a certain session__
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+#### Class-wise subject management  
+----------------------------------
+* __Add subjects for each class separately__
 
-Laravel is accessible, yet powerful, providing tools needed for large, robust applications. A superb combination of simplicity, elegance, and innovation give you tools you need to build any application with which you are tasked.
+#### Student promotion 
+-----------------------
+* __promote a student from one class to another__
 
-## Learning Laravel
+#### Students’ daily attendance  
+-------------------------------
+* __Take attendance of students daily__
+* __Keep track if students are absent__
 
-Laravel has the most extensive and thorough documentation and video tutorial library of any modern web application framework. The [Laravel documentation](https://laravel.com/docs) is thorough, complete, and makes it a breeze to get started learning the framework.
 
-If you're not in the mood to read, [Laracasts](https://laracasts.com) contains over 900 video tutorials on a range of topics including Laravel, modern PHP, unit testing, JavaScript, and more. Boost the skill level of yourself and your entire team by digging into our comprehensive video library.
+#### Students’ attendance report  
+---------------------------------
+* __Get a well defined attendance report for all students of a certain class for a certain month__
 
-## Laravel Sponsors
+#### Exam evaluations or marks management   
+------------------------------------------
+* __Evaluate or put exam marks for each student subject wise__
+* __Compare students’ marks__
+* __Print student mark sheet__
 
-We would like to extend our thanks to the following sponsors for helping fund on-going Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](http://patreon.com/taylorotwell):
+#### Students’ fees management   
+-------------------------------
+* __Create invoice for student fees__
+* __Automatically send fees notification to specific date whose set in amdin__
 
-- **[Vehikl](http://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[British Software Development](https://www.britishsoftware.co)**
-- **[Styde](https://styde.net)**
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
-- [User10](https://user10.com)
-- [Soumettre.fr](https://soumettre.fr/)
+#### Academic year or session handling    
+---------------------------------------
+* __Keep your school records year-wise__
+* __Ability to select academic sessions__
+* __Ability to see previous session data__
 
-## Contributing
+#### Management of teachers     
+----------------------------
+* __Add/edit/delete teachers anytime you need__
+* __Assign teacher to specific class or section__
+* __Assign teacher to specific subject__
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](http://laravel.com/docs/contributions).
+#### Customization of school information    
+-----------------------------------------
+* __Change school name and other information from system settings__
 
-## Security Vulnerabilities
+#### Teacher Panel    
+-------------------
+* __teacher show dasboard attendence and teachers portion__
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
 
-## License
+** First git clone
 
-The Laravel framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
+```
+ http://devel.ictinnovations.com/git/ict/school.git
+```
+**Change configuration according your need and create Database**
+
+```
+$ php artisan migrate
+```
+```
+$ php artisan db:seed
+```
+```
+$ php artisan passport:install (for restfull Api)
+```
+```
+$ php artisan storage:link
+```
+```
+$ php artisan serve --port 8080
+```
+**  http://localhost:8080 **
+```
+$ php artisan storage:link
+
+```
+## cron job Settings
+```
+crontab -e
+
+* * * * * /usr/bin/php7.1 /path/artisan schedule:run 1>> /dev/null 2>&1
+
+```
+# Screenshot
+============
+
+<img src="screenshoot/Screenshot(21).png" >
+<img src="screenshoot/Screenshot(22).png" >
+<img src="screenshoot/Screenshot(23).png" >
+<img src="screenshoot/Screenshot(24).png" >
+<img src="screenshoot/Screenshot(25).png" >
+<img src="screenshoot/Screenshot(26).png" >
+<img src="screenshoot/Screenshot(27).png" >
+<img src="screenshoot/Screenshot(28).png" >
+<img src="screenshoot/Screenshot(29).png" >
+<img src="screenshoot/Screenshot(30).png" >
+<img src="screenshoot/Screenshot(31).png" >
+<img src="screenshoot/Screenshot(32).png" >
+<img src="screenshoot/Screenshot(34).png" >
+<img src="screenshoot/Screenshot(35).png" >
+<img src="screenshoot/Screenshot(33).png" >
+
+System Dependencies
+===================
+* PHP >=7
+* OpenSSL PHP Extension
+* PDO PHP Extension
+* Mbstring PHP Extension
+* Tokenizer PHP Extension
+* XML PHP Extension
+
+
