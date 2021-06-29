@@ -1,4 +1,5 @@
 .env
+composer.lock
 /.env
 storage/*.key
 /storage/logs/*
