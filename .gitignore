@@ -1,0 +1,17 @@
+.env
+/.env
+storage/*.key
+/storage/logs/*
+img/*
+/img/*
+public/images/*
+docss.zip
+docs/uml.zip
+backups/*
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+vendor/*
+./vendor/*
+netbeans-8.0.1-linux.sh
