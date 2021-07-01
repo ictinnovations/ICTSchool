@@ -10,7 +10,7 @@ School managment system feature list
 * __Exam and Paper Management__
 * __Fee Management__
 * __Class and Section Management__
-* __Student Management and admission __
+* __Student Management and admission__
 * __SMS Notification  System__
 * __Voice Notification System__
 
