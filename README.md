@@ -1,4 +1,5 @@
-School managment system feature list
+
+School management system feature list
 ====================================
 
 #### Dasboard
@@ -31,7 +32,7 @@ School managment system feature list
 
 #### Students’ attendance report  
 ---------------------------------
-* __Get a well defined attendance report for all students of a certain class for a certain month__
+* __Get a well-defined attendance report for all students of a certain class for a certain month__
 
 #### Exam evaluations or marks management   
 ------------------------------------------
@@ -53,7 +54,7 @@ School managment system feature list
 #### Management of teachers     
 ----------------------------
 * __Add/edit/delete teachers anytime you need__
-* __Assign teacher to specific class or section__
+* __Assign teacher to a specific class or section__
 * __Assign teacher to specific subject__
 
 #### Customization of school information    
@@ -62,16 +63,48 @@ School managment system feature list
 
 #### Teacher Panel    
 -------------------
-* __teacher show dasboard attendence and teachers portion__
+* __teacher show dashboard attendance and teachers portion__
+
+## ICTSchool Installation
 
 
 ** First git clone
-
 ```
  https://github.com/ictinnovations/ICTSchool.git
+ ```
+#### Create ENV file
+to create env file run, navigate to ICTSchool direcotry and run the following command.
 ```
-**Change configuration according your need and create Database**
+cp .env.example .env
+```
+#### Database creds config in ENV
 
+After create env file, enter database creds e.g.
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=schoolapi
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+#### Create Database
+After change configuration according to your need, create same name database which is defined in **env** file.
+
+### Run Composer Command
+After all configuration, we need to run **composer** command to install laravel and other packages. Run the following command
+```
+composer install
+```
+>After installing Laravel, you may need to configure some permissions. Directories within the storage and the bootstrap/cache directories should be writable by your web server or Laravel will not run.
+
+After run **composer install**  run the following command to genrate **APP_KEY**, It is a private string (encryption_key) in your application that nobody knows about. So, if only your application knows the key, only your application can decrypt data that is encrypted by this key.
+```
+php artisan key:generate
+```
+### Database Migration
+Migrations are like version control for your database, allowing your team to easily modify and share the application's database schema. Migrations are typically paired with Laravel's schema builder to easily build your application's database schema. If you have ever had to tell a teammate to manually add a column to their local database schema, you've faced the problem that database migrations solve.
 ```
 $ php artisan migrate
 ```
@@ -120,11 +153,10 @@ crontab -e
 
 System Dependencies
 ===================
-* PHP >=7
-* OpenSSL PHP Extension
-* PDO PHP Extension
-* Mbstring PHP Extension
-* Tokenizer PHP Extension
-* XML PHP Extension
-
-
+- PHP version 7.2.33
+- Composer version 1.10.1
+- OpenSSL PHP Extension
+- PDO PHP Extension
+- Mbstring PHP Extension
+- Tokenizer PHP Extension
+- XML PHP Extension
