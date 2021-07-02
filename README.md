@@ -2,13 +2,19 @@
 School management system feature list
 ====================================
 
-#### Dasboard
+#### Features
 -------------
-* __Total classes__
-* __Number of students__
-* __number of subjects__
-* __show attendence__
-* __exams__
+* __Multi-Branches System__
+* __Accounts Management__
+* __Result & Report Management__
+* __Mobile Based Attendance System__
+* __Exam and Paper Management__
+* __Fee Management__
+* __Class and Section Management__
+* __Student Management and admission__
+* __SMS Notification  System__
+* __Voice Notification System__
+
 
 #### Student admission system 
 -----------------------------
