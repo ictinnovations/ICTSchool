@@ -166,3 +166,6 @@ System Dependencies
 - Mbstring PHP Extension
 - Tokenizer PHP Extension
 - XML PHP Extension
+
+[ICTSchool](https://github.com/ictinnovations/ICTSchool) has been developed by [ICT Innovations](https://www.ictinnovations.com/) 
+
