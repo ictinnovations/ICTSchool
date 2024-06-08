@@ -31,12 +31,6 @@ $(document).ready(function () {
             $('.navbar-toggle').click();
         }
     });
-
-
-
-
-
-
     //ajax menu checkbox
     $('#is-ajax').click(function (e) {
         $.cookie('is-ajax', $(this).prop('checked'), {expires: 365});
@@ -51,7 +45,6 @@ $(document).ready(function () {
         $('.login-box').find('.input-large').removeClass('span10');
 
     }
-
 
     //highlight current / active link
     $('ul.main-menu li a').each(function () {
@@ -153,9 +146,6 @@ function docReady() {
     $('.raty').raty({
         score: 4 //default stars
     });
-
-
-
     //gallery controls container animation
     $('ul.gallery li').hover(function () {
         $('img', this).fadeToggle(1000);
@@ -252,7 +242,7 @@ function docReady() {
     }
 
     //datatable
-    $('.datatable').dataTable({
+   $('.datatable').dataTable({
         "sDom": "<'row'<'col-md-6'l><'col-md-6'f>r>t<'row'<'col-md-12'i><'col-md-12 center-block'p>>",
         "sPaginationType": "bootstrap",
         "oLanguage": {
@@ -276,17 +266,7 @@ function docReady() {
     });
 
 
-    $('#calendar').fullCalendar({
-        header: {
-            left: 'prev,next',
-            center: 'title'
 
-        },
-        today: 'true',
-        height: 300
-
-
-    });
 
 }
 

@@ -349,7 +349,7 @@ table i {
 <div class="page-wrapper">
       <aside class="menu-sidebar2 d-none d-lg-block">
         <!-- END HEADER MOBILE-->
-        {{--@yield('sidebarmenu')--}}
+        {{-- @yield('sidebarmenu') --}}
         @include('layouts.sidebarmenu') 
 
         </ul>

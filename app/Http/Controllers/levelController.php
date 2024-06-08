@@ -1,9 +1,11 @@
 <?php
 namespace App\Http\Controllers;
+use DB;
+use App\Level;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use App\Level;
-use DB;
+
 class levelController extends BaseController {
 
 	public function __construct() {
@@ -31,19 +33,19 @@ class levelController extends BaseController {
 	*
 	* @return Response
 	*/
-	public function create()
+	public function create(Request $request)
 	{
 		$rules=[
 			'name' => 'required',
 			'description' => 'required'
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
 			return Redirect::to('/level/create')->withErrors($validator);
 		}
 		else {
-			$sname = Input::get('name');
+			$sname = $request->input('name');
 			$sexists=Level::select('*')->where('name','=',$sname)->get();
 			if(count($sexists)>0){
 
@@ -53,8 +55,8 @@ class levelController extends BaseController {
 			}
 			else {
 				$class = new Level;
-				$class->name = Input::get('name');
-				$class->description = Input::get('description');
+				$class->name = $request->input('name');
+				$class->description = $request->input('description');
 				$class->save();
 				return Redirect::to('/level/create')->with("success", "Level Created Succesfully.");
 			}
@@ -102,22 +104,22 @@ class levelController extends BaseController {
 	* @param  int  $id
 	* @return Response
 	*/
-	public function update()
+	public function update(Request $request)
 	{
 		$rules=[
 			'name' => 'required',
 			'description' => 'required'
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
-			return Redirect::to('/level/edit/'.Input::get('id'))->withErrors($validator);
+			return Redirect::to('/level/edit/'.$request->input('id'))->withErrors($validator);
 		}
 		else {
-			$section = Level::find(Input::get('id'));
-			$section->name= Input::get('name');
+			$section = Level::find($request->input('id'));
+			$section->name= $request->input('name');
 
-			$section->description=Input::get('description');
+			$section->description=$request->input('description');
 			$section->save();
 			return Redirect::to('/level/list')->with("success","Level Updated Succesfully.");
 

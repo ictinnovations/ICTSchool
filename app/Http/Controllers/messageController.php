@@ -1,14 +1,15 @@
 <?php
 namespace App\Http\Controllers;
+use DB;
+use App\Models\Level;
+use App\Models\Message;
+use App\Models\Student;
+use App\Models\Teacher;
+use App\Models\ClassModel;
+use Illuminate\Http\Request;
+use App\Models\Ictcore_integration;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use App\ClassModel;
-use App\Level;
-use App\Message;
-use App\Student;
-use App\Teacher;
-use App\Ictcore_integration;
-use DB;
 use App\Http\Controllers\ictcoreController;
 
 class messageController extends BaseController {
@@ -43,9 +44,9 @@ class messageController extends BaseController {
 	*
 	* @return Response
 	*/
-	public function create()
+	public function create(Request $request)
 	{    
-		if(Input::get('role')=='student'){
+		if($request->input('role')=='student'){
 			$rules=[
 			'role' => 'required',
 			'message' => 'required',
@@ -54,7 +55,7 @@ class messageController extends BaseController {
 			'section' => 'required'
 			];
         }
-        if(Input::get('role')=='teacher'){
+        if($request->input('role')=='teacher'){
 			$rules=[
 			'role' => 'required',
 			'message' => 'required',
@@ -63,7 +64,7 @@ class messageController extends BaseController {
 			//'section' => 'required'
 			];
         }
-        if(Input::get('role')=='testing' && Input::get('type')!='sms'){
+        if($request->input('role')=='testing' && $request->input('type')!='sms'){
 			$rules=[
 			'role'      => 'required',
 			'message'   => 'required',
@@ -79,17 +80,17 @@ class messageController extends BaseController {
 			//'section' => 'required'
 			];
         }
-			$validator = \Validator::make(Input::all(), $rules);
+			$validator = \Validator::make($request->all(), $rules);
 			if ($validator->fails())
 			{
 			  return Redirect::to('/message')->withErrors($validator);
 			}else {
-                 //echo "<pre>";echo Input::get('role');exit;
+                 //echo "<pre>";echo $request->input('role');exit;
                    $file_id='';
-                   $msg_type=Input::get('stpye');
-                 //echo "<pre>";print_r(Input::all());exit;
-                  /*   $section = Input::get('section');
-							$class = Input::get('class');
+                   $msg_type=$request->input('stpye');
+                 //echo "<pre>";print_r($request->all());exit;
+                  /*   $section = $request->input('section');
+							$class = $request->input('class');
 							$student=	DB::table('Student')
 							->select('*')
 							->where('isActive','Yes')
@@ -98,12 +99,12 @@ class messageController extends BaseController {
 							->get();
 
 							echo "<pre>";print_r($student->toArray());exit; */
-                  //$phone = explode(',',Input::get('phone_number'));
+                  //$phone = explode(',',$request->input('phone_number'));
 			      //  echo "<pre>";print_r($phone);exit;
-                  echo $type = Input::get('type');
+                  echo $type = $request->input('type');
                   $ictcore_integration = Ictcore_integration::select("*")->where('type',$type)->first();
                   $ict  = new ictcoreController();
-					if(Input::get('message')=='other'){
+					if($request->input('message')=='other'){
 
 						$drctry = storage_path('app/public/messages/');
 					    $fileName = 'othernoti_'.time().'.'.Input::file('message_file')->getClientOriginalExtension();
@@ -119,8 +120,8 @@ class messageController extends BaseController {
                         	$file_id     = $ict->verification_number_telenor_voice($data,$ictcore_integration->ictcore_user,$ictcore_integration->ictcore_password);
 					}else{
 						$data_abs = array(
-							'name' => Input::get('title_abent'),
-							'description' => Input::get('description_absent'),
+							'name' => $request->input('title_abent'),
+							'description' => $request->input('description_absent'),
 							);
 				          $recording_id  =  $ict->ictcore_api('messages/recordings','POST',$data_abs );
 						if(!empty($recording_id->error)){
@@ -134,7 +135,7 @@ class messageController extends BaseController {
 							}
 							if(!is_array($recording_id )){
 								$data = array(
-								'name' => Input::get('title'),
+								'name' => $request->input('title'),
 								'recording_id' => $recording_id,
 								);
 								$program_id = $ict->ictcore_api('programs/voicemessage','POST',$data );
@@ -162,18 +163,18 @@ class messageController extends BaseController {
 					if(!empty($ictcore_integration)   && $ictcore_integration->ictcore_user && $ictcore_integration->ictcore_password){
 
 	                  
-	                  $role = Input::get('role');
-	                  $mess_name = Input::get('mess_name');
+	                  $role = $request->input('role');
+	                  $mess_name = $request->input('mess_name');
 					  $remove_spaces_m =  str_replace(" ","_",$mess_name );
                        
-						if($type=='voice' && Input::get('message')!='other' ){
-							$message = Message::find(Input::get('message'));
+						if($type=='voice' && $request->input('message')!='other' ){
+							$message = Message::find($request->input('message'));
 							$program_id =  $message->ictcore_program_id;
 							$file_id =  $message->telenor_file_id;
 						}elseif($type=='sms' || $type=='Sms' || $type=='SMS'){
 							$data = array(
-								'name' => Input::get('mess_name'),
-								'data' => Input::get('message'),
+								'name' => $request->input('mess_name'),
+								'data' => $request->input('message'),
 								'type' => 'utf-8',
 								'description' =>'',
 							);
@@ -183,7 +184,7 @@ class messageController extends BaseController {
 							echo "adeel";
 							$text_id  =  $ict->ictcore_api('messages/texts','POST',$data );
 							$data     = array(
-								'name' => Input::get('mess_name'),
+								'name' => $request->input('mess_name'),
 								'text_id' =>$text_id,
 							);
 							 $program_id  =  $ict->ictcore_api('programs/sendsms','POST',$data );
@@ -204,12 +205,12 @@ class messageController extends BaseController {
                         }
 						if($role =='student' || $role =='parent' || $role =='all_student'){
 
-							$section = Input::get('section');
-							$class = Input::get('class');
+							$section = $request->input('section');
+							$class = $request->input('class');
 							$student=	DB::table('Student')
 							->select('*')
 							->where('isActive','Yes');
-							if(Input::get('role')!='all_student'){
+							if($request->input('role')!='all_student'){
 							    $student=$student->whereIn('section', $section)
 							         ->where('class', $class);
 						    }
@@ -235,7 +236,7 @@ class messageController extends BaseController {
                                     if($msg_type!='quick'){
                                 		$group_contact_id = $ict->telenor_apis('add_contact',$group_id,$to,'','','');
                                     }else{
-                                        $snd_msg  = $ict->verification_number_telenor_sms($to,Input::get('message'),'SidraSchool',$ictcore_integration->ictcore_user,$ictcore_integration->ictcore_password,$type);
+                                        $snd_msg  = $ict->verification_number_telenor_sms($to,$request->input('message'),'SidraSchool',$ictcore_integration->ictcore_user,$ictcore_integration->ictcore_password,$type);
 
                                     }
                                 }else{
@@ -287,7 +288,7 @@ class messageController extends BaseController {
                                    if($msg_type!='quick'){
                                 		$group_contact_id = $ict->telenor_apis('add_contact',$group_id,$to,'','','');
                                     }else{
-                                        $snd_msg  = $ict->verification_number_telenor_sms($to,Input::get('message'),'SidraSchool',$ictcore_integration->ictcore_user,$ictcore_integration->ictcore_password,$type);
+                                        $snd_msg  = $ict->verification_number_telenor_sms($to,$request->input('message'),'SidraSchool',$ictcore_integration->ictcore_user,$ictcore_integration->ictcore_password,$type);
                                     }
                                 }else{
 								//$contact_id = $ict->ictcore_api('contacts','POST',$data );
@@ -321,7 +322,7 @@ class messageController extends BaseController {
 							    }
 							}
 						}else{
-                          $phone = explode(',',Input::get('phone_number'));
+                          $phone = explode(',',$request->input('phone_number'));
                           foreach($phone as $number){
                             if (preg_match("~^0\d+$~", $number)) {
                                 	$to = preg_replace('/0/', '92', $number, 1);
@@ -333,7 +334,7 @@ class messageController extends BaseController {
                                 if($msg_type!='quick'){
                                 		$group_contact_id = $ict->telenor_apis('add_contact',$group_id,$to,'','','');
                                     }else{
-                                        $snd_msg  = $ict->verification_number_telenor_sms($to,Input::get('message'),'SidraSchool',$ictcore_integration->ictcore_user,$ictcore_integration->ictcore_password,$type);
+                                        $snd_msg  = $ict->verification_number_telenor_sms($to,$request->input('message'),'SidraSchool',$ictcore_integration->ictcore_user,$ictcore_integration->ictcore_password,$type);
                                     }
                                 }else{
                                      $data = array(
@@ -377,7 +378,7 @@ class messageController extends BaseController {
 						}
 						if($msg_type!='quick'){
 							if($ictcore_integration->method == 'telenor'){
-	                        echo  $campaign    = $ict->telenor_apis('campaign_create',$group_id,'',Input::get('message'),$file_id,$type);
+	                        echo  $campaign    = $ict->telenor_apis('campaign_create',$group_id,'',$request->input('message'),$file_id,$type);
 	                               // echo $campaign;
 	                              // $this->info('Notification sended successfully'.$campaign);
 	                             // echo "<pre>";print_r($campaign);
@@ -446,22 +447,22 @@ class messageController extends BaseController {
 	* @param  int  $id
 	* @return Response
 	*/
-	public function update()
+	public function update(Request $request)
 	{
 		$rules=[
 			'name' => 'required',
 			'description' => 'required'
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
-			return Redirect::to('/level/edit/'.Input::get('id'))->withErrors($validator);
+			return Redirect::to('/level/edit/'.$request->input('id'))->withErrors($validator);
 		}
 		else {
-			$section = Level::find(Input::get('id'));
-			$section->name= Input::get('name');
+			$section = Level::find($request->input('id'));
+			$section->name= $request->input('name');
 
-			$section->description=Input::get('description');
+			$section->description=$request->input('description');
 			$section->save();
 			return Redirect::to('/level/list')->with("success","Level Updated Succesfully.");
 

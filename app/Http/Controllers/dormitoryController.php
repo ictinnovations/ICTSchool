@@ -1,16 +1,18 @@
 <?php
 namespace App\Http\Controllers;
+use DB;
+use App\Models\Student;
+use App\Models\Subject;
+use App\Models\Dormitory;
+use App\Models\Institute;
+use App\Models\ClassModel;
+use App\Models\DormitoryFee;
+use Illuminate\Http\Request;
+use App\Models\DormitoryStudent;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Database\Eloquent\Collection;
-use App\Dormitory;
-use App\ClassModel;
-use App\Subject;
-use App\Student;
-use App\DormitoryStudent;
-use App\DormitoryFee;
-use App\Institute;
-use DB;
+
 class dormitoryController extends BaseController {
 
 	public function __construct() {
@@ -38,7 +40,7 @@ class dormitoryController extends BaseController {
 	*
 	* @return Response
 	*/
-	public function create()
+	public function create(Request $request)
 	{
 		$rules=[
 			'name' => 'required',
@@ -46,17 +48,17 @@ class dormitoryController extends BaseController {
 			'address' => 'required',
 
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
 			return Redirect::to('/dormitory')->withErrors($validator);
 		}
 		else {
 			$dormitory = new Dormitory;
-			$dormitory->name= Input::get('name');
-			$dormitory->numOfRoom=Input::get('numOfRoom');
-			$dormitory->address=Input::get('address');
-			$dormitory->description=Input::get('description');
+			$dormitory->name= $request->input('name');
+			$dormitory->numOfRoom=$request->input('numOfRoom');
+			$dormitory->address=$request->input('address');
+			$dormitory->description=$request->input('description');
 			$dormitory->save();
 			return Redirect::to('/dormitory')->with("success","Dormitory Created Succesfully.");
 
@@ -86,7 +88,7 @@ class dormitoryController extends BaseController {
 	* @param  int  $id
 	* @return Response
 	*/
-	public function update()
+	public function update(Request $request)
 	{
 
 		$rules=[
@@ -97,17 +99,17 @@ class dormitoryController extends BaseController {
 		];
 
 
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
-			return Redirect::to('/dormitory/edit/'.Input::get('id'))->withErrors($validator);
+			return Redirect::to('/dormitory/edit/'.$request->input('id'))->withErrors($validator);
 		}
 		else {
-			$dormitory = Dormitory::find(Input::get('id'));
-			$dormitory->name= Input::get('name');
-			$dormitory->numOfRoom=Input::get('numOfRoom');
-			$dormitory->address=Input::get('address');
-			$dormitory->description=Input::get('description');
+			$dormitory = Dormitory::find($request->input('id'));
+			$dormitory->name= $request->input('name');
+			$dormitory->numOfRoom=$request->input('numOfRoom');
+			$dormitory->address=$request->input('address');
+			$dormitory->description=$request->input('description');
 			$dormitory->save();
 			return Redirect::to('/dormitory')->with("success","Dormitory update Succesfully.");
 
@@ -139,7 +141,7 @@ class dormitoryController extends BaseController {
 	}
 
 
-	public function stdcreate()
+	public function stdcreate(Request $request)
 	{
 		$rules=[
 			'regiNo' => 'required',
@@ -151,19 +153,19 @@ class dormitoryController extends BaseController {
 
 
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
 			return Redirect::to('/dormitory/assignstd')->withErrors($validator);
 		}
 		else {
 			$dormStd = new DormitoryStudent;
-			$dormStd->regiNo=Input::get('regiNo');
-			$dormStd->joinDate=Input::get('joinDate');
-			$dormStd->dormitory=Input::get('dormitory');
-			$dormStd->roomNo=Input::get('roomNo');
-			$dormStd->monthlyFee=Input::get('monthlyFee');
-			$dormStd->isActive=Input::get('isActive');
+			$dormStd->regiNo=$request->input('regiNo');
+			$dormStd->joinDate=$request->input('joinDate');
+			$dormStd->dormitory=$request->input('dormitory');
+			$dormStd->roomNo=$request->input('roomNo');
+			$dormStd->monthlyFee=$request->input('monthlyFee');
+			$dormStd->isActive=$request->input('isActive');
 			$dormStd->save();
 			return Redirect::to('/dormitory/assignstd')->with("success","Student added to dormitory Succesfully.");
 
@@ -180,12 +182,12 @@ class dormitoryController extends BaseController {
 		//return View::Make('app.dormitory_stdlist',compact('students','dormitories','formdata'));
 		return View('app.dormitory_stdlist',compact('students','dormitories','formdata'));
 	}
-	public function poststdShow()
+	public function poststdShow(Request $request)
 	{
 		$rules = ['dormitory' => 'required',];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails()) {
-			return Redirect::to('/dormitory/assignstd/list')->withInput(Input::all())->withErrors($validator);
+			return Redirect::to('/dormitory/assignstd/list')->withInput($request->all())->withErrors($validator);
 		}
 		else {
 			$students = DB::table('Student')
@@ -193,11 +195,11 @@ class dormitoryController extends BaseController {
 			->join('dormitory_student', 'Student.regiNo', '=', 'dormitory_student.regiNo')
 			->select('dormitory_student.id', 'Student.regiNo', 'Student.rollNo', 'Student.firstName', 'Student.middleName', 'Student.lastName', 'Student.fatherName', 'Student.motherName', 'Student.fatherCellNo', 'Student.motherCellNo', 'Student.localGuardianCell',
 			'Class.Name as class','dormitory_student.roomNo', 'dormitory_student.monthlyFee','dormitory_student.joinDate','dormitory_student.leaveDate','dormitory_student.isActive')
-			->where('dormitory_student.dormitory',Input::get('dormitory'))
+			->where('dormitory_student.dormitory',$request->input('dormitory'))
 			->get();
 			$dormitories = Dormitory::pluck('name','id');
 			$formdata = new formfoo();
-			$formdata->dormitory=Input::get('dormitory');
+			$formdata->dormitory=$request->input('dormitory');
 			//return View::Make('app.dormitory_stdlist',compact('students','dormitories','formdata'));
 			return View('app.dormitory_stdlist',compact('students','dormitories','formdata'));
 		}
@@ -217,7 +219,7 @@ class dormitoryController extends BaseController {
 	* @param  int  $id
 	* @return Response
 	*/
-	public function stdupdate()
+	public function stdupdate(Request $request)
 	{
 
 		$rules=[
@@ -229,21 +231,21 @@ class dormitoryController extends BaseController {
 		];
 
 
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
-			return Redirect::to('/dormitory/assignstd/edit/'.Input::get('id'))->withErrors($validator);
+			return Redirect::to('/dormitory/assignstd/edit/'.$request->input('id'))->withErrors($validator);
 		}
 		else {
-			$dormStd = DormitoryStudent::find(Input::get('id'));
-			if(Input::get('leaveDate')!=""){
-				$dormStd->leaveDate=Input::get('leaveDate');
+			$dormStd = DormitoryStudent::find($request->input('id'));
+			if($request->input('leaveDate')!=""){
+				$dormStd->leaveDate=$request->input('leaveDate');
 			}
 
-			$dormStd->dormitory=Input::get('dormitory');
-			$dormStd->roomNo=Input::get('roomNo');
-			$dormStd->monthlyFee=Input::get('monthlyFee');
-			$dormStd->isActive=Input::get('isActive');
+			$dormStd->dormitory=$request->input('dormitory');
+			$dormStd->roomNo=$request->input('roomNo');
+			$dormStd->monthlyFee=$request->input('monthlyFee');
+			$dormStd->isActive=$request->input('isActive');
 			$dormStd->save();
 			return Redirect::to('/dormitory/assignstd/list')->with("success","Dormitory student info update Succesfully.");
 
@@ -303,7 +305,7 @@ class dormitoryController extends BaseController {
 		//return View::Make('app.dormitory_fee',compact('dormitories'));
 		return View('app.dormitory_fee',compact('dormitories'));
 	}
-	public function feeadd()
+	public function feeadd(Request $request)
 	{
 		$rules=[
 			'regiNo' => 'required',
@@ -311,16 +313,16 @@ class dormitoryController extends BaseController {
 			'feeAmount' => 'required',
 
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
 			return Redirect::to('/dormitory/fee')->withErrors($validator);
 		}
 		else {
 			$dormFee = new DormitoryFee;
-			$dormFee->regiNo=Input::get('regiNo');
-			$dormFee->feeMonth=Input::get('feeMonth');
-			$dormFee->feeAmount=Input::get('feeAmount');
+			$dormFee->regiNo=$request->input('regiNo');
+			$dormFee->feeMonth=$request->input('feeMonth');
+			$dormFee->feeAmount=$request->input('feeAmount');
 			$dormFee->save();
 			return Redirect::to('/dormitory/fee')->with("success","Fee added Succesfully.");
 

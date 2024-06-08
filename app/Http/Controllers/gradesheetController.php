@@ -1,17 +1,18 @@
 <?php
 namespace App\Http\Controllers;
+use DB;
+use Storage;
+use App\Models\GPA;
+use App\Models\Marks;
+use App\Models\Student;
+use App\Models\Subject;
+use App\Models\MeritList;
+use App\Models\ClassModel;
+use App\Models\Ictcore_fees;
+use Illuminate\Http\Request;
+use App\Models\Ictcore_integration;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use App\ClassModel;
-use App\Subject;
-use App\Student;
-use App\Marks;
-use App\GPA;
-use App\MeritList;
-use App\Ictcore_fees;
-use App\Ictcore_integration;
-use Storage;
-use DB;
 use App\Http\Controllers\ictcoreController;
 Class formfoo5{
 
@@ -31,7 +32,7 @@ class gradesheetController extends BaseController {
 	*
 	* @return Response
 	*/
-	public function index()
+	public function index(Request $request)
 	{
 		$formdata = new formfoo5;
 		$formdata->class="";
@@ -53,11 +54,11 @@ class gradesheetController extends BaseController {
 				      $gradsystem ='';
 					}
 		//return View::Make('app.gradeSheet',compact('classes','formdata','students'));
-		if(Input::get('class')!='' && Input::get('section')!=''){
-		$formdata->class   = Input::get('class');
-		$formdata->section = Input::get('section');
+		if($request->input('class')!='' && $request->input('section')!=''){
+		$formdata->class   = $request->input('class');
+		$formdata->section = $request->input('section');
 		}
-		$regiNo  = Input::get('regiNo');
+		$regiNo  = $request->input('regiNo');
 
 		return View('app.gradeSheet',compact('classes','formdata','students','gradsystem','regiNo'));
 	}
@@ -68,7 +69,7 @@ class gradesheetController extends BaseController {
 	*
 	* @return Response
 	*/
-	public function stdlist()
+	public function stdlist(Request $request)
 	{
 		$rules=[
 			'class' => 'required',
@@ -78,35 +79,35 @@ class gradesheetController extends BaseController {
 
 
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
 			$formdata = new formfoo5;
-			$formdata->class=Input::get('class');
-			$formdata->section=Input::get('section');
-			$formdata->exam=Input::get('exam');
-			$formdata->session=Input::get('session');
-			if(Input::get('regiNo_f')!='' && Input::get('section_f')!='' && Input::get('class_f')!=''){
-				return Redirect::to('/gradesheet?class='.Input::get('class_f').'&section='.Input::get('section_f').'&regiNo='.Input::get('regiNo_f'))->withErrors($validator);
+			$formdata->class=$request->input('class');
+			$formdata->section=$request->input('section');
+			$formdata->exam=$request->input('exam');
+			$formdata->session=$request->input('session');
+			if($request->input('regiNo_f')!='' && $request->input('section_f')!='' && $request->input('class_f')!=''){
+				return Redirect::to('/gradesheet?class='.$request->input('class_f').'&section='.$request->input('section_f').'&regiNo='.$request->input('regiNo_f'))->withErrors($validator);
 			}
 			return Redirect::to('/gradesheet')->withErrors($validator);
 		}
 		else {
-         // echo "<pre>";print_r(Input::all());
+         // echo "<pre>";print_r($request->all());
           //exit;
-			if(Input::get('send_sms')=='yes'){
-				$send = $this->send_sms(Input::get('class'),Input::get('section'),Input::get('exam'),Input::get('session'));
+			if($request->input('send_sms')=='yes'){
+				$send = $this->send_sms($request->input('class'),$request->input('section'),$request->input('exam'),$request->input('session'));
 			   // echo "<pre>";print_r($send);
 			    //exit;
 			}
-			if(is_array(Input::get('exam'))){
-				 $exams_ids =implode(',',Input::get('exam')) ;
+			if(is_array($request->input('exam'))){
+				 $exams_ids =implode(',',$request->input('exam')) ;
 				$ispubl  = DB::table('MeritList')
 				->select('regiNo','exam')
-				->where('class','=',Input::get('class'))
-				->where('session','=',trim(Input::get('session')))
-				->where('section_id','=',trim(Input::get('section')))
-				->whereIn('exam',Input::get('exam'))
+				->where('class','=',$request->input('class'))
+				->where('session','=',trim($request->input('session')))
+				->where('section_id','=',trim($request->input('section')))
+				->whereIn('exam',$request->input('exam'))
 				->orderBy('created_at','desc')
 				->groupBy('regiNo')
 				->get();
@@ -114,10 +115,10 @@ class gradesheetController extends BaseController {
 		    	$exams_ids='';
 		    	$ispubl  = DB::table('MeritList')
 				->select('regiNo','exam')
-				->where('class','=',Input::get('class'))
-				->where('session','=',trim(Input::get('session')))
-				->where('exam','=',Input::get('exam'))
-			    ->where('section_id','=',trim(Input::get('section')))
+				->where('class','=',$request->input('class'))
+				->where('session','=',trim($request->input('session')))
+				->where('exam','=',$request->input('exam'))
+			    ->where('section_id','=',trim($request->input('section')))
                
 				->get();
 		    }
@@ -130,28 +131,28 @@ class gradesheetController extends BaseController {
 				->join('Marks', 'Student.regiNo', '=', 'Marks.regiNo')
 				->select(DB::raw('DISTINCT(Student.regiNo)'), 'Student.rollNo', 'Student.firstName', 'Student.middleName', 'Student.lastName', 'Student.group', 'Student.section', 'Marks.shift', 'Marks.class')
 				->where('Student.isActive', '=', 'Yes')
-				->where('Student.class', '=', Input::get('class'))
-				//->where('Marks.class', '=', Input::get('class'))
-				->where('Student.section', '=', Input::get('section'))
-				->where('Student.session', '=', trim(Input::get('session')))
-				->where('Marks.exam', '=', Input::get('exam'));
-				if(Input::get('regiNo_f')!='' && Input::get('section_f')!='' && Input::get('class_f')!=''){
-					$students =$students->where('Student.regiNo',Input::get('regiNo_f')); 
+				->where('Student.class', '=', $request->input('class'))
+				//->where('Marks.class', '=', $request->input('class'))
+				->where('Student.section', '=', $request->input('section'))
+				->where('Student.session', '=', trim($request->input('session')))
+				->where('Marks.exam', '=', $request->input('exam'));
+				if($request->input('regiNo_f')!='' && $request->input('section_f')!='' && $request->input('class_f')!=''){
+					$students =$students->where('Student.regiNo',$request->input('regiNo_f')); 
 				}
 
 				$students =$students->get();
 
 				$formdata = new formfoo5;
-				$formdata->class = Input::get('class');
-				$formdata->section = Input::get('section');
-				$formdata->session = Input::get('session');
-				if(is_array(Input::get('exam'))){
-					$formdata->exam = Input::get('exam')[0];
+				$formdata->class = $request->input('class');
+				$formdata->section = $request->input('section');
+				$formdata->session = $request->input('session');
+				if(is_array($request->input('exam'))){
+					$formdata->exam = $request->input('exam')[0];
 			    }else{
-			    	$formdata->exam = Input::get('exam');
+			    	$formdata->exam = $request->input('exam');
 			    }
-				$formdata->type = Input::get('type');
-				$formdata->postclass = array_get($classes, Input::get('class'));
+				$formdata->type = $request->input('type');
+				$formdata->postclass = array_get($classes, $request->input('class'));
 
 				//return View::Make('app.gradeSheet', compact('classes', 'formdata', 'students'));
 				 if(Storage::disk('local')->exists('/public/grad_system.txt')){
@@ -163,17 +164,17 @@ class gradesheetController extends BaseController {
 					}else{
 				      $gradsystem ='';
 					}
-					$type = Input::get('type');
+					$type = $request->input('type');
 					
                   // exit;
 				
-					$regiNo = Input::get('regiNo_f');
+					$regiNo = $request->input('regiNo_f');
 				return View('app.gradeSheet', compact('classes', 'formdata', 'students','gradsystem','type','exams_ids','regiNo'));
 			}
 			else
 			{
-				if(Input::get('regiNo_f')!='' && Input::get('section_f')!='' && Input::get('class_f')!=''){
-					return Redirect::to('/gradesheet?class='.Input::get('class_f').'&section='.Input::get('section_f').'&regiNo='.Input::get('regiNo_f'))->withInput()->with("noresult", "Results Not Published Yet!");
+				if($request->input('regiNo_f')!='' && $request->input('section_f')!='' && $request->input('class_f')!=''){
+					return Redirect::to('/gradesheet?class='.$request->input('class_f').'&section='.$request->input('section_f').'&regiNo='.$request->input('regiNo_f'))->withInput()->with("noresult", "Results Not Published Yet!");
 				}
 				return Redirect::to('/gradesheet')->withInput()->with("noresult", "Results Not Published Yet!");
 			}
@@ -802,7 +803,7 @@ public function send_sms($class,$section,$exam,$session)
 		}
 		return $total;
 	}
-	public  function  postgenerate()
+	public  function  postgenerate(Request $request)
 	{
 		$rules = [
 			'class' => 'required',
@@ -810,29 +811,29 @@ public function send_sms($class,$section,$exam,$session)
 			//'section' => 'required',
 			'session' => 'required'
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails()) {
 			return Redirect::to('/result/generate')->withErrors($validator)->withInput();
 		} else {
 			$isGenerated=DB::table('MeritList')
 			->select('regiNo')
-			->where('class', '=', Input::get('class'))
-			->where('session', '=', trim(Input::get('session')))
-			->where('exam', '=', Input::get('exam'))
+			->where('class', '=', $request->input('class'))
+			->where('session', '=', trim($request->input('session')))
+			->where('exam', '=', $request->input('exam'))
 			//->where('section_id', '=', 1)
 			->get();
 			if(count($isGenerated)==0)
 			{
-				$subjects           = Subject::select('name', 'code', 'type', 'subgroup')->where('class', '=', Input::get('class'))->get();
-				$sectionsHas        = Student::select('section')->where('class', '=', Input::get('class'))->where('session', trim(Input::get('session')))->where('isActive', '=', 'Yes')->distinct()->orderBy('section', 'asc')->get();
-				$sectionMarksSubmit = Marks::select('section')->where('class', '=', Input::get('class'))->where('session', trim(Input::get('session')))->where('exam',Input::get('exam'))->distinct()->get();
+				$subjects           = Subject::select('name', 'code', 'type', 'subgroup')->where('class', '=', $request->input('class'))->get();
+				$sectionsHas        = Student::select('section')->where('class', '=', $request->input('class'))->where('session', trim($request->input('session')))->where('isActive', '=', 'Yes')->distinct()->orderBy('section', 'asc')->get();
+				$sectionMarksSubmit = Marks::select('section')->where('class', '=', $request->input('class'))->where('session', trim($request->input('session')))->where('exam',$request->input('exam'))->distinct()->get();
 				//dd($sectionsHas);
 				if (count($sectionsHas)==count($sectionMarksSubmit))
 				{
 					$isAllSubSectionMarkSubmit =false;
 					$notSubSection='';
 					foreach ($sectionsHas as $section) {
-						$marksubmit = Marks::select('subject')->where('class', '=', Input::get('class'))->where('section',$section->section)->where('session', trim(Input::get('session')))->where('exam',Input::get('exam'))->distinct()->get();
+						$marksubmit = Marks::select('subject')->where('class', '=', $request->input('class'))->where('section',$section->section)->where('session', trim($request->input('session')))->where('exam',$request->input('exam'))->distinct()->get();
 
 						if(count($subjects) == count($marksubmit))
 						{
@@ -857,18 +858,18 @@ public function send_sms($class,$section,$exam,$session)
 						$students = Student::select('regiNo')
 						->join('section','Student.section','=','section.id')
 						->select('Student.*','section.name')
-						->where('Student.class', '=', Input::get('class'))
-						->where('Student.session', '=', trim(Input::get('session')))
+						->where('Student.class', '=', $request->input('class'))
+						->where('Student.session', '=', trim($request->input('session')))
 						->where('Student.isActive', '=', 'Yes')->get();
                       //  echo "<pre>";print_r($students->toArray());exit;
 						if (count($students) != 0) {
 							$marksSubmitStudents=Marks::select('Marks.regiNo')
 													->join('Student', 'Marks.regiNo', '=', 'Student.regiNo')
 													->where('Student.isActive', '=', 'Yes')
-													->where('Student.class', '=', Input::get('class'))
-													->where('Marks.class', '=', Input::get('class'))
-													->where('Marks.session', '=', trim(Input::get('session')))
-													->where('Marks.exam', '=', Input::get('exam'))
+													->where('Student.class', '=', $request->input('class'))
+													->where('Marks.class', '=', $request->input('class'))
+													->where('Marks.session', '=', trim($request->input('session')))
+													->where('Marks.exam', '=', $request->input('exam'))
 													->distinct()
 													->get();
 
@@ -877,7 +878,7 @@ public function send_sms($class,$section,$exam,$session)
 								$gparules = GPA::select('gpa', 'grade', 'markfrom')->get();
 								$foobar = array();
 								foreach ($students as $student) {
-									$marks = Marks::select('subject', 'grade', 'point', 'total')->where('regiNo', '=', $student->regiNo)->where('exam', '=', Input::get('exam'))->get();
+									$marks = Marks::select('subject', 'grade', 'point', 'total')->where('regiNo', '=', $student->regiNo)->where('exam', '=', $request->input('exam'))->get();
 
 									$totalpoint  = 0;
 									$totalmarks  = 0;
@@ -948,9 +949,9 @@ public function send_sms($class,$section,$exam,$session)
 										$grandGrade = $this->gradnGradeCal($grandPoint, $gparules);
 									}
 									$merit          = new MeritList;
-									$merit->class   = Input::get('class');
-									$merit->session = trim(Input::get('session'));
-									$merit->exam    = Input::get('exam');
+									$merit->class   = $request->input('class');
+									$merit->session = trim($request->input('session'));
+									$merit->exam    = $request->input('exam');
 									$merit->regiNo  = $student->regiNo;
 									$merit->totalNo = $totalmarks;
 									$merit->point   = $grandPoint;
@@ -1024,7 +1025,7 @@ public function send_sms($class,$section,$exam,$session)
 		//return View::Make('app.resultsearch',compact('formdata','classes'));
 		return View('app.resultsearch',compact('formdata','classes'));
 	}
-	public function postsearch()
+	public function postsearch(Request $request)
 	{
 		$rules=[
 
@@ -1032,13 +1033,13 @@ public function send_sms($class,$section,$exam,$session)
 			'regiNo' => 'required',
 			'class' => 'required'
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
-			return Redirect::to('/result/search')->withErrors($validator)->withInput(Input::all());
+			return Redirect::to('/result/search')->withErrors($validator)->withInput($request->all());
 		}
 		else {
-			return Redirect::to('/gradesheet/print/'.Input::get('regiNo').'/'.Input::get('exam').'/'.Input::get('class'));
+			return Redirect::to('/gradesheet/print/'.$request->input('regiNo').'/'.$request->input('exam').'/'.$request->input('class'));
 		}
 	}
 	public function searchpub()
@@ -1049,7 +1050,7 @@ public function send_sms($class,$section,$exam,$session)
 		//return View::Make('app.resultsearchpublic',compact('formdata','classes'));
 		return View('app.resultsearchpublic',compact('formdata','classes'));
 	}
-	public function postsearchpub()
+	public function postsearchpub(Request $request)
 	{
 
 		$rules=[
@@ -1057,22 +1058,22 @@ public function send_sms($class,$section,$exam,$session)
 		 'regiNo' => 'required',
 		 'class' => 'required'
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
-			return Redirect::to('/results')->withErrors($validator)->withInput(Input::all());
+			return Redirect::to('/results')->withErrors($validator)->withInput($request->all());
 		}
 		else {
 
 
-			return Redirect::to('/gradesheet/print/'.Input::get('regiNo').'/'.Input::get('exam').'/'.Input::get('class'));
+			return Redirect::to('/gradesheet/print/'.$request->input('regiNo').'/'.$request->input('exam').'/'.$request->input('class'));
 		}
 	}
 	public function gradsystem()
 	{
 	    //return View('app.resultsearchpublic',compact(''));
 	}
-	public function m_printsheet($regiNo,$exam,$class)
+	public function m_printsheet(Request $request, $regiNo,$exam,$class)
 	{
         $examed    = DB::table('exam')->where('id',$exam)->first();
 		$exam_name =  $examed->type;
@@ -1260,11 +1261,11 @@ public function send_sms($class,$section,$exam,$session)
 				$attendance=DB::select(DB::RAW($query));
 				////////////echo "<pre>";print_r($meritdata);
 				//exit;
-				if(Input::get('type')=='sigle' || Input::get('type')==''):
+				if($request->input('type')=='sigle' || $request->input('type')==''):
 				return View('app.mstdgradesheet', compact('student', 'extra', 'meritdata', 'subcollection', 'blextra', 'banglaArray', 'enextra', 'englishArray','attendance'));
 				else:
-					//echo "<pre>";print_r($this->combined_results(Input::get('type'),$regiNo,$exam,$class));
-                     $data = $this->combined_results(Input::get('type'),$regiNo,$exam,$class);
+					//echo "<pre>";print_r($this->combined_results($request->input('type'),$regiNo,$exam,$class));
+                     $data = $this->combined_results($request->input('type'),$regiNo,$exam,$class);
                      $result= $data['result_data'];
                      $attendance= $data['attendance'];
                      return View('app.mstdgradesheetc', compact('result','attendance'));
@@ -1283,7 +1284,7 @@ public function send_sms($class,$section,$exam,$session)
 
 		}
 	}
-public function combined_results($type,$regiNo,$exam,$class)
+public function combined_results(Request $request, $type,$regiNo,$exam,$class)
 {
 
 	/*$examed    = DB::table('exam')->where('id',$exam)->first();
@@ -1375,7 +1376,7 @@ public function combined_results($type,$regiNo,$exam,$class)
     }else{
 	return  Redirect::back()->with('noresult','Result Not Found!');
 	}*/
-	$exams_array = explode(',',Input::get('examps_ids'));
+	$exams_array = explode(',',$request->input('examps_ids'));
 	$result_data = DB::table('Student')
        ->join('Class', 'Student.class', '=', 'Class.code')
        ->join('section','Student.section','=','section.id')
@@ -1410,7 +1411,7 @@ public function combined_results($type,$regiNo,$exam,$class)
 }
 
 
-	public  function  mpostgenerate()
+	public  function  mpostgenerate(Request $request)
 	{
 		$rules = [
 			'class'   => 'required',
@@ -1418,22 +1419,22 @@ public function combined_results($type,$regiNo,$exam,$class)
 			'session' => 'required',
 			'section' => 'required'
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails()) {
 			return Redirect::to('/result/generate')->withErrors($validator)->withInput();
 		} else {
 			$isGenerated=DB::table('MeritList')
 			->select('regiNo')
-			->where('class', '=', Input::get('class'))
-			->where('session', '=', trim(Input::get('session')))
-			->where('exam', '=', Input::get('exam'))
-			->where('section_id', '=', Input::get('section'))
+			->where('class', '=', $request->input('class'))
+			->where('session', '=', trim($request->input('session')))
+			->where('exam', '=', $request->input('exam'))
+			->where('section_id', '=', $request->input('section'))
 			->get();
 			if(count($isGenerated)==0)
 			{
-				 $subjects            = Subject::select('name', 'code', 'type', 'subgroup')->where('class', '=', Input::get('class'))->get();
-				 $sectionsHas         = Student::select('section')->where('class', '=', Input::get('class'))->where('section', '=', Input::get('section'))->where('session', trim(Input::get('session')))->where('isActive', '=', 'Yes')->distinct()->orderBy('section', 'asc')->get();
-				 $sectionMarksSubmit  = Marks::select('section')->where('class', '=', Input::get('class'))->where('section', '=', Input::get('section'))->where('session', trim(Input::get('session')))->where('exam',Input::get('exam'))->distinct()->get();
+				 $subjects            = Subject::select('name', 'code', 'type', 'subgroup')->where('class', '=', $request->input('class'))->get();
+				 $sectionsHas         = Student::select('section')->where('class', '=', $request->input('class'))->where('section', '=', $request->input('section'))->where('session', trim($request->input('session')))->where('isActive', '=', 'Yes')->distinct()->orderBy('section', 'asc')->get();
+				 $sectionMarksSubmit  = Marks::select('section')->where('class', '=', $request->input('class'))->where('section', '=', $request->input('section'))->where('session', trim($request->input('session')))->where('exam',$request->input('exam'))->distinct()->get();
 				 
 				 //echo "ee<pre>";print_r($sectionsHas->toArray());
 				// echo "ew<pre>";print_r($sectionMarksSubmit->toArray());
@@ -1444,7 +1445,7 @@ public function combined_results($type,$regiNo,$exam,$class)
 					$isAllSubSectionMarkSubmit =false;
 					$notSubSection='';
 					foreach ($sectionsHas as $section) {
-						$marksubmit = Marks::select('subject')->where('class', '=', Input::get('class'))->where('section',$section->section)->where('session', trim(Input::get('session')))->where('exam',Input::get('exam'))->distinct()->get();
+						$marksubmit = Marks::select('subject')->where('class', '=', $request->input('class'))->where('section',$section->section)->where('session', trim($request->input('session')))->where('exam',$request->input('exam'))->distinct()->get();
 
 						if(count($subjects) == count($marksubmit))
 						{
@@ -1469,9 +1470,9 @@ public function combined_results($type,$regiNo,$exam,$class)
 						$students = Student::select('regiNo')
 									->join('section','Student.section','=','section.id')
 									->select('Student.*','section.name')
-									->where('Student.class',    '=', Input::get('class'))
-									->where('Student.section',  '=', Input::get('section'))
-									->where('Student.session',  '=', trim(Input::get('session')))
+									->where('Student.class',    '=', $request->input('class'))
+									->where('Student.section',  '=', $request->input('section'))
+									->where('Student.session',  '=', trim($request->input('session')))
 									->where('Student.isActive', '=', 'Yes')
 									->get();
                       //  echo "<pre>";print_r($students->toArray());exit;
@@ -1479,10 +1480,10 @@ public function combined_results($type,$regiNo,$exam,$class)
 							$marksSubmitStudents=Marks::select('Marks.regiNo')
 							->join('Student', 'Marks.regiNo', '=', 'Student.regiNo')
 							->where('Student.isActive', '=', 'Yes')
-							->where('Student.class', '=', Input::get('class'))
-							->where('Marks.class', '=', Input::get('class'))
-							->where('Marks.session', '=', trim(Input::get('session')))
-							->where('Marks.exam', '=', Input::get('exam'))
+							->where('Student.class', '=', $request->input('class'))
+							->where('Marks.class', '=', $request->input('class'))
+							->where('Marks.session', '=', trim($request->input('session')))
+							->where('Marks.exam', '=', $request->input('exam'))
 							->distinct()
 							->get();
 								//echo count($students).'mm'.count($marksSubmitStudents);exit;
@@ -1492,7 +1493,7 @@ public function combined_results($type,$regiNo,$exam,$class)
 								$foobar   = array();
 								foreach ($students as $student) {
 									
-									$marks 			= Marks::select('subject', 'grade', 'point', 'total','total_marks')->where('regiNo', '=', $student->regiNo)->where('exam', '=', Input::get('exam'))->get();
+									$marks 			= Marks::select('subject', 'grade', 'point', 'total','total_marks')->where('regiNo', '=', $student->regiNo)->where('exam', '=', $request->input('exam'))->get();
 									$totalpoint     = 0;
 									$totalmarks     = 0;
 									$subcounter     = 0;
@@ -1600,9 +1601,9 @@ public function combined_results($type,$regiNo,$exam,$class)
 									//echo "<pre>dd".$grandPoint ;print_r($grandGrade);
 									//echo "grade = ".$grade;
 									$merit          		= new MeritList;
-									$merit->class   		= Input::get('class');
-									$merit->session 		= trim(Input::get('session'));
-									$merit->exam    		= Input::get('exam');
+									$merit->class   		= $request->input('class');
+									$merit->session 		= trim($request->input('session'));
+									$merit->exam    		= $request->input('exam');
 									$merit->regiNo  		= $student->regiNo;
 									$merit->totalNo 		= $totalmarks;
 									$merit->point   		= $grandPoint;

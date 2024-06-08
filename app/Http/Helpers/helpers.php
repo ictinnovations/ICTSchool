@@ -1,10 +1,10 @@
 <?php
-use App\ClassModel;
-use App\Subject;
-use App\AcadamicYear;
-use App\Student;
-use App\FeeSetup;
-use App\FeeCol;
+use App\ModelsClassModel;
+use App\Models\Subject;
+use App\Models\AcadamicYear;
+use App\Models\Student;
+use App\Models\FeeSetup;
+use App\Models\FeeCol;
 use App\Http\Controllers\ictcoreController;
 use Carbon\Carbon;
 //use Storage;

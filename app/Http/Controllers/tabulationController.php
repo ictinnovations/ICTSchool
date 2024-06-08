@@ -1,13 +1,15 @@
 <?php
 namespace App\Http\Controllers;
+use DB;
+use App\Models\Marks;
+use App\Models\Student;
+use App\Models\Subject;
+use App\Models\ClassModel;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use App\ClassModel;
-use App\Subject;
-use App\Student;
-use App\Marks;
-use DB;
-use Maatwebsite\Excel\Facades\Excel;
+
 class tabulationController extends BaseController {
 
 	public function __construct() {
@@ -41,15 +43,15 @@ class tabulationController extends BaseController {
 	*
 	* @return Response
 	*/
-	public function getsheet()
+	public function getsheet(Request $request)
 	{
 
-		$inputs=Input::all();
+		$inputs=$request->all();
 		$input=(object)$inputs;
 		$subjects = Subject::select('name')->where('class',$input->class)->orderby('code','asc')->get();
 		if(count($subjects)<1)
 		{
-			return  Redirect::to('/tabulation')->withInput(Input::all())->with("error","There are not subjects for this class!");
+			return  Redirect::to('/tabulation')->withInput($request->all())->with("error","There are not subjects for this class!");
 		}
 
 		$students = Student::select('regiNo','firstName','middleName','lastName')->where('class',$input->class)->where('section',$input->section)->where('session',trim($input->session))
@@ -58,7 +60,7 @@ class tabulationController extends BaseController {
 
 		if(count($students)<1)
 		{
-			return  Redirect::to('/tabulation')->withInput(Input::all())->with("error","There are not student for this class!");
+			return  Redirect::to('/tabulation')->withInput($request->all())->with("error","There are not student for this class!");
 		}
 		$exam = DB::table('exam')->where('id',$input->exam)->first();
 		$merit = DB::table('MeritList')
@@ -72,7 +74,7 @@ class tabulationController extends BaseController {
 		//echo "<pre>";print_r($merit->get());exit;
 		if($merit->count()==0)
 		{
-			return  Redirect::to('/tabulation')->withInput(Input::all())->with("error","Marks not submit or result not generate for this exam!");
+			return  Redirect::to('/tabulation')->withInput($request->all())->with("error","Marks not submit or result not generate for this exam!");
 		}else{
 				$merit =$merit->get();
 		}
@@ -81,7 +83,7 @@ class tabulationController extends BaseController {
 			$marks=Marks::select('written','mcq','practical','ca','total','grade','point')->where('regiNo',$student->regiNo)->where('exam',$input->exam)->orderby('subject','asc')->get();
 			if(count($marks)<1)
 			{
-				return  Redirect::to('/tabulation')->withInput(Input::all())->with("error","Marks not submited yet!");
+				return  Redirect::to('/tabulation')->withInput($request->all())->with("error","Marks not submited yet!");
 			}
 			/*$marks = DB::table('Marks')
 			->join('MeritList', 'Marks.regiNo', '=', 'MeritList.regiNo')

@@ -1,12 +1,14 @@
 <?php
 namespace App\Http\Controllers;
+use DB;
+use App\Models\Exam;
+use App\Models\ClassModel;
+use App\Models\SectionModel;
+use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use App\Exam;
-use App\ClassModel;
-use App\SectionModel;
 
-use DB;
 class paperController extends BaseController {
 
 	public function __construct() {
@@ -37,7 +39,7 @@ class paperController extends BaseController {
 	*
 	* @return Response
 	*/
-	public function create()
+	public function create(Request $request)
 	{
 		$rules=[
 			'type' => 'required',
@@ -45,19 +47,19 @@ class paperController extends BaseController {
 			'section' => 'required'
 
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
 			return Redirect::to('/exam/create')->withErrors($validator);
 		}
 		else {
-			$type = Input::get('type');
+			$type = $request->input('type');
 
-			 $classes = DB::table('Class')->select("*")->where('code','=',Input::get('class'))->first();
+			 $classes = DB::table('Class')->select("*")->where('code','=',$request->input('class'))->first();
 
 			
 
-			$sexists=Exam::select('*')->where('type','=',$type)->where('class_id','=',$classes->id)->where('section_id','=',Input::get('section'))->get();
+			$sexists=Exam::select('*')->where('type','=',$type)->where('class_id','=',$classes->id)->where('section_id','=',$request->input('section'))->get();
 			if(count($sexists)>0){
 
 				$errorMessages = new \Illuminate\Support\MessageBag;
@@ -65,11 +67,11 @@ class paperController extends BaseController {
 				return Redirect::to('/exam/create')->withErrors($errorMessages);
 			}
 			else {
-				//echo "<pre>";print_r(Input::get('section'));exit;
-				foreach(Input::get('section') as $section_id)
+				//echo "<pre>";print_r($request->input('section'));exit;
+				foreach($request->input('section') as $section_id)
 				{
 					$exam = new Exam;
-					$exam->type = Input::get('type');
+					$exam->type = $request->input('type');
 					$exam->class_id = $classes->id;
 					$exam->section_id = $section_id;
 					$exam->save();
@@ -134,25 +136,25 @@ class paperController extends BaseController {
 	* @param  int  $id
 	* @return Response
 	*/
-	public function update()
+	public function update(Request $request)
 	{
 		$rules=[
 			'type' => 'required',
 			'class' => 'required',
 			'section' => 'required'
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
-			return Redirect::to('/exam/edit/'.Input::get('id'))->withErrors($validator);
+			return Redirect::to('/exam/edit/'.$request->input('id'))->withErrors($validator);
 		}
 		else {
 
-			$classes = DB::table('Class')->select("*")->where('code','=',Input::get('class'))->first();
-			$exam = Exam::find(Input::get('id'));
-			$exam->type = Input::get('type');
+			$classes = DB::table('Class')->select("*")->where('code','=',$request->input('class'))->first();
+			$exam = Exam::find($request->input('id'));
+			$exam->type = $request->input('type');
 			$exam->class_id = $classes->id;
-			$exam->section_id = Input::get('section');
+			$exam->section_id = $request->input('section');
 
 			$exam->save();
 			return Redirect::to('/exam/list')->with("success","Exam Updated Succesfully.");

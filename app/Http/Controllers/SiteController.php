@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
-use App\AboutContent;
-use App\AboutSlider;
-use App\Event;
-use App\SiteMeta;
-use App\Testimonial;
+use App\Models\AboutContent;
+use App\Models\AboutSlider;
+use App\Models\Event;
+use App\Models\SiteMeta;
+use App\Models\Testimonial;
 use App\Http\Helpers\AppHelper;
 
 

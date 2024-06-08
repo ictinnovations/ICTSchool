@@ -1,30 +1,32 @@
 <?php
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Redirect;
-use App\ClassModel;
-use App\Subject;
-use App\Attendance;
-use App\Student;
-use App\Message;
-use App\SectionAttendance;
-use App\Ictcore_attendance;
-use App\Ictcore_integration;
-use App\Institute;
 use DB;
-use Excel;
 use Auth;
-use App\SMSLog;
-use App\SectionModel;
-use App\Holidays;
-use App\ClassOff;
-use App\Http\Controllers\ictcoreController;
+use Excel;
+use Carbon\Carbon;
+use App\Models\SMSLog;
+use App\Models\Message;
+use App\Models\Student;
+use App\Models\Subject;
+use App\Models\ClassOff;
+use App\Models\Holidays;
+use App\Models\Institute;
+use App\Models\Attendance;
+use App\Models\ClassModel;
+use App\Models\SectionModel;
+use Illuminate\Http\Request;
+use App\Models\SectionAttendance;
+use App\Models\Ictcore_attendance;
+use Illuminate\Support\Collection;
+use App\Models\Ictcore_integration;
 
 Class formfoo{
 
 }
-use Illuminate\Support\Collection;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Redirect;
+use App\Http\Controllers\ictcoreController;
+
 class attendanceController extends BaseController {
 		public function __construct() {
 			/*$this->beforeFilter('csrf', array('on'=>'post'));
@@ -60,7 +62,7 @@ class attendanceController extends BaseController {
 			//return View::Make('app.attendanceCreateFile');
 			return View('app.attendanceCreateFile');
 		}
-		public function create()
+		public function create(Request $request)
 		{
 			$rules = [
 			'class' => 'required',
@@ -70,15 +72,15 @@ class attendanceController extends BaseController {
 			'regiNo' => 'required',
 			'date' => 'required',
 			];
-			$validator = \Validator::make(Input::all(), $rules);
+			$validator = \Validator::make($request->all(), $rules);
 			if ($validator->fails()) {
-			 return Redirect::to('/attendance/create')->withInput(Input::all())->withErrors($validator);
+			 return Redirect::to('/attendance/create')->withInput($request->all())->withErrors($validator);
 			} else {
 
 				$absentStudents = array();
-				$students = Input::get('regiNo');
-				$presents = Input::get('present');
-				$leave    = Input::get('leave');
+				$students = $request->input('regiNo');
+				$presents = $request->input('present');
+				$leave    = $request->input('leave');
                 //echo "<pre>present";print_r($presents);
                 //echo "<pre>leave";print_r($leave);
                 //exit;
@@ -113,15 +115,15 @@ class attendanceController extends BaseController {
              // echo "<pre>pp";print_r($stpresent);
              // echo "<pre>ab";print_r($absentStudents);
                 //exit;
-				$presentDate = $this->parseAppDate(Input::get('date'));
+				$presentDate = $this->parseAppDate($request->input('date'));
 				DB::beginTransaction();
 				try {
 					$i=0;
 
-                      $classc = DB::table('Class')->select('*')->where('code','=',Input::get('class'))->first();
+                      $classc = DB::table('Class')->select('*')->where('code','=',$request->input('class'))->first();
                       $class_id =  $classc->id;
 					foreach ($stpresent as $stp) {
-						 $atten = DB::table('Attendance')->where('section_id',Input::get('section'))->where('date','=',$presentDate)->where('regiNo','=',$stp['regiNo']);
+						 $atten = DB::table('Attendance')->where('section_id',$request->input('section'))->where('date','=',$presentDate)->where('regiNo','=',$stp['regiNo']);
 		                if($atten->count()==0){
 
 							$attenData= [
@@ -129,8 +131,8 @@ class attendanceController extends BaseController {
 							'regiNo' => $stp['regiNo'],
 							'status' => "Present",
 							'class_id'=>$class_id,
-							'section_id'=>Input::get('section'),
-							'session'=>Input::get('session'),
+							'section_id'=>$request->input('section'),
+							'session'=>$request->input('session'),
 							'created_at' => Carbon::now()
 							];
 							Attendance::insert($attenData);
@@ -149,8 +151,8 @@ class attendanceController extends BaseController {
 							'regiNo' => $absst,
 							'status' => "leave",
 							'class_id'=>$class_id,
-							'section_id'=>Input::get('section'),
-							'session'=>Input::get('session'),
+							'section_id'=>$request->input('section'),
+							'session'=>$request->input('session'),
 							'created_at' => Carbon::now()
 							];
 							}else{*/
@@ -159,8 +161,8 @@ class attendanceController extends BaseController {
 							'regiNo' => $absst,
 							'status' => "Absent",
 							'class_id'=>$class_id,
-							'section_id'=>Input::get('section'),
-							'session'=>Input::get('session'),
+							'section_id'=>$request->input('section'),
+							'session'=>$request->input('session'),
 							'created_at' => Carbon::now()
 							];
 							//}
@@ -184,7 +186,7 @@ class attendanceController extends BaseController {
 					return Redirect::to('/attendance/create')->withErrors($errorMessages);
 				}
 				
-				$isSendSMS = Input::get('isSendSMS');
+				$isSendSMS = $request->input('isSendSMS');
 				if ($isSendSMS == null) {
 					return Redirect::to('/attendance/create')->with("success", "Students attendance save Succesfully.");
 				} else {
@@ -192,7 +194,7 @@ class attendanceController extends BaseController {
 					
 					$student=array();
 					///////////////////////////////////////////////////////////////////////////////////////////////message Create in ictcore////////////////////////////////////////////////////////////////////////////////////////////
-				/*	$message = Message::find(Input::get('message'));
+				/*	$message = Message::find($request->input('message'));
 					$ict  = new ictcoreController();
 					$result = $ict->ictcore_api('messages/recordings','GET',$data=array() );
 					$array= array();
@@ -229,7 +231,7 @@ class attendanceController extends BaseController {
 						->join('Class', 'Student.class', '=', 'Class.code')
 						->select( 'Student.regiNo','Student.rollNo','Student.firstName','Student.middleName','Student.lastName','Student.fatherName','Student.fatherCellNo','Class.Name as class')
 						->where('Student.regiNo','=',$absst)
-						->where('Student.class',Input::get('class'))
+						->where('Student.class',$request->input('class'))
 						->first();
 						/////////////////////////////////////////////////////////////////////////////////////////////Contact Create in ictcore//////////////////////////////////////////////////////////////////////////////////////////
 						 
@@ -349,10 +351,10 @@ class attendanceController extends BaseController {
 		*
 		* @return Response
 		*/
-		public function create_file()
+		public function create_file(Request $request)
 		{
 
-			$file = Input::file('fileUpload');
+			$file = $request->file('fileUpload');
 			$ext = strtolower($file->getClientOriginalExtension());
 
 			$validator = \Validator::make(array('ext' => $ext),array('ext' => 'in:xls,xlsx')
@@ -362,7 +364,7 @@ class attendanceController extends BaseController {
 			} else {
 				try {
 							$toInsert = 0;
-	            $data = \Excel::load(Input::file('fileUpload'), function ($reader) { })->get();
+	            $data = \Excel::load($request->file('fileUpload'), function ($reader) { })->get();
 
 	        if(!empty($data) && $data->count()){
 						DB::beginTransaction();
@@ -473,7 +475,7 @@ class attendanceController extends BaseController {
 		* @param  int  $id
 		* @return Response
 		*/
-		public function show()
+		public function show(Request $request)
 		{
 			$formdata = new formfoo;
 			$formdata->class="";
@@ -503,10 +505,10 @@ class attendanceController extends BaseController {
 			$attendance = DB::table('Student')
 			->join('Attendance', 'Student.regiNo', '=', 'Attendance.regiNo')
 			->select('Student.id', 'Student.regiNo', 'Student.rollNo', 'Student.firstName', 'Student.middleName', 'Student.lastName','Student.class','Attendance.status')
-				//->where('Student.class','=',Input::get('class'))
-				//->where('Student.section','=',Input::get('section'))
+				//->where('Student.class','=',$request->input('class'))
+				//->where('Student.section','=',$request->input('section'))
 				//->Where('Student.shift','=','Morning')
-				//->where('Student.session','=',trim(Input::get('session')))
+				//->where('Student.session','=',trim($request->input('session')))
 				->where('Student.isActive', '=', 'Yes')
 				->where('Attendance.date', '=', $date )
 				->get();
@@ -517,7 +519,7 @@ class attendanceController extends BaseController {
 			return View('app.attendanceList',compact('classes','attendance','formdata'));
 		}
 
-		public function getlist()
+		public function getlist(Request $request)
 		{
 
 			$rules=[
@@ -528,13 +530,13 @@ class attendanceController extends BaseController {
 				'date' => 'required',
 
 			];
-			$validator = \Validator::make(Input::all(), $rules);
+			$validator = \Validator::make($request->all(), $rules);
 			if ($validator->fails())
 			{
 				return Redirect::to('/attendance/list/')->withErrors($validator);
 			}
 			else {
-				$date = $this->parseAppDate(Input::get('date'));
+				$date = $this->parseAppDate($request->input('date'));
 
 
 				/*$attendance = Student::with(['attendance' => function($query) use($date){
@@ -544,19 +546,19 @@ class attendanceController extends BaseController {
 	         $attendance = DB::table('Student')
 			->join('Attendance', 'Student.regiNo', '=', 'Attendance.regiNo')
 			->select('Student.id', 'Student.regiNo', 'Student.rollNo', 'Student.firstName', 'Student.middleName', 'Student.lastName','Student.class','Attendance.status')
-				->where('Student.class','=',Input::get('class'))
-				->where('Student.section','=',Input::get('section'))
+				->where('Student.class','=',$request->input('class'))
+				->where('Student.section','=',$request->input('section'))
 				->Where('Student.shift','=','Morning')
-				->where('Student.session','=',trim(Input::get('session')))
+				->where('Student.session','=',trim($request->input('session')))
 				->where('Student.isActive', '=', 'Yes')
 				->where('Attendance.date', '=', $date)
 				->get();
 				$formdata = new formfoo;
-				$formdata->class=Input::get('class');
-				$formdata->section=Input::get('section');
-				$formdata->shift=Input::get('shift');
-				$formdata->session=Input::get('session');
-				$formdata->date=Input::get('date');
+				$formdata->class=$request->input('class');
+				$formdata->section=$request->input('section');
+				$formdata->shift=$request->input('shift');
+				$formdata->session=$request->input('session');
+				$formdata->date=$request->input('date');
 				$classes2 = ClassModel::select('code','name')->orderby('code','asc')->pluck('name','code');
 
 				//return View::Make('app.attendanceList',compact('classes2','attendance','formdata'));
@@ -589,10 +591,10 @@ class attendanceController extends BaseController {
 		* @param  int  $id
 		* @return Response
 		*/
-		public function update()
+		public function update(Request $request)
 		{
-			$attd = Attendance::find(Input::get('id'));
-			$ispresent = Input::get('ispresent');
+			$attd = Attendance::find($request->input('id'));
+			$ispresent = $request->input('ispresent');
 			if($ispresent==null)
 			{
 				$attd->status="No";
@@ -629,10 +631,10 @@ class attendanceController extends BaseController {
              $attendance = DB::table('Student')
 			->join('Attendance', 'Student.regiNo', '=', 'Attendance.regiNo')
 			->select('Student.id', 'Student.regiNo', 'Student.rollNo', 'Student.firstName', 'Student.middleName', 'Student.lastName','Student.class','Attendance.status','Attendance.date')
-				->where('Student.class','=',Input::get('class'))
-				->where('Student.section','=',Input::get('section'))
+				->where('Student.class','=',$request->input('class'))
+				->where('Student.section','=',$request->input('section'))
 				->Where('Student.shift','=','Morning')
-				->where('Student.session','=',trim(Input::get('session')))
+				->where('Student.session','=',trim($request->input('session')))
 				->where('Student.isActive', '=', 'Yes')
 				->where('Attendance.date', '=', $date)
 				->where ('Attendance.status','=', 'Present')
@@ -676,9 +678,9 @@ class attendanceController extends BaseController {
 			$attendance = array();
 			return View('app.studentAttendance',compact('classes','formdata','attendance'));
 		}
-		public function getReport()
+		public function getReport(Request $request)
 		{
-			/*$student= Student::where('regiNo','=',Input::get('regiNo'))
+			/*$student= Student::where('regiNo','=',$request->input('regiNo'))
 			->where('Student.isActive', '=', 'Yes')
 			->first();
 
@@ -690,7 +692,7 @@ class attendanceController extends BaseController {
 					  //$query->where ('status','=', 'Present');
 				}])
 				//with('attendance')
-				->where('regiNo','=',Input::get('regiNo'))
+				->where('regiNo','=',$request->input('regiNo'))
 				//->where ('status','=', 'Present')
 				->where('isActive', '=', 'Yes')
 				->first();
@@ -709,38 +711,38 @@ class attendanceController extends BaseController {
 				'tdate'    => 'required',
 
 			];
-			$validator = \Validator::make(Input::all(), $rules);
+			$validator = \Validator::make($request->all(), $rules);
 			if ($validator->fails())
 			{
 				return Redirect::to('/attendance/report/')->withErrors($validator);
 			}
 			else {
-				$fdate = $this->parseAppDate(Input::get('fdate'));
-				$tdate = $this->parseAppDate(Input::get('tdate'));
+				$fdate = $this->parseAppDate($request->input('fdate'));
+				$tdate = $this->parseAppDate($request->input('tdate'));
 
 
 				/*$attendance = Student::with(['attendance' => function($query) use($date){
 
 				     $query->where('date',$date);
 				}])*/
-            	//echo "<pre>";print_r(Input::get('section'));exit;
+            	//echo "<pre>";print_r($request->input('section'));exit;
                
 	         $attendance = DB::table('Attendance')
 			->join('Student', 'Attendance.regiNo', '=', 'Student.regiNo')
 			->leftjoin('section', 'section.id', '=', 'Attendance.section_id')
 			->select('Attendance.id', 'Student.regiNo', 'Student.rollNo', 'Student.firstName', 'Student.middleName', 'Student.lastName','Student.class','Attendance.status','Attendance.section_id','Attendance.date','section.name as section');
-				if(Input::get('class')!='all'){
-			     $classc = DB::table('Class')->select('*')->where('code','=',Input::get('class'))->first();
+				if($request->input('class')!='all'){
+			     $classc = DB::table('Class')->select('*')->where('code','=',$request->input('class'))->first();
 				 $attendance=$attendance->where('Attendance.class_id','=',$classc->id);
-				//->where('Student.section','=',Input::get('section'))
-				 $attendance=$attendance->whereIn('Attendance.section_id', Input::get('section'));
+				//->where('Student.section','=',$request->input('section'))
+				 $attendance=$attendance->whereIn('Attendance.section_id', $request->input('section'));
 				}else{
 					$attendance=$attendance->where('Attendance.class_id','!=',NULL);
-					//->where('Student.section','=',Input::get('section'))
+					//->where('Student.section','=',$request->input('section'))
 				 	$attendance=$attendance->where('Attendance.section_id','!=', NULL);
 				}
 				//$attendance=$attendance->Where('Student.shift','=','Morning');
-				//->where('Student.session','=',trim(Input::get('session')))
+				//->where('Student.session','=',trim($request->input('session')))
 				$attendance=$attendance->where('Student.isActive', '=', 'Yes');
 				//->where('Attendance.date', '=', $date)
 				$attendance=$attendance->whereBetween('Attendance.date', [$fdate, $tdate]);
@@ -748,11 +750,11 @@ class attendanceController extends BaseController {
 				$attendance=$attendance->get();
 				//echo "<pre>";print_r($attendance);
 				$formdata = new formfoo;
-				$formdata->class=Input::get('class');
-				//$formdata->section=Input::get('section');
-				$formdata->shift=Input::get('shift');
-				$formdata->session=Input::get('session');
-				$formdata->date=Input::get('date');
+				$formdata->class=$request->input('class');
+				//$formdata->section=$request->input('section');
+				$formdata->shift=$request->input('shift');
+				$formdata->session=$request->input('session');
+				$formdata->date=$request->input('date');
 
 				$classes2 = ClassModel::select('code','name')->orderby('code','asc')->pluck('name','code');
 
@@ -822,13 +824,13 @@ class attendanceController extends BaseController {
     }
     public function getReport()
     {
-        $student= Student::where('regiNo', '=', Input::get('regiNo'))
+        $student= Student::where('regiNo', '=', $request->input('regiNo'))
             ->where('Student.isActive', '=', 'Yes')
             ->first();
 
         if(count($student)>0) {
             $student = Student::with('attendance')
-                ->where('regiNo', '=', Input::get('regiNo'))
+                ->where('regiNo', '=', $request->input('regiNo'))
                 ->where('isActive', '=', 'Yes')
                 ->first();
             $class = ClassModel::where('code', '=', $student->class)->first();
@@ -865,27 +867,27 @@ class attendanceController extends BaseController {
      *
      * @return Response
      */
-    public function holidayCreate()
+    public function holidayCreate(Request $request)
     {
         $rules=[
             'holiDate' => 'required'
         ];
-        $validator = \Validator::make(Input::all(), $rules);
+        $validator = \Validator::make($request->all(), $rules);
         if ($validator->fails())
         {
             return Redirect::to('/holiday/create')->withErrors($validator);
         }
         else {
 
-            $holiDayStart = \Carbon\Carbon::createFromFormat('d/m/Y',Input::get('holiDate'));
+            $holiDayStart = \Carbon\Carbon::createFromFormat('d/m/Y',$request->input('holiDate'));
             $holiDayEnd = null;
-            if(strlen(Input::get('holiDateEnd'))) {
-                $holiDayEnd = \Carbon\Carbon::createFromFormat('d/m/Y', Input::get('holiDateEnd'));
+            if(strlen($request->input('holiDateEnd'))) {
+                $holiDayEnd = \Carbon\Carbon::createFromFormat('d/m/Y', $request->input('holiDateEnd'));
             }
 
             $dateList = [];
 
-            $desc = Input::get('description');
+            $desc = $request->input('description');
 
             if($holiDayEnd){
                 if($holiDayEnd<$holiDayStart){
@@ -965,7 +967,7 @@ class attendanceController extends BaseController {
      *
      * @return Response
      */
-    public function classOffStore()
+    public function classOffStore(Request $request)
     {
 
         $rules=[
@@ -973,21 +975,21 @@ class attendanceController extends BaseController {
             'oType' => 'required',
 
         ];
-        $validator = \Validator::make(Input::all(), $rules);
+        $validator = \Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             return Redirect::to('/class-off')->withErrors($validator);
         }
         else {
 
-            $offDateStart = \Carbon\Carbon::createFromFormat('d/m/Y', Input::get('offDate'));
+            $offDateStart = \Carbon\Carbon::createFromFormat('d/m/Y', $request->input('offDate'));
             $offDateEnd = null;
-            if(strlen(Input::get('offDateEnd'))) {
-                $offDateEnd = \Carbon\Carbon::createFromFormat('d/m/Y', Input::get('offDateEnd'));
+            if(strlen($request->input('offDateEnd'))) {
+                $offDateEnd = \Carbon\Carbon::createFromFormat('d/m/Y', $request->input('offDateEnd'));
             }
 
             $offList = [];
-            $desc = Input::get('description');
-            $oType = Input::get('oType');
+            $desc = $request->input('description');
+            $oType = $request->input('oType');
 
 
 
@@ -1078,14 +1080,14 @@ class attendanceController extends BaseController {
     }
 
 
-    public function monthlyReport()
+    public function monthlyReport(Request $request)
     {
-        $class        = Input::get('class', null);
-        $section      = Input::get('section', null);
-         $session      = trim(Input::get('session', date('Y')));
-        $shift        = Input::get('shift', null);
-        $isPrint      = Input::get('print_view', null);
-        $yearMonth    = Input::get('yearMonth', date('Y-m'));
+        $class        = $request->input('class', null);
+        $section      = $request->input('section', null);
+         $session      = trim($request->input('session', date('Y')));
+        $shift        = $request->input('shift', null);
+        $isPrint      = $request->input('print_view', null);
+        $yearMonth    = $request->input('yearMonth', date('Y-m'));
 
         $classes2     = ClassModel::select('code', 'name')->orderby('code', 'asc')->get();
            if(!empty(FixData()['classes'])){
@@ -1102,7 +1104,7 @@ class attendanceController extends BaseController {
                 $errorMessages->add('Error', 'Please don\'t mess with inputs!!!');
                 return Redirect::to('/attendance/monthly-report')->withErrors($errorMessages);
             }
-            if(Input::get('regiNo')==''){
+            if($request->input('regiNo')==''){
               $students = Student::where('class', $class)
                 ->where('isActive', 'Yes')
                 ->where('session' , $session)
@@ -1116,7 +1118,7 @@ class attendanceController extends BaseController {
                 ->where('session' , $session)
                 ->where('shift'   , $shift)
                 ->where('section' , $section)
-                ->where('regiNo' , Input::get('regiNo'))
+                ->where('regiNo' , $request->input('regiNo'))
                  //->lists('regiNo');
                 ->pluck('regiNo');
             }
@@ -1179,7 +1181,7 @@ class attendanceController extends BaseController {
         	}else{
         		$keys=array();
         	}
-        	$type = Input::get('type');
+        	$type = $request->input('type');
             //            return $data;
            // echo "<pre>";print_r($keys);
             //exit;
@@ -1216,9 +1218,9 @@ class attendanceController extends BaseController {
         return $selectCol;
     }
 
-    public function attendance_detail()
+    public function attendance_detail(Request $request)
     {
-    	$action = Input::get('action');
+    	$action = $request->input('action');
     	if($action!=''):
     		$now   = Carbon::now();
 		    $year  =  $now->year;

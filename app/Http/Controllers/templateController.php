@@ -1,12 +1,13 @@
 <?php
 namespace App\Http\Controllers;
+use DB;
+use Storage;
+use App\Models\Message;
+use App\Models\ClassModel;
+use App\Models\Ictcore_integration;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use App\ClassModel;
-use App\Ictcore_integration;
-use App\Message;
-use Storage;
-use DB;
 use App\Http\Controllers\ictcoreController;
 
 class templateController extends BaseController {
@@ -38,7 +39,7 @@ class templateController extends BaseController {
 	*
 	* @return Response
 	*/
-	public function create()
+	public function create(Request $request)
 	{
 		$rules=[
 			'title' => 'required',
@@ -47,10 +48,10 @@ class templateController extends BaseController {
 			//'message' => 'required|mimes:wav',
 
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
-			if(Input::get('title')=='mark_notification'){
+			if($request->input('title')=='mark_notification'){
 				return Redirect::to('/template/creates')->withErrors($validator);
 			}
 			return Redirect::to('/template/create')->withErrors($validator);
@@ -59,13 +60,13 @@ class templateController extends BaseController {
 
             // echo "<pre>";print_r(Input::file('message'));exit;
 
-			$sname = Input::get('title');
+			$sname = $request->input('title');
 			$sexists=message::select('*')->where('name','=',$sname)->get();
 			if(count($sexists)>0){
 
 				$errorMessages = new \Illuminate\Support\MessageBag;
 				$errorMessages->add('deplicate', 'Title all ready exists!!');
-				if(Input::get('title')=='mark_notification'){
+				if($request->input('title')=='mark_notification'){
 					return Redirect::to('/template/creates')->withErrors($errorMessages);
 				}
 				return Redirect::to('/template/create')->withErrors($errorMessages);
@@ -74,26 +75,26 @@ class templateController extends BaseController {
 
 
 				$ictcore_message = new Message;
-				$ictcore_message->name = Input::get('title');
-				$ictcore_message->description = Input::get('description');
+				$ictcore_message->name = $request->input('title');
+				$ictcore_message->description = $request->input('description');
 			    $ictcore_message->recording ='';
 			    $ictcore_message->ictcore_recording_id ='';
                 $ictcore_message->ictcore_program_id  ='';
                 $ictcore_message->telenor_file_id  ='';
 				$ictcore_message->save();
-				if(Input::get('title')=='mark_notification'){
+				if($request->input('title')=='mark_notification'){
 					//return Redirect::to('/template/creates')->withErrors($errorMessages);
 					return Redirect::to('/template/list/')->with("success", "Message Created Succesfully.");
 				}
 				return Redirect::to('/template/list/')->with("success", "Message Created Succesfully.");
 
-               /* $remove_spaces =  str_replace(" ","_",Input::get('title'));
+               /* $remove_spaces =  str_replace(" ","_",$request->input('title'));
 
 				$fileName= $remove_spaces.'.'.Input::file('message')->getClientOriginalExtension();
 
 				$class = new Message;
-				$class->name = Input::get('title');
-				$class->description = Input::get('description');
+				$class->name = $request->input('title');
+				$class->description = $request->input('description');
 			    $class->recording =$fileName;
 
 				$class->save();
@@ -105,8 +106,8 @@ class templateController extends BaseController {
                    
 		    	if(!empty($ictcore_integration) && $ictcore_integration->ictcore_url && $ictcore_integration->ictcore_user && $ictcore_integration->ictcore_password){
 				$ictcore_api  = new ictcoreController();
-				$sname = Input::get('title');
-                $remove_spaces =  str_replace(" ","_",Input::get('title'));
+				$sname = $request->input('title');
+                $remove_spaces =  str_replace(" ","_",$request->input('title'));
 				$fileName= $remove_spaces.'.'.Input::file('message')->getClientOriginalExtension();
 
 				 $drctry = storage_path('app/public/messages/');
@@ -140,8 +141,8 @@ class templateController extends BaseController {
 
               }else{
                 $data = array(
-                             'name' => Input::get('title'),
-				             'description' => Input::get('description'),
+                             'name' => $request->input('title'),
+				             'description' => $request->input('description'),
 							 );
 
                  $recording_id  =  $ictcore_api->ictcore_api('messages/recordings','POST',$data );
@@ -151,7 +152,7 @@ class templateController extends BaseController {
                 if(!is_array($recording_id )){
 
                   $data = array(
-                             'name' => Input::get('title'),
+                             'name' => $request->input('title'),
 				             'recording_id' => $recording_id,
 							 );
                  $program_id = $ictcore_api->ictcore_api('programs/voicemessage','POST',$data );
@@ -165,8 +166,8 @@ class templateController extends BaseController {
                 }
             }
 				$ictcore_message = new Message;
-				$ictcore_message->name = Input::get('title');
-				$ictcore_message->description = Input::get('description');
+				$ictcore_message->name = $request->input('title');
+				$ictcore_message->description = $request->input('description');
 			    $ictcore_message->recording =$fileName;
 			    $ictcore_message->ictcore_recording_id =$recording_id;
                 $ictcore_message->ictcore_program_id  =$program_id;
@@ -229,22 +230,22 @@ class templateController extends BaseController {
 	* @param  int  $id
 	* @return Response
 	*/
-	public function update()
+	public function update(Request $request)
 	{
 		$rules=[
 			'title' => 'required',
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
-			if(Input::get('title')=='mark_notification'){
+			if($request->input('title')=='mark_notification'){
 					return Redirect::to('/template/creates')->withErrors($errorMessages);
 					return Redirect::to('/message/edit/'.$ictcore_message->id)->with("success", "Message Created Succesfully.");
 
 				}
 
 
-			return Redirect::to('/message/edit/'.Input::get('id'))->withErrors($validator);
+			return Redirect::to('/message/edit/'.$request->input('id'))->withErrors($validator);
 		}
 		else {
 
@@ -258,11 +259,11 @@ class templateController extends BaseController {
 			{
 				$messages = $validator->errors();
 				$messages->add('Notvalid!', 'Audio must be a audio wav!');
-				return Redirect::to('/message/edit/'.Input::get('id'))->withErrors($messages);
+				return Redirect::to('/message/edit/'.$request->input('id'))->withErrors($messages);
 			}
 			else {
 
-				$remove_spaces =  str_replace(" ","_",Input::get('title'));
+				$remove_spaces =  str_replace(" ","_",$request->input('title'));
 				$fileName= $remove_spaces.'.'.Input::file('message')->getClientOriginalExtension();
 
 				//$student->photo = $fileName;
@@ -272,7 +273,7 @@ class templateController extends BaseController {
 
 		}
 		else {
-			   $fileName = Input::get('recording');
+			   $fileName = $request->input('recording');
 
 		}*/
 
@@ -280,14 +281,14 @@ class templateController extends BaseController {
 
 
 
-			$message = Message::find(Input::get('id'));
-			$message->name= Input::get('title');
+			$message = Message::find($request->input('id'));
+			$message->name= $request->input('title');
 
-			$message->description=Input::get('description');
+			$message->description=$request->input('description');
 			//$message->recording=$fileName;
 
 			$message->save();
-			return Redirect::to('/message/edit/'.Input::get('id'))->with("success","Message Updated Succesfully.");
+			return Redirect::to('/message/edit/'.$request->input('id'))->with("success","Message Updated Succesfully.");
 
 		}
 	}

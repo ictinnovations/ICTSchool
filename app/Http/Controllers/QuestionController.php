@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
-use App\ClassModel;
-use App\Question;
-use App\QuestionTemp;
-use App\Subject;
+use App\Models\ClassModel;
+use App\Models\Question;
+use App\Models\QuestionTemp;
+use App\Models\Subject;
 use Carbon\Carbon;
 use DB;
 Class formfoo1{
@@ -60,7 +60,7 @@ class QuestionController extends Controller
 
     
 
-        $validator = \Validator::make(Input::all(), $rules);
+        $validator = \Validator::make($request->all(), $rules);
         if ($validator->fails())
         {
             return Redirect::to('/question/create')->withErrors($validator)->withInput();
@@ -134,7 +134,7 @@ class QuestionController extends Controller
     }
 
 
-    public function generate()
+    public function generate(Request $request)
     {
     	$formdata = new formfoo1;
 		$formdata->class="";
@@ -312,7 +312,7 @@ class QuestionController extends Controller
             'chapter' => 'required',
             'level' => 'required',
         ];
-        $validator = \Validator::make(Input::all(), $rules);
+        $validator = \Validator::make($request->all(), $rules);
         if ($validator->fails())
         {
             return Redirect::to('/question/create')->withErrors($validator)->withInput();

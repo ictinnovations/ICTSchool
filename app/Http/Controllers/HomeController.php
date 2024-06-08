@@ -1,14 +1,18 @@
 <?php
+
 namespace App\Http\Controllers;
+
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
-use App\Institute;
+use App\Models\Institute;
 /*use Illuminate\Foundation\Bus\DispatchesCommands;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;*/
-class HomeController extends BaseController {
+
+class HomeController extends BaseController
+{
 
 	/*
 	|--------------------------------------------------------------------------
@@ -26,17 +30,15 @@ class HomeController extends BaseController {
 	public function index()
 	{
 		$error = \Session::get('error');
-		$institute=Institute::select('name')->first();
-		if(!$institute)
-		{
-			$institute=new Institute;
-			$institute->name="ictvission";
+		$institute = Institute::select('name')->first();
+		if (!$institute) {
+			$institute = new Institute;
+			$institute->name = "ictvission";
 		}
 		//return View::make('login',compact('error','institute'));
-		 return view('login',compact('error','institute'));
+		return view('login', compact('error', 'institute'));
 
 		//echo "hello";
 
 	}
-
 }

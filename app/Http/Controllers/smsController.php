@@ -1,9 +1,11 @@
 <?php
 namespace App\Http\Controllers;
+use DB;
+use App\Models\SMSLog;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use App\SMSLog;
-use DB;
+
 class smsController extends BaseController {
 
 	public function __construct() {
@@ -31,7 +33,7 @@ class smsController extends BaseController {
 	*
 	* @return Response
 	*/
-	public function create()
+	public function create(Request $request)
 	{
 		$rules=[
 			'type' => 'required',
@@ -40,16 +42,16 @@ class smsController extends BaseController {
 
 
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
 			return Redirect::to('/sms')->withErrors($validator);
 		}
 		else {
 			$sms = new SMS;
-			$sms->type= Input::get('type');
-			$sms->sender=Input::get('sender');
-			$sms->message=Input::get('message');
+			$sms->type= $request->input('type');
+			$sms->sender=$request->input('sender');
+			$sms->message=$request->input('message');
 
 			$sms->save();
 			return Redirect::to('/sms')->with("success","SMS Format Created Succesfully.");
@@ -78,7 +80,7 @@ class smsController extends BaseController {
 	* @param  int  $id
 	* @return Response
 	*/
-	public function update()
+	public function update(Request $request)
 	{
 		$rules=[
 			'type' => 'required',
@@ -87,16 +89,16 @@ class smsController extends BaseController {
 
 
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
-			return Redirect::to('/sms/edit/'.Input::get('id'))->withErrors($validator);
+			return Redirect::to('/sms/edit/'.$request->input('id'))->withErrors($validator);
 		}
 		else {
-			$sms = SMS::find(Input::get('id'));
-			$sms->type= Input::get('type');
-			$sms->sender=Input::get('sender');
-			$sms->message=Input::get('message');
+			$sms = SMS::find($request->input('id'));
+			$sms->type= $request->input('type');
+			$sms->sender=$request->input('sender');
+			$sms->message=$request->input('message');
 			$sms->save();
 			return Redirect::to('/sms')->with("success","SMS Format Updated Succesfully.");
 
@@ -144,7 +146,7 @@ class smsController extends BaseController {
 	        return View('app.smsLog',compact('smslogs','foo'));
 
 	}
-	public function postsmsLog()
+	public function postsmsLog(Request $request)
 	{
 		$rules=[
 			'fromDate' => 'required',
@@ -153,14 +155,14 @@ class smsController extends BaseController {
 
 
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
 			return Redirect::to('/smslog')->withErrors($validator);
 		}
 		else {
-			$smslogs = SMSLog::select('*')->where(DB::raw('date(created_at)'),'>=',trim(Input::get('fromDate')))
-			->where(DB::raw('date(created_at)'),'<=',trim(Input::get('toDate')))->get();
+			$smslogs = SMSLog::select('*')->where(DB::raw('date(created_at)'),'>=',trim($request->input('fromDate')))
+			->where(DB::raw('date(created_at)'),'<=',trim($request->input('toDate')))->get();
 			$foo="1";
 			//return View::Make('app.smsLog',compact('smslogs','foo'));
 			return View('app.smsLog',compact('smslogs','foo'));

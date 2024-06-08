@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Permission;
+use App\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
@@ -27,16 +27,16 @@ class permissionController extends Controller
         $teacherd='';
         $studentss='';
         $accountant='';
-        if(Input::get('admin')){
+        if($request->input('admin')){
           $admin="yes";
         }
-        if(Input::get('teacher')){
+        if($request->input('teacher')){
           $teacherd="yes";
         }
-        if(Input::get('student')){
+        if($request->input('student')){
           $studentss="yes";
         }
-        if(Input::get('accountant')){
+        if($request->input('accountant')){
           $accountant="yes";
         }
        return view('app/permission',compact('permissions','admin','teacherd','studentss','accountant'));
@@ -140,8 +140,8 @@ class permissionController extends Controller
       foreach($permission_fields as $field){
         $permission_save = new Permission;
         $field_name = str_replace(" ","_",strtolower($field));
-        $admin =Input::get('admin');
-            if(!empty(Input::get('admin')) && in_array($field_name, array_keys(Input::get('admin')))){
+        $admin =$request->input('admin');
+            if(!empty($request->input('admin')) && in_array($field_name, array_keys($request->input('admin')))){
                 $permission_save->permission_name  =  $field_name ;
                 $permission_save->permission_group =  'admin'     ;
                 $permission_save->permission_type  =  'yes'       ;  
@@ -157,7 +157,7 @@ class permissionController extends Controller
         $permission_save = new Permission;
         $field_name = str_replace(" ","_",strtolower($field));
         
-            if(!empty(Input::get('student')) && in_array($field_name, array_keys(Input::get('student')))){
+            if(!empty($request->input('student')) && in_array($field_name, array_keys($request->input('student')))){
                 $permission_save->permission_name  =  $field_name ;
                 $permission_save->permission_group =  'student'     ;
                 $permission_save->permission_type  =  'yes'       ;  
@@ -172,7 +172,7 @@ class permissionController extends Controller
       foreach($permission_fields as $field){
         $permission_save = new Permission;
         $field_name = str_replace(" ","_",strtolower($field));
-            if(!empty(Input::get('teacher')) && in_array($field_name, array_keys(Input::get('teacher')))){
+            if(!empty($request->input('teacher')) && in_array($field_name, array_keys($request->input('teacher')))){
                 $permission_save->permission_name  =  $field_name ;
                 $permission_save->permission_group =  'teacher'     ;
                 $permission_save->permission_type  =  'yes'       ;  
@@ -188,7 +188,7 @@ class permissionController extends Controller
       foreach($permission_fields as $field){
         $permission_save = new Permission;
         $field_name = str_replace(" ","_",strtolower($field));
-            if(!empty(Input::get('accutant')) && in_array($field_name, array_keys(Input::get('accutant')))){
+            if(!empty($request->input('accutant')) && in_array($field_name, array_keys($request->input('accutant')))){
                 $permission_save->permission_name  =  $field_name ;
                 $permission_save->permission_group =  'accountant'     ;
                 $permission_save->permission_type  =  'yes'       ;  
@@ -207,7 +207,7 @@ class permissionController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Permission  $permission
+     * @param  \App\Models\Permission  $permission
      * @return \Illuminate\Http\Response
      */
     public function show(Permission $permission)
@@ -218,7 +218,7 @@ class permissionController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Permission  $permission
+     * @param  \App\Models\Permission  $permission
      * @return \Illuminate\Http\Response
      */
     public function edit(Permission $permission)
@@ -230,7 +230,7 @@ class permissionController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Permission  $permission
+     * @param  \App\Models\Permission  $permission
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Permission $permission)
@@ -241,7 +241,7 @@ class permissionController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Permission  $permission
+     * @param  \App\Models\Permission  $permission
      * @return \Illuminate\Http\Response
      */
     public function destroy(Permission $permission)

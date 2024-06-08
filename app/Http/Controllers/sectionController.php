@@ -1,9 +1,10 @@
 <?php
 namespace App\Http\Controllers;
+use DB;
+use App\Models\SectionModel;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use App\SectionModel;
-use DB;
 //
 class sectionController extends BaseController {
 
@@ -42,7 +43,7 @@ class sectionController extends BaseController {
 	*
 	* @return Response
 	*/
-	public function create()
+	public function create(Request $request)
 	{
 		$rules=[
 			'name' => 'required',
@@ -51,15 +52,15 @@ class sectionController extends BaseController {
 			//'description' => 'required',
 			'teacher_id' => 'required'
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
 			//return Redirect::to('/section/create')->withInput()->withErrors($validator);
 			return Redirect::to('/section/list')->withInput()->withErrors($validator);
 		}
 		else {
-			$sname = Input::get('name');
-			$sexists=SectionModel::select('*')->where('name','=',$sname)->where('class_code','=',Input::get('class'))->get();
+			$sname = $request->input('name');
+			$sexists=SectionModel::select('*')->where('name','=',$sname)->where('class_code','=',$request->input('class'))->get();
 			if(count($sexists)>0){
 
 				$errorMessages = new \Illuminate\Support\MessageBag;
@@ -69,13 +70,13 @@ class sectionController extends BaseController {
 			}
 			else {
 				$class = new SectionModel;
-				$class->name = Input::get('name');
-				$class->class_code = Input::get('class');
-				$class->description = Input::get('description');
-				if(Input::get('description')==''){
+				$class->name = $request->input('name');
+				$class->class_code = $request->input('class');
+				$class->description = $request->input('description');
+				if($request->input('description')==''){
 					$class->description = '';
 				}
-				$class->teacher_id = Input::get('teacher_id');
+				$class->teacher_id = $request->input('teacher_id');
 				$class->save();
 				//return Redirect::to('/section/create')->with("success", "Section Created Succesfully.");
 				return Redirect::to('/section/list')->with("success", "Section Created Succesfully.");
@@ -88,7 +89,7 @@ class sectionController extends BaseController {
 	*
 	* @return Response
 	*/
-	public function show()
+	public function show(Request $request)
 	{
 		//$Classes = ClassModel::orderby('code','asc')->get();
 		$sections = DB::table('section')
@@ -176,27 +177,27 @@ class sectionController extends BaseController {
 	* @param  int  $id
 	* @return Response
 	*/
-	public function update()
+	public function update(Request $request)
 	{
 		$rules=[
 			'name' => 'required',
 			//'description' => 'required',
 			'teacher_id' => 'required'
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
-			return Redirect::to('/section/edit/'.Input::get('id'))->withErrors($validator);
+			return Redirect::to('/section/edit/'.$request->input('id'))->withErrors($validator);
 		}
 		else {
-			$section = SectionModel::find(Input::get('id'));
-			$section->name= Input::get('name');
-            $section->class_code = Input::get('class');
-			$section->description=Input::get('description');
-			if(Input::get('description')==''){
+			$section = SectionModel::find($request->input('id'));
+			$section->name= $request->input('name');
+            $section->class_code = $request->input('class');
+			$section->description=$request->input('description');
+			if($request->input('description')==''){
 				$section->description='';
 			}
-			$section->teacher_id = Input::get('teacher_id');
+			$section->teacher_id = $request->input('teacher_id');
 			$section->save();
 			return Redirect::to('/section/list')->with("success","Section Updated Succesfully.");
 
@@ -260,9 +261,9 @@ class sectionController extends BaseController {
 		->join('section', 'section.id', '=', 'timetable.section_id')
 		->select('teacher.*','timetable.stattime','timetable.endtime','timetable.day','timetable.id as timetable_id','Subject.name AS subname' , 'section.name as section_id', 'section.class_code as classname')
 		->where('timetable.section_id',$id)
-		/*	->where('section',Input::get('section'))
-		->where('shift',Input::get('shift'))
-		->where('session',trim(Input::get('session')))*/
+		/*	->where('section',$request->input('section'))
+		->where('shift',$request->input('shift'))
+		->where('session',trim($request->input('session')))*/
 		->get();
 		// $timetables = DB::table('timetable')->where('timetable.teacher_id',$id)->get();
 		//echo "<pre>";print_r($timetables); exit;

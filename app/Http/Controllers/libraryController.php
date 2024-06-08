@@ -1,20 +1,22 @@
 <?php
 namespace App\Http\Controllers;
+use DB;
+use App\Models\Marks;
+use App\Models\FeeCol;
+use App\Models\AddBook;
+use App\Models\Student;
+use App\Models\Subject;
+use App\Models\FeeSetup;
+use App\Models\Institute;
+use App\Models\Issuebook;
+use App\Models\Accounting;
+use App\Models\Attendance;
+use App\Models\ClassModel;
+use App\Models\FeeHistory;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use App\Subject;
-use App\ClassModel;
-use App\Student;
-use App\Attendance;
-use App\Accounting;
-use App\Marks;
-use App\AddBook;
-use App\FeeCol;
-use App\FeeSetup;
-use App\Institute;
-use App\FeeHistory;
-use App\Issuebook;
-use DB;
+
 class formfoo7{
 }
 
@@ -42,7 +44,7 @@ class libraryController extends BaseController {
 	*
 	* @return Response
 	*/
-	public function postAddbook()
+	public function postAddbook(Request $request)
 	{
 		$rules=[
 			'code' => 'required|max:50',
@@ -51,13 +53,13 @@ class libraryController extends BaseController {
 			'type' => 'required',
 			'class' => 'required'
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
 			return Redirect::to('/library/addbook')->withErrors($validator)->withInput();
 		}
 		else {
-			$book=AddBook::select('*')->where('code',Input::get('code'))->get();
+			$book=AddBook::select('*')->where('code',$request->input('code'))->get();
 			if(count($book)>0)
 			{
 				$errorMessages = new Illuminate\Support\MessageBag;
@@ -66,15 +68,15 @@ class libraryController extends BaseController {
 			}
 			else {
 				$book = new AddBook();
-				$book->code = Input::get('code');
-				$book->title = Input::get('title');
-				$book->author = Input::get('author');
-				$book->quantity = Input::get('quantity');
-				$book->rackNo = Input::get('rackNo');
-				$book->rowNo = Input::get('rowNo');
-				$book->type = Input::get('type');
-				$book->class = Input::get('class');
-				$book->desc = Input::get('desc');
+				$book->code = $request->input('code');
+				$book->title = $request->input('title');
+				$book->author = $request->input('author');
+				$book->quantity = $request->input('quantity');
+				$book->rackNo = $request->input('rackNo');
+				$book->rowNo = $request->input('rowNo');
+				$book->type = $request->input('type');
+				$book->class = $request->input('class');
+				$book->desc = $request->input('desc');
 				$book->save();
 				return Redirect::to('/library/addbook')->with("success", "Book added to library Succesfully.");
 
@@ -100,10 +102,10 @@ class libraryController extends BaseController {
 		//return View::Make('app.booklist',compact('classes','formdata','books'));
 		return View('app.booklist',compact('classes','formdata','books'));
 	}
-	public function postviewbook()
+	public function postviewbook(Request $request)
 	{
 
-		if(Input::get('classcode')=="All"){
+		if($request->input('classcode')=="All"){
 			$books=AddBook::leftJoin('Class', function($join) {
 				$join->on('Books.class', '=', 'Class.code');
 			})
@@ -117,7 +119,7 @@ class libraryController extends BaseController {
 			$books = DB::table('Books')
 			->join('Class', 'Books.class', '=', 'Class.code')
 			->select('Books.id', 'Books.code', 'Books.title', 'Books.author','Books.quantity','Books.rackNo','Books.rowNo','Books.type','Books.desc','Class.Name as class')
-			->where('Books.class',Input::get('classcode'))->orderBy('id', 'desc')->paginate(50);
+			->where('Books.class',$request->input('classcode'))->orderBy('id', 'desc')->paginate(50);
 		}
 		//$books->setBaseUrl('view-show');
 		$books->withPath('view-show');
@@ -125,7 +127,7 @@ class libraryController extends BaseController {
 		$classes = $classes->toArray('All' , 'All') ;
 		//$classes = array('All' => 'All')+ClassModel::pluck('name','code');
 		$formdata = new formfoo7;
-		$formdata->class = Input::get('classcode');
+		$formdata->class = $request->input('classcode');
 		//return View::Make('app.booklist',compact('classes','formdata','books'));
 		return View('app.booklist',compact('classes','formdata','books'));
 
@@ -155,7 +157,7 @@ class libraryController extends BaseController {
 	* @param  int  $id
 	* @return Response
 	*/
-	public function postUpdateBook()
+	public function postUpdateBook(Request $request)
 	{
 		$rules=[
 			'code' => 'required|max:50',
@@ -164,23 +166,23 @@ class libraryController extends BaseController {
 			'type' => 'required',
 			'class' => 'required'
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
-			return Redirect::to('/library/edit/'.Input::get('id'))->withErrors($validator)->withInput();
+			return Redirect::to('/library/edit/'.$request->input('id'))->withErrors($validator)->withInput();
 		}
 		else {
 
-			$book = AddBook::find(Input::get('id'));
-			//$book->code = Input::get('code');
-			$book->title = Input::get('title');
-			$book->author = Input::get('author');
-			$book->quantity = Input::get('quantity');
-			$book->rackNo = Input::get('rackNo');
-			$book->rowNo = Input::get('rowNo');
-			$book->type = Input::get('type');
-			$book->class = Input::get('class');
-			$book->desc = Input::get('desc');
+			$book = AddBook::find($request->input('id'));
+			//$book->code = $request->input('code');
+			$book->title = $request->input('title');
+			$book->author = $request->input('author');
+			$book->quantity = $request->input('quantity');
+			$book->rackNo = $request->input('rackNo');
+			$book->rowNo = $request->input('rowNo');
+			$book->type = $request->input('type');
+			$book->class = $request->input('class');
+			$book->desc = $request->input('desc');
 			$book->save();
 			return Redirect::to('/library/view')->with("success", "Book updated Succesfully.");
 
@@ -216,7 +218,7 @@ class libraryController extends BaseController {
 		return View('app.bookissue',compact('students','books'));
 	}
 
-	public function postissueBook()
+	public function postissueBook(Request $request)
 	{
 
 		$rules=[
@@ -227,7 +229,7 @@ class libraryController extends BaseController {
 			'returnDate' => 'required',
 
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
 			return Redirect::to('/library/issuebook')->withErrors($validator)->withInput();
@@ -235,16 +237,16 @@ class libraryController extends BaseController {
 		else {
 
 
-			/*$availabeQuantity=DB::table('bookStock')->select('quantity')->where('code',Input::get('code'))->first();
+			/*$availabeQuantity=DB::table('bookStock')->select('quantity')->where('code',$request->input('code'))->first();
 
-			if(Input::get('quantity')>$availabeQuantity->quantity)
+			if($request->input('quantity')>$availabeQuantity->quantity)
 			{
 			$errorMessages = new Illuminate\Support\MessageBag;
 			$errorMessages->add('deplicate', 'This book quantity not availabe right now!');
 			return Redirect::to('/library/issuebook')->withErrors($errorMessages)->withInput();
 
 		}*/
-		$data=Input::all();
+		$data=$request->all();
 		$issueData = [];
 		$now=\Carbon\Carbon::now();
 		foreach ($data['bookCode'] as $key => $value){
@@ -262,14 +264,14 @@ class libraryController extends BaseController {
 		}
 		Issuebook::insert($issueData);
 		/*  $issuebook = new Issuebook();
-		$issuebook->code = Input::get('code');
-		$issuebook->quantity = Input::get('quantity');
-		$issuebook->regiNo = Input::get('regiNo');
-		$issuebook->issueDate = $this->parseAppDate(Input::get('issueDate'));
-		$issuebook->returnDate = $this->parseAppDate(Input::get('returnDate'));
-		$issuebook->fine = Input::get('fine');
+		$issuebook->code = $request->input('code');
+		$issuebook->quantity = $request->input('quantity');
+		$issuebook->regiNo = $request->input('regiNo');
+		$issuebook->issueDate = $this->parseAppDate($request->input('issueDate'));
+		$issuebook->returnDate = $this->parseAppDate($request->input('returnDate'));
+		$issuebook->fine = $request->input('fine');
 		$issuebook->save();*/
-		return Redirect::to('/library/issuebook')->with("success","Succesfully book borrowed for '".Input::get('regiNo')."'.");
+		return Redirect::to('/library/issuebook')->with("success","Succesfully book borrowed for '".$request->input('regiNo')."'.");
 
 	}
 
@@ -280,24 +282,24 @@ public function getissueBookview()
 	//return View::Make('app.bookissueview');
 	return View('app.bookissueview');
 }
-public function postissueBookview()
+public function postissueBookview(Request $request)
 {
 
-	if(Input::get('status')!="")
+	if($request->input('status')!="")
 	{
 		$books = Issuebook::select('*')
-		->Where('Status','=',Input::get('status'))
+		->Where('Status','=',$request->input('status'))
 		->get();
 		//return View::Make('app.bookissueview',compact('books'));
 		return View('app.bookissueview',compact('books'));
 	}
-	if(Input::get('regiNo')!="" || Input::get('code') !="" || Input::get('issueDate') !="" || Input::get('returnDate') !="")
+	if($request->input('regiNo')!="" || $request->input('code') !="" || $request->input('issueDate') !="" || $request->input('returnDate') !="")
 	{
 
-		$books = Issuebook::select('*')->where('regiNo','=',Input::get('regiNo'))
-		->orWhere('code','=',Input::get('code'))
-		->orWhere('issueDate','=',$this->parseAppDate(Input::get('issueDate')))
-		->orWhere('returnDate','=',$this->parseAppDate(Input::get('returnDate')))
+		$books = Issuebook::select('*')->where('regiNo','=',$request->input('regiNo'))
+		->orWhere('code','=',$request->input('code'))
+		->orWhere('issueDate','=',$this->parseAppDate($request->input('issueDate')))
+		->orWhere('returnDate','=',$this->parseAppDate($request->input('returnDate')))
 
 		->get();
 		//return View::Make('app.bookissueview',compact('books'));
@@ -317,7 +319,7 @@ public function getissueBookupdate($id)
 	//return View::Make('app.bookissueedit',compact('book'));
 	return View('app.bookissueedit',compact('book'));
 }
-public function postissueBookupdate()
+public function postissueBookupdate(Request $request)
 {
 	$rules=[
 		'regiNo' => 'required|max:20',
@@ -327,20 +329,20 @@ public function postissueBookupdate()
 		'status' => 'required',
 
 	];
-	$validator = \Validator::make(Input::all(), $rules);
+	$validator = \Validator::make($request->all(), $rules);
 	if ($validator->fails())
 	{
-		return Redirect::to('/library/issuebookupdate/'.Input::get('id'))->withErrors($validator);
+		return Redirect::to('/library/issuebookupdate/'.$request->input('id'))->withErrors($validator);
 	}
 	else {
 
-		$book = Issuebook::find(Input::get('id'));
-		$book->code = Input::get('code');
-		$book->regiNo = Input::get('regiNo');
-		$book->issueDate = $this->parseAppDate(Input::get('issueDate'));
-		$book->returnDate = $this->parseAppDate(Input::get('returnDate'));
-		$book->fine = Input::get('fine');
-		$book->Status = Input::get('status');
+		$book = Issuebook::find($request->input('id'));
+		$book->code = $request->input('code');
+		$book->regiNo = $request->input('regiNo');
+		$book->issueDate = $this->parseAppDate($request->input('issueDate'));
+		$book->returnDate = $this->parseAppDate($request->input('returnDate'));
+		$book->fine = $request->input('fine');
+		$book->Status = $request->input('status');
 		$book->save();
 		return Redirect::to('/library/issuebookview')->with("success","Succesfully book record updated.");
 
@@ -363,9 +365,9 @@ public function getsearch()
 	//return View::Make('app.booksearch',compact('classes'));
 	return View('app.booksearch',compact('classes'));
 }
-public function postsearch()
+public function postsearch(Request $request)
 {
-	if(Input::get('code')!="" || Input::get('title')!="" || Input::get('author') !="")
+	if($request->input('code')!="" || $request->input('title')!="" || $request->input('author') !="")
 	{
 		$query=AddBook::leftJoin('Class', function($join) {
 			$join->on('Books.class', '=', 'Class.code');
@@ -373,9 +375,9 @@ public function postsearch()
 		})
 		->join('bookStock','Books.code', '=', 'bookStock.code')
 		->select('Books.id', 'Books.code', 'Books.title', 'Books.author','bookStock.quantity','Books.rackNo','Books.rowNo','Books.type','Books.desc',DB::raw("IFNULL			(Class.Name,'All') as class"));
-		if(Input::get('code')!="") $query->where('Books.code','=',Input::get('code'));
-		if(Input::get('title')!="")$query->orWhere('Books.title','LIKE','%'.Input::get('title').'%');
-		if(Input::get('author') !="")$query->orWhere('Books.author','LIKE','%'.Input::get('author').'%');
+		if($request->input('code')!="") $query->where('Books.code','=',$request->input('code'));
+		if($request->input('title')!="")$query->orWhere('Books.title','LIKE','%'.$request->input('title').'%');
+		if($request->input('author') !="")$query->orWhere('Books.author','LIKE','%'.$request->input('author').'%');
 
 
 		$books=$query->get();
@@ -394,7 +396,7 @@ public function postsearch()
 
 	}
 }
-public function postsearch2()
+public function postsearch2(Request $request)
 {
 	$rules=[
 		'type' => 'required',
@@ -402,19 +404,19 @@ public function postsearch2()
 
 
 	];
-	$validator = \Validator::make(Input::all(), $rules);
+	$validator = \Validator::make($request->all(), $rules);
 	if ($validator->fails())
 	{
 		return Redirect::to('/library/search')->withErrors($validator);
 	}
 	else {
-		if(Input::get('class')=="All"){
+		if($request->input('class')=="All"){
 			$books=AddBook::leftJoin('Class', function($join) {
 				$join->on('Books.class', '=', 'Class.code');
 			})
 			->join('bookStock','Books.code', '=', 'bookStock.code')
 			->select('Books.id', 'Books.code', 'Books.title', 'Books.author','bookStock.quantity','Books.rackNo','Books.rowNo','Books.type','Books.desc',DB::raw("IFNULL(Class.Name,'All') as class"))
-			->where('Books.type',Input::get('type'))
+			->where('Books.type',$request->input('type'))
 			->get();
 
 		}
@@ -424,8 +426,8 @@ public function postsearch2()
 			->join('Class', 'Books.class', '=', 'Class.code')
 			->join('bookStock','Books.code', '=', 'bookStock.code')
 			->select('Books.id', 'Books.code', 'Books.title', 'Books.author','bookStock.quantity','Books.rackNo','Books.rowNo','Books.type','Books.desc','Class.Name as class')
-			->where('Books.class',Input::get('class'))
-			->where('Books.type',Input::get('type'))->get();
+			->where('Books.class',$request->input('class'))
+			->where('Books.type',$request->input('type'))->get();
 		}
 		//$classes = array('All' => 'All')+ClassModel::pluck('name','code');
 		$classes = ClassModel::pluck('name','code');

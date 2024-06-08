@@ -791,10 +791,10 @@ $get_data = branchesapi($branch->username,$branch->password,$branch->branch_url,
             var myChart = new Chart(ctx, {
     type: 'line',
     data: {
-          labels: ["<?php echo join($class, '","')?>"],
+          labels: ["<?php echo join('","', $class)?>"],
         datasets: [{
                     label: 'Present',
-                    data: ["<?php echo join($present, '","')?>"],
+                    data: ["<?php echo join('","', $absent)?>"],
                     backgroundColor:  "rgb(54, 162, 235)",
                     borderColor:  "rgb(54, 162, 235)",
                     fill: false,
@@ -802,7 +802,7 @@ $get_data = branchesapi($branch->username,$branch->password,$branch->branch_url,
                     pointHoverRadius: 20,
                 }, {
                     label: 'Absent',
-                    data: ["<?php echo join($absent, '","')?>"],
+                    data: ["<?php echo join('","', $absent )?>"],
                     backgroundColor: "rgb(255, 99, 132)",
                     borderColor: "rgb(255, 99, 132)",
                     fill: false,
@@ -852,7 +852,7 @@ Chart.defaults.global.legend = {
    var lineCharttest = new Chart(ctx, {
      type: 'line',
      data: {
-       labels: ["<?php echo join($incomes['key'], '","')?>"],
+       labels: ["<?php echo join('","', $incomes['key'])?>"],
        datasets: [{
          label: "Income",
          backgroundColor: "rgba(38, 185, 154, 0.31)",
@@ -862,7 +862,7 @@ Chart.defaults.global.legend = {
          pointHoverBackgroundColor: "#fff",
          pointHoverBorderColor: "rgba(220,220,220,1)",
          pointBorderWidth: 1,
-         data: [<?php echo join($incomes['value'], ',')?>]
+         data: [<?php echo join(',', $incomes['value'])?>]
        }, {
          label: "Expence",
          backgroundColor: "rgba(3, 88, 106, 0.3)",
@@ -872,7 +872,7 @@ Chart.defaults.global.legend = {
          pointHoverBackgroundColor: "#fff",
          pointHoverBorderColor: "rgba(151,187,205,1)",
          pointBorderWidth: 1,
-         data: [<?php echo join($expences['value'], ',')?>]
+         data: [<?php echo join(',', $expences['value'])?>]
        }]
      },
      options: {

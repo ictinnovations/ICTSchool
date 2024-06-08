@@ -4,16 +4,16 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Student;
-use App\User;
-use App\SectionModel;
-use App\ClassModel;
-use App\Referal;
-use App\FeeSetup;
-use App\AdmissionfeeCollection;
+use App\Models\Student;
+use App\Models\User;
+use App\Models\SectionModel;
+use App\Models\ClassModel;
+use App\Models\Referal;
+use App\Models\FeeSetup;
+use App\Models\AdmissionfeeCollection;
 use Hash;
 use DB;
-use App\Ictcore_integration;
+use App\Models\Ictcore_integration;
 use App\Http\Controllers\ictcoreController;
 use Carbon\Carbon;
 class foobar{
@@ -36,13 +36,13 @@ class studentController extends BaseController {
 	*
 	* @return Response
 	*/
-	public function index()
+	public function index(Request $request)
 	{
 		$classes = ClassModel::select('name','code')->get();
 		
 		$section = SectionModel::select('id','name')->where('class_code','=','cl1')->get();
 		//$sections = SectionModel::select('name')->get();
-		$family_id = Input::get('family_id');
+		$family_id = $request->input('family_id');
 		$families = DB::table('Student')
 					->join('Class', 'Student.class', '=', 'Class.code')
 					->join('section', 'Student.section', '=', 'section.id')
@@ -62,7 +62,7 @@ class studentController extends BaseController {
 	{
 
 		
-			$query = Input::get('query');
+			$query = $request->input('query');
 			$output="";
 			$data=DB::table('Student')
 			->join('Class','Student.class','=','Class.code')
@@ -101,7 +101,7 @@ class studentController extends BaseController {
 	{
 
 		
-			$query = Input::get('query');
+			$query = $request->input('query');
 			$output="";
 			$data=DB::table('Student')
 			->join('Class','Student.class','=','Class.code')
@@ -141,7 +141,7 @@ class studentController extends BaseController {
 	{
 
 		
-			$query = Input::get('query');
+			$query = $request->input('query');
 			$output="";
 			$data=DB::table('Student')->where('fatherCellNo','LIKE','%'.$query."%")
 			->groupBy('fatherCellNo')
@@ -161,10 +161,10 @@ class studentController extends BaseController {
 		      echo $output;
 		
 	}
-	public function get_family_id()
+	public function get_family_id(Request $request)
 	{
 		// return '98';
-		$query = Input::get('query');
+		$query = $request->input('query');
 		///return $query;
 		if(strlen($query)>=10 ){
 
@@ -206,10 +206,10 @@ class studentController extends BaseController {
 		}
 		//echo strlen($query);
 	}
-	public function get_family_data()
+	public function get_family_data(Request $request)
 	{
 		// return '98';
-		$query = Input::get('query');
+		$query = $request->input('query');
 
 		//$ex = explode('(', $query)
 		//preg_match_all('\[(\d+)=>([\d,]+)\]', $query, $matches);
@@ -277,7 +277,7 @@ if( preg_match( '!\(([^\)]+)\)!', $query, $match ) ){
 
 	public function getrefral($refral)
 	{
-		//$refral = Input::get('query');
+		//$refral = $request->input('query');
 		$data=DB::table('Student')
 		        ->where('fatherName','LIKE','%'.$refral.'%')
 		        ->orwhere('family_id','LIKE','%'.$refral.'%')
@@ -301,7 +301,7 @@ if( preg_match( '!\(([^\)]+)\)!', $query, $match ) ){
 	}
 	public function f_id_list($f_id)
 	{
-		//$refral = Input::get('query');
+		//$refral = $request->input('query');
 		$data=DB::table('Student')
 		        //->where('fatherName','LIKE','%'.$refral.'%')
 		        ->where('family_id','LIKE','%'.$f_id.'%')
@@ -425,27 +425,27 @@ if( preg_match( '!\(([^\)]+)\)!', $query, $match ) ){
 
 	
 
-	$validator = \Validator::make(Input::all(), $rules,$messsages);
-	$validator = \Validator::make(Input::all(), $rules,$messsages);
+	$validator = \Validator::make($request->all(), $rules,$messsages);
+	$validator = \Validator::make($request->all(), $rules,$messsages);
 
 
 	//$messages = array( 'lname' => 'The Lastname field is required' );
-	//$validator = \Validator::make(Input::all(), $rules, $messages);
-	//$validator = \Validator::make(Input::all(), $rules);
+	//$validator = \Validator::make($request->all(), $rules, $messages);
+	//$validator = \Validator::make($request->all(), $rules);
 	if ($validator->fails())
 	{
 		return Redirect::to('/student/create')->withErrors($validator)->withInput();
 	}
 	else {
-		if( preg_match( '!\(([^\)]+)\)!', Input::get('refer_by'), $match ) ){
+		if( preg_match( '!\(([^\)]+)\)!', $request->input('refer_by'), $match ) ){
     			$refer_by = $match[1];
 		}else{
-			$refer_by =Input::get('refer_by');
+			$refer_by =$request->input('refer_by');
 		}
-		if( preg_match( '!\(([^\)]+)\)!', Input::get('family_id'), $match ) ){
+		if( preg_match( '!\(([^\)]+)\)!', $request->input('family_id'), $match ) ){
     			$family_id = $match[1];
 		}else{
-			$family_id =Input::get('family_id');
+			$family_id =$request->input('family_id');
 		}
 
 		if($family_id ==$refer_by ){
@@ -456,13 +456,13 @@ if( preg_match( '!\(([^\)]+)\)!', $query, $match ) ){
 
 		$check_ids = DB::table('Student')
             			->where('family_id', '=', $family_id)
-						//->where('fatherCellNo', '=', Input::get('fatherCellNo'))
+						//->where('fatherCellNo', '=', $request->input('fatherCellNo'))
 						->get();
 			    $get_family_ids = array();
-			//echo "<pre>".Input::get('family_id');print_r($check_ids->toArray());
+			//echo "<pre>".$request->input('family_id');print_r($check_ids->toArray());
 			if(count($check_ids->toArray())>0){
 				foreach($check_ids as $f_id){
-					if($f_id->fatherCellNo==Input::get('fatherCellNo')){
+					if($f_id->fatherCellNo==$request->input('fatherCellNo')){
 						$get_family_ids[] = $f_id->family_id;
 					}
 				}
@@ -474,111 +474,111 @@ if( preg_match( '!\(([^\)]+)\)!', $query, $match ) ){
 			}
 //echo "testr";exit;
 
-		if(Input::file('photo')!=''){
+		if($request->file('photo')!=''){
 
-		$fileName=Input::get('regiNo').'.'.Input::file('photo')->getClientOriginalExtension();
+		$fileName=$request->input('regiNo').'.'.$request->file('photo')->getClientOriginalExtension();
 		
 		}else{
 			$fileName='';
 		}
         
 		$student = new Student;
-		$student->regiNo = Input::get('regiNo');
-		$student->discount_id = Input::get('discount_id');
-		if(Input::get('discount_id')==''){
+		$student->regiNo = $request->input('regiNo');
+		$student->discount_id = $request->input('discount_id');
+		if($request->input('discount_id')==''){
 			$student->discount_id = 0;
 		}
 		
-		/*if(Input::get('discount_id') ==''){
+		/*if($request->input('discount_id') ==''){
 			$student->discount_id = NULL;
 		}*/
-		$student->firstName = Input::get('fname');
+		$student->firstName = $request->input('fname');
 
-		$student->middleName = Input::get('mname');
-		if(Input::get('mname') ==''){
+		$student->middleName = $request->input('mname');
+		if($request->input('mname') ==''){
 			$student->middleName = "";
 		}
-		$student->lastName = Input::get('lname');
-		if(Input::get('lname') ==''){
+		$student->lastName = $request->input('lname');
+		if($request->input('lname') ==''){
 			$student->lastName = "";
 		}
-		$student->gender = Input::get('gender');
+		$student->gender = $request->input('gender');
 		
-		$student->religion = Input::get('religion');
+		$student->religion = $request->input('religion');
 
-		if(Input::get('religion') ==''){
+		if($request->input('religion') ==''){
 			$student->religion = "";
 		}
-		$student->bloodgroup = Input::get('bloodgroup');
+		$student->bloodgroup = $request->input('bloodgroup');
 
-		if(Input::get('bloodgroup')==''){
+		if($request->input('bloodgroup')==''){
 		$student->bloodgroup="";
 
 		}
-		$student->dob         = Input::get('dob');
-		if(Input::get('dob')==''){
+		$student->dob         = $request->input('dob');
+		if($request->input('dob')==''){
 			$student->dob         = '';
 		}
 		$student->session     = get_current_session()->id;
-		//$student->session= trim(Input::get('session'));
-		$student->class       = Input::get('class');
-		$student->section     = Input::get('section');
-		$student->group       = Input::get('group');
-		$student->rollNo      = Input::get('rollNo');
-		$student->shift       = Input::get('shift');
+		//$student->session= trim($request->input('session'));
+		$student->class       = $request->input('class');
+		$student->section     = $request->input('section');
+		$student->group       = $request->input('group');
+		$student->rollNo      = $request->input('rollNo');
+		$student->shift       = $request->input('shift');
 
 		$student->photo       = $fileName;
-		$student->nationality = Input::get('nationality');
-		if(Input::get('nationality') ==''){
+		$student->nationality = $request->input('nationality');
+		if($request->input('nationality') ==''){
 			$student->nationality="";
 		}
-		$student->extraActivity= Input::get('extraActivity');
-		if(Input::get('extraActivity') ==''){
+		$student->extraActivity= $request->input('extraActivity');
+		if($request->input('extraActivity') ==''){
 			$student->extraActivity = "";
 		}
-		$student->remarks= Input::get('remarks');
-       if(Input::get('remarks') ==''){
+		$student->remarks= $request->input('remarks');
+       if($request->input('remarks') ==''){
 			$student->remarks = "";
 		}
-		$student->b_form= Input::get('b_form');
-		if(Input::get('b_form')==''){
+		$student->b_form= $request->input('b_form');
+		if($request->input('b_form')==''){
 			$student->b_form         = '';
 		}
-		$student->fatherName= Input::get('fatherName');
-		$student->fatherCellNo= Input::get('fatherCellNo');
+		$student->fatherName= $request->input('fatherName');
+		$student->fatherCellNo= $request->input('fatherCellNo');
 		
-		$student->motherName= Input::get('motherName' );
-		if(Input::get('motherName')==''){
+		$student->motherName= $request->input('motherName' );
+		if($request->input('motherName')==''){
 			$student->motherName= "";
 			
 		}
-		$student->motherCellNo= Input::get('motherCellNo');
-		if(Input::get('motherCellNo')==''){
+		$student->motherCellNo= $request->input('motherCellNo');
+		if($request->input('motherCellNo')==''){
 			$student->motherCellNo="";
 		}
-		$student->localGuardian= Input::get('localGuardian');
-		if(Input::get('localGuardian')==''){
+		$student->localGuardian= $request->input('localGuardian');
+		if($request->input('localGuardian')==''){
 			$student->localGuardian="";
 		}
-		$student->localGuardianCell= Input::get('localGuardianCell');
-		if(Input::get('localGuardianCell') ==''){
+		$student->localGuardianCell= $request->input('localGuardianCell');
+		if($request->input('localGuardianCell') ==''){
 			$student->localGuardianCell="";
 		}
 
 		$student->family_id=$family_id;
-		$student->about_family=Input::get('familyc');
+		$student->about_family=$request->input('familyc');
 
-		$student->presentAddress= Input::get('presentAddress');
-		if(Input::get('presentAddress')==''){
+		$student->presentAddress= $request->input('presentAddress');
+		if($request->input('presentAddress')==''){
 			$student->presentAddress         = '';
 		}
-		$student->parmanentAddress= Input::get('parmanentAddress');
-		if(Input::get('parmanentAddress')==''){
+		$student->parmanentAddress= $request->input('parmanentAddress');
+		if($request->input('parmanentAddress')==''){
 			$student->parmanentAddress='';
 		}
 		$student->isActive= "Yes";
 
-		$hasStudent = Student::where('regiNo','=',Input::get('regiNo'))->where('class','=',Input::get('class'))->first();
+		$hasStudent = Student::where('regiNo','=',$request->input('regiNo'))->where('class','=',$request->input('class'))->first();
 		if ($hasStudent)
 		{
 			$messages = $validator->errors();
@@ -587,16 +587,16 @@ if( preg_match( '!\(([^\)]+)\)!', $query, $match ) ){
 		}
 		else {
 			$student->save();
-			if( Input::file('photo')!=''){
-             Input::file('photo')->move(base_path() .'/public/images',$fileName);
+			if( $request->file('photo')!=''){
+             $request->file('photo')->move(base_path() .'/public/images',$fileName);
          	}
-         	if(Input::get('adfee')>0){
+         	if($request->input('adfee')>0){
          		$admissionfee = new AdmissionfeeCollection;
          		$admissionfee->student_id = $student->id;
-         		$admissionfee->admission_fee = Input::get('adfee');
+         		$admissionfee->admission_fee = $request->input('adfee');
          		$admissionfee->save(); 
          	}
-         	if(Input::get('family_id')!='' && Input::get('refer_by')!='' /*&& Input::get('f_status')=='new'*/){
+         	if($request->input('family_id')!='' && $request->input('refer_by')!='' /*&& $request->input('f_status')=='new'*/){
 
          		$saverefral              = new Referal;
          		$saverefral->student_id  = $student->id;
@@ -606,12 +606,12 @@ if( preg_match( '!\(([^\)]+)\)!', $query, $match ) ){
          	}
                /*  $user = new User;
 
-                $user->firstname = Input::get('fname');
-                $user->lastname  = Input::get('lname');
-                $user->email =     Input::get('regiNo').'@gmail.com';
-              	$user->login     = Input::get('regiNo');
+                $user->firstname = $request->input('fname');
+                $user->lastname  = $request->input('lname');
+                $user->email =     $request->input('regiNo').'@gmail.com';
+              	$user->login     = $request->input('regiNo');
               	$user->group     =  'Student';
-                $user->password  =	Hash::make(Input::get('regiNo'));
+                $user->password  =	Hash::make($request->input('regiNo'));
                 $user->save();
 
                  $ictcore_integration = Ictcore_integration::select("*")->first();
@@ -627,7 +627,7 @@ if( preg_match( '!\(([^\)]+)\)!', $query, $match ) ){
 								);
 								$contact_id = $ict->ictcore_api('contacts','POST',$data );
 
-                               $message = 'School name'.'<br>'.'Login Name: '. Input::get('regiNo').'Password: '.Input::get('regiNo');
+                               $message = 'School name'.'<br>'.'Login Name: '. $request->input('regiNo').'Password: '.$request->input('regiNo');
                                 $data = array(
 								'name' => 'School Name',
 								'data' => $message,
@@ -688,13 +688,15 @@ public function show()
 	$formdata->section="";
 	$formdata->shift="";
 	$formdata->session="";
+
+	
 	//return View::Make("app.studentList",compact('students','classes','formdata'));
 	return View("app.studentList",compact('students','classes','formdata'));
 }
-public function getList()
+public function getList(Request $request)
 {
 	
-if(Input::get('search')==''){
+if($request->input('search')==''){
 	$rules = [
 		'class' => 'required',
 		'section' => 'required',
@@ -708,14 +710,14 @@ if(Input::get('search')==''){
 	
 	];
 }
-	$validator = \Validator::make(Input::all(), $rules);
+	$validator = \Validator::make($request->all(), $rules);
 	if ($validator->fails()) {
-		return Redirect::to('/student/list')->withInput(Input::all())->withErrors($validator);
+		return Redirect::to('/student/list')->withInput($request->all())->withErrors($validator);
 	} else {
 
-		if(Input::get('search')=='yes'){
-         //echo Input::get('student_name');
-            /*$exp       = explode('(',Input::get('student_name'));
+		if($request->input('search')=='yes'){
+         //echo $request->input('student_name');
+            /*$exp       = explode('(',$request->input('student_name'));
          	$class     = explode(')',$exp[1]);
          	$section   = explode(')',$exp[2]);
          	$regiNo    = explode(')',$exp[3]);
@@ -731,7 +733,7 @@ if(Input::get('search')==''){
 			->select('Student.id','Student.family_id', 'Student.regiNo', 'Student.rollNo', 'Student.firstName', 'Student.middleName', 'Student.lastName', 'Student.fatherName', 'Student.motherName', 'Student.fatherCellNo', 'Student.motherCellNo', 'Student.localGuardianCell',
 			'Class.Name as class','Class.code as class_code', 'Student.presentAddress', 'Student.gender', 'Student.session','section.name','section.id as section_id')
 			->where('Student.isActive', '=', 'Yes')
-			->where('Student.id',trim(Input::get('student_name')))
+			->where('Student.id',trim($request->input('student_name')))
 			//->where('session',trim($session1[1]))
 			//->where('regiNo',trim($regiNo1[1]))
 			->first();
@@ -739,10 +741,10 @@ if(Input::get('search')==''){
 			//exit;
          	return Redirect::to('student/view/'.$students->id);
 		}else{
-		$class_code	=Input::get('class');
-		$section_id=Input::get('section');
-		$shift=Input::get('shift');
-		$session_year =trim(Input::get('session'));
+		$class_code	=$request->input('class');
+		$section_id=$request->input('section');
+		$shift=$request->input('shift');
+		$session_year =trim($request->input('session'));
 		$students = DB::table('Student')
 		->join('Class', 'Student.class', '=', 'Class.code')
 		->join('section', 'Student.section', '=', 'section.id')
@@ -757,16 +759,16 @@ if(Input::get('search')==''){
 		}
 		if(count($students)<1)
 		{
-			return Redirect::to('/student/list')->withInput(Input::all())->with('error','No Students Found!');
+			return Redirect::to('/student/list')->withInput($request->all())->with('error','No Students Found!');
 
 		}
 		else {
 			$classes            = ClassModel::pluck('name','code');
 			$formdata           = new formfoo2;
-			$formdata->class    = Input::get('class');
-			$formdata->section  = Input::get('section');
-			$formdata->shift    = Input::get('shift');
-			$formdata->session  = trim(Input::get('session'));
+			$formdata->class    = $request->input('class');
+			$formdata->section  = $request->input('section');
+			$formdata->shift    = $request->input('shift');
+			$formdata->session  = trim($request->input('session'));
 			$month=8;
 			$fee_name=2;
 			//return View::Make("app.studentList", compact('students','classes','formdata'));
@@ -828,10 +830,10 @@ public function family_student_list($family_id)
 
 }
 
-public function add_family_discount($family_id){
+public function add_family_discount(Request $request, $family_id){
 
-	$ids = Input::get('student_id');
-	$dis = Input::get('discount');
+	$ids = $request->input('student_id');
+	$dis = $request->input('discount');
 	$i=0;
 	//echo "<pre>";print_r($ids);
 	//echo "<pre>";print_r($dis);
@@ -887,7 +889,7 @@ public function view($id)
         		$fee_name ='';
         	}
     /*$fee = DB::table('feesSetup')
-		       ->where('class',Input::get('class'))
+		       ->where('class',$request->input('class'))
 		       ->where('type','Monthly')
 		       ->first();*/
 	return View("app.studentView",compact('student','attendances','year','month','fee_name'));
@@ -921,7 +923,7 @@ public function edit($id)
 * @param  int  $id
 * @return Response
 */
-public function update()
+public function update(Request $request)
 {
 
 	$rules=[
@@ -945,147 +947,147 @@ public function update()
 		//'presentAddress' => 'required',
 		//'parmanentAddress' => 'required'
 	];
-	$validator = \Validator::make(Input::all(), $rules);
+	$validator = \Validator::make($request->all(), $rules);
 	if ($validator->fails())
 	{
-		return Redirect::to('/student/edit/'.Input::get('id'))->withErrors($validator);
+		return Redirect::to('/student/edit/'.$request->input('id'))->withErrors($validator);
 	}
 	else {
 
-		$student = Student::find(Input::get('id'));
+		$student = Student::find($request->input('id'));
 
 		if(Input::hasFile('photo'))
 		{
 
-			if(substr(Input::file('photo')->getMimeType(), 0, 5) != 'image')
+			if(substr($request->file('photo')->getMimeType(), 0, 5) != 'image')
 			{
 				$messages = $validator->errors();
 				$messages->add('Notvalid!', 'Photo must be a image,jpeg,jpg,png!');
-				return Redirect::to('/student/edit/'.Input::get('id'))->withErrors($messages);
+				return Redirect::to('/student/edit/'.$request->input('id'))->withErrors($messages);
 			}
 			else {
 
-				$fileName=Input::get('regiNo').'.'.Input::file('photo')->getClientOriginalExtension();
+				$fileName=$request->input('regiNo').'.'.$request->file('photo')->getClientOriginalExtension();
 				$student->photo = $fileName;
-				Input::file('photo')->move(base_path() .'/public/images',$fileName);
+				$request->file('photo')->move(base_path() .'/public/images',$fileName);
 			}
 
 		}
 		else {
-			$student->photo= Input::get('oldphoto');
+			$student->photo= $request->input('oldphoto');
 
 		}
-		//$student->regiNo=Input::get('regiNo');
-		//$student->rollNo=Input::get('rollNo');
-		/*$student->firstName= Input::get('fname');
-		$student->middleName= Input::get('mname');
-		$student->lastName= Input::get('lname');
-		$student->gender= Input::get('gender');
-		$student->religion= Input::get('religion');
-		$student->bloodgroup= Input::get('bloodgroup');
-		$student->nationality= Input::get('nationality');
-		$student->dob= Input::get('dob');
-		$student->session= trim(Input::get('session'));
-		$student->class= Input::get('class');
-		$student->section= Input::get('section');
-		$student->group= Input::get('group');
-		$student->nationality= Input::get('nationality');
-		$student->extraActivity= Input::get('extraActivity');
-		$student->remarks= Input::get('remarks');
+		//$student->regiNo=$request->input('regiNo');
+		//$student->rollNo=$request->input('rollNo');
+		/*$student->firstName= $request->input('fname');
+		$student->middleName= $request->input('mname');
+		$student->lastName= $request->input('lname');
+		$student->gender= $request->input('gender');
+		$student->religion= $request->input('religion');
+		$student->bloodgroup= $request->input('bloodgroup');
+		$student->nationality= $request->input('nationality');
+		$student->dob= $request->input('dob');
+		$student->session= trim($request->input('session'));
+		$student->class= $request->input('class');
+		$student->section= $request->input('section');
+		$student->group= $request->input('group');
+		$student->nationality= $request->input('nationality');
+		$student->extraActivity= $request->input('extraActivity');
+		$student->remarks= $request->input('remarks');
 
-		$student->fatherName= Input::get('fatherName');
-		$student->fatherCellNo= Input::get('fatherCellNo');
-		$student->motherName= Input::get('motherName');
-		$student->motherCellNo= Input::get('motherCellNo');
-		$student->localGuardian= Input::get('localGuardian');
-		$student->localGuardianCell= Input::get('localGuardianCell');
-		$student->shift= Input::get('shift');
+		$student->fatherName= $request->input('fatherName');
+		$student->fatherCellNo= $request->input('fatherCellNo');
+		$student->motherName= $request->input('motherName');
+		$student->motherCellNo= $request->input('motherCellNo');
+		$student->localGuardian= $request->input('localGuardian');
+		$student->localGuardianCell= $request->input('localGuardianCell');
+		$student->shift= $request->input('shift');
 
-		$student->presentAddress= Input::get('presentAddress');
-		$student->parmanentAddress= Input::get('parmanentAddress');*/
+		$student->presentAddress= $request->input('presentAddress');
+		$student->parmanentAddress= $request->input('parmanentAddress');*/
 
-		$student->firstName = Input::get('fname');
+		$student->firstName = $request->input('fname');
 
-		$student->middleName = Input::get('mname');
-		if(Input::get('mname') ==''){
+		$student->middleName = $request->input('mname');
+		if($request->input('mname') ==''){
 			$student->middleName = "";
 		}
-		$student->lastName = Input::get('lname');
-		if(Input::get('lname')==''){
+		$student->lastName = $request->input('lname');
+		if($request->input('lname')==''){
 			$student->lastName ="";
 		}
-		$student->gender= Input::get('gender');
+		$student->gender= $request->input('gender');
 		
-		$student->religion= Input::get('religion');
+		$student->religion= $request->input('religion');
 
-		if(Input::get('religion') ==''){
+		if($request->input('religion') ==''){
 			$student->religion = "";
 		}
-		$student->bloodgroup= Input::get('bloodgroup');
+		$student->bloodgroup= $request->input('bloodgroup');
 
-		if(Input::get('bloodgroup')==''){
+		if($request->input('bloodgroup')==''){
 		$student->bloodgroup="";
 
 		}
-		$student->dob= Input::get('dob');
-		if(Input::get('dob')==''){
+		$student->dob= $request->input('dob');
+		if($request->input('dob')==''){
 			$student->dob='';
 		}
-		$student->session= trim(Input::get('session'));
-		$student->class= Input::get('class');
-		$student->section= Input::get('section');
-		$student->group= Input::get('group');
-		//$student->rollNo= Input::get('rollNo');
-		$student->shift= Input::get('shift');
+		$student->session= trim($request->input('session'));
+		$student->class= $request->input('class');
+		$student->section= $request->input('section');
+		$student->group= $request->input('group');
+		//$student->rollNo= $request->input('rollNo');
+		$student->shift= $request->input('shift');
 
 		//$student->photo= $fileName;
-		$student->nationality= Input::get('nationality');
-		if(Input::get('nationality') ==''){
+		$student->nationality= $request->input('nationality');
+		if($request->input('nationality') ==''){
 			$student->nationality="";
 		}
-		$student->extraActivity= Input::get('extraActivity');
-		if(Input::get('extraActivity') ==''){
+		$student->extraActivity= $request->input('extraActivity');
+		if($request->input('extraActivity') ==''){
 			$student->extraActivity = "";
 		}
-		$student->remarks= Input::get('remarks');
-       if(Input::get('remarks') ==''){
+		$student->remarks= $request->input('remarks');
+       if($request->input('remarks') ==''){
 			$student->remarks = "";
 		}
-		$student->b_form= Input::get('b_form');
-		if(Input::get('b_form')==''){
+		$student->b_form= $request->input('b_form');
+		if($request->input('b_form')==''){
 			$student->b_form= "";
 		}
-		$student->fatherName= Input::get('fatherName');
-		$student->fatherCellNo= Input::get('fatherCellNo');
+		$student->fatherName= $request->input('fatherName');
+		$student->fatherCellNo= $request->input('fatherCellNo');
 		
-		$student->motherName= Input::get('motherName' );
-		if(Input::get('motherName')==''){
+		$student->motherName= $request->input('motherName' );
+		if($request->input('motherName')==''){
 			$student->motherName= "";
 			
 		}
-		$student->motherCellNo= Input::get('motherCellNo');
-		if(Input::get('motherCellNo')==''){
+		$student->motherCellNo= $request->input('motherCellNo');
+		if($request->input('motherCellNo')==''){
 			$student->motherCellNo="";
 		}
-		$student->localGuardian= Input::get('localGuardian');
-		if(Input::get('localGuardian')==''){
+		$student->localGuardian= $request->input('localGuardian');
+		if($request->input('localGuardian')==''){
 			$student->localGuardian="";
 		}
-		$student->localGuardianCell= Input::get('localGuardianCell');
-		if(Input::get('localGuardianCell') ==''){
+		$student->localGuardianCell= $request->input('localGuardianCell');
+		if($request->input('localGuardianCell') ==''){
 			$student->localGuardianCell="";
 		}
 
-		$student->presentAddress= Input::get('presentAddress');
-		if(Input::get('presentAddress')==''){
+		$student->presentAddress= $request->input('presentAddress');
+		if($request->input('presentAddress')==''){
 			$student->presentAddress= "";
 		}
-		$student->parmanentAddress= Input::get('parmanentAddress');
-		if(Input::get('parmanentAddress')==''){
+		$student->parmanentAddress= $request->input('parmanentAddress');
+		if($request->input('parmanentAddress')==''){
 			$student->parmanentAddress='';
 		}
-        $student->discount_id = Input::get('discount_id');
-		if(Input::get('discount_id') ==''){
+        $student->discount_id = $request->input('discount_id');
+		if($request->input('discount_id') ==''){
 			$student->discount_id = 0;
 		}
 
@@ -1119,7 +1121,7 @@ public function family_edit($family_id)
 	return View("app.familyEdit",compact('student','classes','sections','family_id'));
 }
 
-public function family_update()
+public function family_update(Request $request)
 {
 	$rules=[
 		'familb'      => 'required',
@@ -1127,21 +1129,21 @@ public function family_update()
 		'cell_phone'  => 'required',
 		'adfamily_id' => 'required',
 	];
-	$validator = \Validator::make(Input::all(), $rules);
+	$validator = \Validator::make($request->all(), $rules);
 	if ($validator->fails())
 	{
-		return Redirect::to('family/edit/'.Input::get('family_id'))->withErrors($validator);
+		return Redirect::to('family/edit/'.$request->input('family_id'))->withErrors($validator);
 	}
 	else {
-		$family_id   = trim(Input::get('family_id'));
-		$family_idn  = trim(Input::get('adfamily_id'));
-		$fathername  = trim(Input::get('f-name'));
-		$cell_phone  = trim(Input::get('cell_phone'));
+		$family_id   = trim($request->input('family_id'));
+		$family_idn  = trim($request->input('adfamily_id'));
+		$fathername  = trim($request->input('f-name'));
+		$cell_phone  = trim($request->input('cell_phone'));
 
 
 			$check_ids = DB::table('Student')
-            			->where('family_id', '<>', Input::get('family_id'))
-						->orwhere('fatherCellNo', '<>', Input::get('family_id'))
+            			->where('family_id', '<>', $request->input('family_id'))
+						->orwhere('fatherCellNo', '<>', $request->input('family_id'))
 				/*->where(function($q) use( $family_id) {
 			        $q->where('family_id', '<>', $family_id);
 			        ->orwhere('fatherCellNo', '<>', $family_id);
@@ -1150,7 +1152,7 @@ public function family_update()
 			    $get_family_ids = array();
 			foreach($check_ids as $f_id){
 
-				/*if( Input::get('adfamily_id') === $f_id->family_id && ($f_id->family_id==$family_id || $family_id===$f_id->fatherCellNo)){
+				/*if( $request->input('adfamily_id') === $f_id->family_id && ($f_id->family_id==$family_id || $family_id===$f_id->fatherCellNo)){
 							echo "ewew";
 				}else{
 					echo "dsds";
@@ -1160,32 +1162,32 @@ public function family_update()
 				}
 			}
             //echo "<pre>".$family_id;print_r($get_family_ids);exit;
-			if(in_array(Input::get('adfamily_id'), $get_family_ids)){
+			if(in_array($request->input('adfamily_id'), $get_family_ids)){
 
-					return Redirect::to('family/edit/'.Input::get('family_id'))->withErrors('Family Id Already Assign Other Family plase select different ID');
+					return Redirect::to('family/edit/'.$request->input('family_id'))->withErrors('Family Id Already Assign Other Family plase select different ID');
 			}
 
 
 
 		DB::table('Student')
-            		//->where('family_id', '=', Input::get('family_id'))
-					//->orwhere('fatherCellNo', '=', Input::get('family_id'))
+            		//->where('family_id', '=', $request->input('family_id'))
+					//->orwhere('fatherCellNo', '=', $request->input('family_id'))
 					->where(function($q) use( $family_id) {
 				        $q->where('Student.family_id', '=', $family_id)
 				        ->orWhere('Student.fatherCellNo', '=', $family_id);
 				    })
-            		->update(['about_family' => Input::get('familb'),'family_id' => $family_idn,'fatherName' =>$fathername,'fatherCellNo' =>$cell_phone ]);
+            		->update(['about_family' => $request->input('familb'),'family_id' => $family_idn,'fatherName' =>$fathername,'fatherCellNo' =>$cell_phone ]);
 
 			return Redirect::to('/family/list')->with("success","Family Updated Succesfully.");	
 	}
 
 }
 
-public function add_family_student($f_id)
+public function add_family_student(Request $request, $f_id)
 {
 
 	//..echo $f_id;
-	//print_r(Input::get('regino'));
+	//print_r($request->input('regino'));
 
 	$fm = DB::table('Student')
             		
@@ -1200,22 +1202,22 @@ public function add_family_student($f_id)
 		$fatherCellNo = $fm->fatherCellNo;
 
 		DB::table('Student')
-			  ->whereIn('id',Input::get('regino'))
+			  ->whereIn('id',$request->input('regino'))
 			  ->update(['family_id' => $family_id,'fatherName' =>$fatherName,'fatherCellNo' =>$fatherCellNo ]);
 
 			  return Redirect::to('/family/students/'.$f_id)->with("success","Family Updated Succesfully.");	
 		//echo "<pre>";print_r($fm);
-            		//->update(['about_family' => Input::get('familb'),'family_id' => $family_idn,'fatherName' =>$fathername,'fatherCellNo' =>$cell_phone ]);
+            		//->update(['about_family' => $request->input('familb'),'family_id' => $family_idn,'fatherName' =>$fathername,'fatherCellNo' =>$cell_phone ]);
 }
-public function shift_student_family($f_id)
+public function shift_student_family(Request $request, $f_id)
 {
 
-	echo "<pre>";print_r(Input::all());
+	// echo "<pre>";print_r($request->all());
 	$fm = DB::table('Student')
             		
 		->where(function($q) use( $f_id) {
-				$q->where('Student.family_id', '=', Input::get('f_id'))
-				->orWhere('Student.fatherCellNo', '=', Input::get('f_phone'));
+				$q->where('Student.family_id', '=', $request->input('f_id'))
+				->orWhere('Student.fatherCellNo', '=', $request->input('f_phone'));
 		})
 		->first();
 		if(empty($fm)){
@@ -1223,7 +1225,7 @@ public function shift_student_family($f_id)
 			return Redirect::to('family/students/'.$f_id)->with("error","Family Not Found.");
 
 		}else{
-			$sids = Input::get('sid');
+			$sids = $request->input('sid');
 			///foreach($sids as $id){
 			DB::table('Student')
 			  ->whereIn('id',$sids)
@@ -1233,7 +1235,7 @@ public function shift_student_family($f_id)
 
 		}
 	//..echo $f_id;
-	//print_r(Input::get('regino'));
+	//print_r($request->input('regino'));
 
 	/*$fm = DB::table('Student')
             		
@@ -1248,12 +1250,12 @@ public function shift_student_family($f_id)
 		$fatherCellNo = $fm->fatherCellNo;
 
 		DB::table('Student')
-			  ->whereIn('id',Input::get('regino'))
+			  ->whereIn('id',$request->input('regino'))
 			  ->update(['family_id' => $family_id,'fatherName' =>$fatherName,'fatherCellNo' =>$fatherCellNo ]);
 
 			  return Redirect::to('/family/students/'.$f_id)->with("success","Family Updated Succesfully.");	*/
 		//echo "<pre>";print_r($fm);
-            		//->update(['about_family' => Input::get('familb'),'family_id' => $family_idn,'fatherName' =>$fathername,'fatherCellNo' =>$cell_phone ]);
+            		//->update(['about_family' => $request->input('familb'),'family_id' => $family_idn,'fatherName' =>$fathername,'fatherCellNo' =>$cell_phone ]);
 }
 
 
@@ -1308,9 +1310,9 @@ public function index_file(){
 
 
 }
-public function create_file(){
+public function create_file(Request $request){
 
-$file = Input::file('fileUpload');
+$file = $request->file('fileUpload');
 			$ext = strtolower($file->getClientOriginalExtension());
 			$validator = \Validator::make(array('ext' => $ext),array('ext' => 'in:xls,xlsx,csv'));
 
@@ -1319,7 +1321,7 @@ $file = Input::file('fileUpload');
 			}else {
 				    try{
 						$toInsert = 0;
-			            $data = \Excel::load(Input::file('fileUpload'), function ($reader) { })->get();
+			            $data = \Excel::load($request->file('fileUpload'), function ($reader) { })->get();
 
 			             
 
@@ -1469,18 +1471,18 @@ public function access($id)
    return Redirect::to('/student/list')->with("error","Teacher not found.");
 }
 
-public function send_sms()
+public function send_sms(Request $request)
 {
     $ictcore_integration  = Ictcore_integration::select("*")->where('type','sms')->first();
     $ict                  = new ictcoreController();
-    $snd_msg  = $ict->verification_number_telenor_sms(Input::get('phone'),Input::get('message'),'SidraSchool',$ictcore_integration->ictcore_user,$ictcore_integration->ictcore_password,'sms');
+    $snd_msg  = $ict->verification_number_telenor_sms($request->input('phone'),$request->input('message'),'SidraSchool',$ictcore_integration->ictcore_user,$ictcore_integration->ictcore_password,'sms');
     //echo "<pre>";print_r( $snd_msg);
     //exit;
     if($snd_msg->response!='OK'){
     $error = "Whoops!";
-	return Redirect::to('/student/view/'.Input::get('id'))->with("error"," $error Message Not send");
+	return Redirect::to('/student/view/'.$request->input('id'))->with("error"," $error Message Not send");
     }else{
-     return Redirect::to('/student/view/'.Input::get('id'))->with("success","  Message sended");
+     return Redirect::to('/student/view/'.$request->input('id'))->with("success","  Message sended");
 
     }
 }

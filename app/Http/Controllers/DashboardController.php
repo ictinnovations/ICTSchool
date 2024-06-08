@@ -1,19 +1,20 @@
 <?php
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Input;
-use App\ClassModel;
-use App\Subject;
-use App\Student;
-use App\Attendance;
-use App\Accounting;
-use App\Marks;
-use App\AddBook;
-use App\Teacher;
-use App\Branch;
-use App\FeeCol;
-use Carbon\Carbon;
 use DB;
 use Auth;
+use Carbon\Carbon;
+use App\Models\Marks;
+use App\Models\Branch;
+use App\Models\FeeCol;
+use App\Models\AddBook;
+use App\Models\Student;
+use App\Models\Subject;
+use App\Models\Teacher;
+use App\Models\Accounting;
+use App\Models\Attendance;
+use App\Models\ClassModel;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
 
 class DashboardController extends BaseController {
 
@@ -27,7 +28,7 @@ class DashboardController extends BaseController {
 	*
 	* @return Response
 	*/
-	public function index()
+	public function index(Request $request)
 	{
 
 		/*activity()
@@ -37,17 +38,17 @@ class DashboardController extends BaseController {
 		   ->log('Look, I logged something');*/
 		
         $now                  =  Carbon::now();
-		if(Input::get('year') == ""){
+		if($request->input('year') == ""){
 
 			$year1            =  $now->year;
 		}else{
-			$year1            =  trim(urlencode(Input::get('year')));
+			$year1            =  trim(urlencode($request->input('year')));
 		}
 			$year             =  get_current_session()->id;
-        if(Input::get('month')==""){
+        if($request->input('month')==""){
         	$month            =  $now->month;
     	}else{
-    		$month            = trim(Input::get('month'));
+    		$month            = trim($request->input('month'));
     	}
     	//echo "mm - -".$month ."-- year -- ".$year1 ;
 		$error            = \Session::get('error');
@@ -56,15 +57,18 @@ class DashboardController extends BaseController {
 		$tsubject         =  Subject::count();
 		$tstudent         =  Student::where('isActive','Yes')->where('session',$year)->count();
 
-		//echo get_current_session()->id. $tstudent;exit;
+		// echo get_current_session()->id. $tstudent;exit;
+		// dd($year);
 		$teacher         =  Teacher::count();
- 		$totalAttendance = Attendance::groupBy('date')->get();
+		$totalAttendance = Attendance::groupBy('date')
+		->select('date')
+		->get();
  		//echo Carbon::now()->format('Y-m-d');
  		$totalabsent     = Attendance::where('date',Carbon::now()->format('Y-m-d'))->where('status','Absent')->count();
  		$totallate       = Attendance::where('date',Carbon::now()->format('Y-m-d'))->where('status','Late')->count();
 
  		//echo "<pre>";print_r($totalabsent );exit;
- 		$totalExam = Marks::groupBy('exam')->groupBy('subject')->get();
+ 		$totalExam = Marks::groupBy('exam','subject')->get();
 		$book      = AddBook::count();
  		$total     = [
  			'class'       =>$tclass,
@@ -78,16 +82,16 @@ class DashboardController extends BaseController {
 			'totallate'   =>$totallate
  		];
  	     // 	//graph data
- 	  //dd($total);
+ 	//   dd($tstudent);
  		$monthlyIncome = Accounting::selectRaw('month(date) as month, sum(amount) as amount, year(date) as year')
 				 		->where('type','Income')
 				 		->groupBy('month')
 				 		->get();
 //,DB::RAW('IFNULL(sum(payableAmount),0) as payTotal,IFNULL(sum(paidAmount),0) as paiTotal,(IFNULL(sum(payableAmount),0)- IFNULL(sum(paidAmount),0)) as dueamount')
  		$tutionfees = FeeCol::join('billHistory','stdBill.billNo','=','billHistory.billNo')->select(DB::RAW('billHistory.month, year(stdBill.created_at) as year,sum(stdBill.payableAmount) as payTotal,IFNULL(sum(paidAmount),0) as paiTotal,(IFNULL(sum(payableAmount),0)- IFNULL(sum(paidAmount),0)) as dueamount'))
-							//->where('class',Input::get('class'))
+							//->where('class',$request->input('class'))
 							->groupBy('month')
-							//->where('regiNo',Input::get('student'))
+							//->where('regiNo',$request->input('student'))
 							->get();
 			$comabine_array = array();
 			$i=0;
@@ -150,7 +154,7 @@ class DashboardController extends BaseController {
 
  		$tutionfeesum = FeeCol::select(DB::RAW('sum(payableAmount) as payTotal,IFNULL(sum(paidAmount),0) as paiTotal,(IFNULL(sum(payableAmount),0)- IFNULL(sum(paidAmount),0)) as dueamount'))
 		->whereYear('created_at',$year1 )
-		//->where('regiNo',Input::get('student'))
+		//->where('regiNo',$request->input('student'))
 		->first();
 		$incomeTotals = $incomeTotal +$tutionfeesum->paiTotal;
  		//echo "<pre>";print_r($incomes);exit;
@@ -189,7 +193,7 @@ class DashboardController extends BaseController {
 
 		//$all_section =	DB::table('section')->select( '*')->get();
 		$all_section =	DB::table('Class')->select( '*')->get();
-		//$student_all =	DB::table('Student')->select( '*')->where('class','=',Input::get('class'))->where('section','=',Input::get('section'))->where('session','=',$student->session)->get();
+		//$student_all =	DB::table('Student')->select( '*')->where('class','=',$request->input('class'))->where('section','=',$request->input('section'))->where('session','=',$student->session)->get();
         $ourallpaid   = 0;
         $ourallunpaid = 0;
 		if(count($all_section)>0){
@@ -310,8 +314,8 @@ class DashboardController extends BaseController {
 		//echo "<pre>";print_r($total);
 		
      $month_n = $now->format('F');
-       if(Input::get('month')!=""){
-       	$month_n = \DateTime::createFromFormat('!m', Input::get('month'))->format('F');
+       if($request->input('month')!=""){
+       	$month_n = \DateTime::createFromFormat('!m', $request->input('month'))->format('F');
        }
 
          $class   = array();

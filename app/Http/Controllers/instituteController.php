@@ -4,8 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use ValidatesRequests;
-use App\Institute;
-use App\Branch;
+use App\Models\Institute;
+use App\Models\Branch;
 use DB;
 use Storage;
 class instituteController extends BaseController {
@@ -96,11 +96,11 @@ class instituteController extends BaseController {
 			'username.*' => 'required',
 			'password.*' => 'required',
 		];
-		//echo "<pre>";print_r(Input::file('logo'));exit;
-		$validator = \Validator::make(Input::all(), $rules);
+		//echo "<pre>";print_r($request->file('logo'));exit;
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
-			return Redirect::to('branches')->withinput(Input::all())->withErrors($validator);
+			return Redirect::to('branches')->withinput($request->all())->withErrors($validator);
 		}
 		else {
 				Branch::truncate();
@@ -136,7 +136,7 @@ class instituteController extends BaseController {
 	*
 	* @return Response
 	*/
-	public function save()
+	public function save(Request $request)
 	{
 		$rules=[
 			'name' => 'required',
@@ -149,29 +149,29 @@ class instituteController extends BaseController {
 
 
 		];
-		//echo "<pre>";print_r(Input::file('logo'));exit;
-		$validator = \Validator::make(Input::all(), $rules);
+		//echo "<pre>";print_r($request->file('logo'));exit;
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
-			return Redirect::to('institute')->withinput(Input::all())->withErrors($validator);
+			return Redirect::to('institute')->withinput($request->all())->withErrors($validator);
 		}
 		else {
             
-            if(Input::get('grade_system')=='' ):
+            if($request->input('grade_system')=='' ):
               $gs = 'manual';
             else:
               $gs = 'auto';
             endif;
                 Storage::put('/public/grad_system.txt', $gs);
-               //echo Input::get('family');exit;
-            if(Input::get('family')=='' ):
+               //echo $request->input('family');exit;
+            if($request->input('family')=='' ):
               $fm = 'off';
             else:
               $fm = 'on';
             endif;
             Storage::put('/public/family.txt', $fm);
 
-             if(Input::get('accounting')=='' ):
+             if($request->input('accounting')=='' ):
               $accounting = 'yes';
             else:
               $accounting = 'no';
@@ -180,19 +180,19 @@ class instituteController extends BaseController {
             Storage::put('/public/accounting.txt', $accounting);
 			DB::table("institute")->delete();
 			$institue=new Institute;
-			$institue->name = Input::get('name');
-			$institue->establish = Input::get('establish');
-			$institue->web = Input::get('web');
-			$institue->email = Input::get('email');
-			$institue->phoneNo = Input::get('phoneNo');
-			$institue->address = Input::get('address');
+			$institue->name = $request->input('name');
+			$institue->establish = $request->input('establish');
+			$institue->web = $request->input('web');
+			$institue->email = $request->input('email');
+			$institue->phoneNo = $request->input('phoneNo');
+			$institue->address = $request->input('address');
 			$institue->save();
 
-			if(Input::file('logo')!=''){
+			if($request->file('logo')!=''){
 
-				$fileName='logo.'.Input::file('logo')->getClientOriginalExtension();
+				$fileName='logo.'.$request->file('logo')->getClientOriginalExtension();
 			    //echo base_path() .'/img/',$fileName;exit;
-			    $check = Input::file('logo')->move(base_path() .'/img/',$fileName);
+			    $check = $request->file('logo')->move(base_path() .'/img/',$fileName);
 			      //print_r($check );
 			      //echo base_path() .'/img/',$fileName;exit;
 			}else{

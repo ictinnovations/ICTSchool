@@ -4,15 +4,15 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Student;
+use App\Models\Student;
 use Illuminate\Support\Facades\File;
-use App\Ictcore_integration;
-use App\Ictcore_attendance;
-use App\Ictcore_fees;
-use App\SectionModel;
-use App\Schedule;
-use App\ClassModel;
-use App\Notification;
+use App\Models\Ictcore_integration;
+use App\Models\Ictcore_attendance;
+use App\Models\Ictcore_fees;
+use App\Models\SectionModel;
+use App\Models\Schedule;
+use App\Models\ClassModel;
+use App\Models\Notification;
 use DB;
 use Carbon\Carbon;
 use Storage;
@@ -30,11 +30,11 @@ class ictcoreController {
 	*
 	* @return Response
 	*/
-	public function index()
+	public function index(Request $request)
 	{
 
-		$ictcore_integration= Ictcore_integration::select("*")->where('type',Input::get('type'))->first();
-        $type = Input::get('type');
+		$ictcore_integration= Ictcore_integration::select("*")->where('type',$request->input('type'))->first();
+        $type = $request->input('type');
 		if(is_null($ictcore_integration)){
 			$ictcore_integration = new Ictcore_integration;
 			$ictcore_integration->ictcore_url = "";
@@ -44,9 +44,9 @@ class ictcoreController {
 		return View('app.ictcore',compact('ictcore_integration','type'));
 	}
 
-	public function create()
+	public function create(Request $request)
 	{
-		if(Input::get('method')==''){
+		if($request->input('method')==''){
 			$rules=[
 			//'ictcore_url' => 'required',
 			'ictcore_user' => 'required',
@@ -61,11 +61,11 @@ class ictcoreController {
 			];
 
 	    }
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails()){
-			return Redirect::to('ictcore?type='.Input::get('type'))->withinput(Input::all())->withErrors($validator);
+			return Redirect::to('ictcore?type='.$request->input('type'))->withinput($request->all())->withErrors($validator);
 		}else {
-			if(Input::get('method')==''){
+			if($request->input('method')==''){
 				$method  = 'ictcore';
 				$method1 = 'ictcore_getway';
 
@@ -74,25 +74,25 @@ class ictcoreController {
 				$method1 =	''      ;
 			}
 
-			if(Input::get('ictcore_url')==''){
+			if($request->input('ictcore_url')==''){
 				//$url = '';
 				$url = 'http://core.ict.vision:180/api/';
 
 			}else{
-				$url =Input::get('ictcore_url');
+				$url =$request->input('ictcore_url');
 			}
 			//echo $url;exit;
-			DB::table("ictcore_integration")->where('type',Input::get('type'))->delete();
+			DB::table("ictcore_integration")->where('type',$request->input('type'))->delete();
 			$ictcore_integration                      = new Ictcore_integration;
 			$ictcore_integration->ictcore_url         = $url;
-			$ictcore_integration->ictcore_user        = Input::get('ictcore_user');
-			$ictcore_integration->ictcore_password    = Input::get('ictcore_password');
-			$ictcore_integration->ictcore_account_id  = Input::get('ictcore_account_id');
+			$ictcore_integration->ictcore_user        = $request->input('ictcore_user');
+			$ictcore_integration->ictcore_password    = $request->input('ictcore_password');
+			$ictcore_integration->ictcore_account_id  = $request->input('ictcore_account_id');
 			$ictcore_integration->method              = $method;
-			$ictcore_integration->type                = Input::get('type');
+			$ictcore_integration->type                = $request->input('type');
 			$ictcore_integration->type1   			  = $method1;
 			$ictcore_integration->save();
-			return Redirect::to('ictcore?type='.Input::get('type'))->with('success', 'Integration  Information saved.');
+			return Redirect::to('ictcore?type='.$request->input('type'))->with('success', 'Integration  Information saved.');
 		}
 	}
 
@@ -117,14 +117,14 @@ class ictcoreController {
 		return View('app.ictcoreAttendance',compact('ictcore_attendance','ictcore_fees'));
 	}
 
-	public function post_attendance()
+	public function post_attendance(Request $request)
 	{
-		//echo  "<pre>";print_r(Input::all());
+		//echo  "<pre>";print_r($request->all());
 		//exit;
-     $ictcore_late   =	DB::table('ictcore_attendance')->select('*')->where('late_file',Input::get('message_late'))->first();
-     $ictcore_absent =	DB::table('ictcore_attendance')->select('*')->where('recording',Input::get('message_absent'))->first();
+     $ictcore_late   =	DB::table('ictcore_attendance')->select('*')->where('late_file',$request->input('message_late'))->first();
+     $ictcore_absent =	DB::table('ictcore_attendance')->select('*')->where('recording',$request->input('message_absent'))->first();
 				   //echo "<pre>";print_r($ictcore_attendance );exit;
-	 $ictcore_fess   =	DB::table('ictcore_fees')->select('*')->where('recording',Input::get('fee_message'))->first();
+	 $ictcore_fess   =	DB::table('ictcore_fees')->select('*')->where('recording',$request->input('fee_message'))->first();
 		if(!empty($ictcore_late) ){
 			$late = 'message_late' .'=>'. 'required';
 		}else{
@@ -149,7 +149,7 @@ class ictcoreController {
 		$absent,
 		$fe,
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		
 		if ($validator->fails()){
 			return Redirect::to('/ictcore/attendance')->withErrors($validator);
@@ -165,9 +165,9 @@ class ictcoreController {
                 $ictcore_attendance =	DB::table('ictcore_attendance')->select('*')->first();
 				   //echo "<pre>";print_r($ictcore_attendance );exit;
 				$ictcore_fess =	DB::table('ictcore_fees')->select('*')->first();
-				 $name_absent = Input::get('title_abent');
-				 $name_late   = Input::get('title_late');
-				 $name_fee    = Input::get('fee_title');
+				 $name_absent = $request->input('title_abent');
+				 $name_late   = $request->input('title_late');
+				 $name_fee    = $request->input('fee_title');
                  
 
                  $recording_id_absent = '';
@@ -182,19 +182,19 @@ class ictcoreController {
 
                //if($ictcore_integration->method=="telenor" && $attendance_noti->type=='voice'){
                   
-                    if(Input::file('message_absent')==''){
-                   //echo   $ictcore_attendance->late_file ."=======".Input::get('message_late1');
-                   $inpet_attendance_file_ab = Input::get('message_absent1');
+                    if($request->file('message_absent')==''){
+                   //echo   $ictcore_attendance->late_file ."=======".$request->input('message_late1');
+                   $inpet_attendance_file_ab = $request->input('message_absent1');
                    }else{
-                   	                  // echo   $ictcore_attendance->late_file ."=======ee".Input::get('message_late');
-                     $inpet_attendance_file_ab = Input::file('message_absent');
+                   	                  // echo   $ictcore_attendance->late_file ."=======ee".$request->input('message_late');
+                     $inpet_attendance_file_ab = $request->file('message_absent');
 
                    }
                     if($inpet_attendance_file_ab!=''){
                     if(empty($ictcore_attendance) || $ictcore_attendance->recording != $inpet_attendance_file_ab){
-                        $fileName_absnet = $name_absent.'_'.time().'.'.Input::file('message_absent')->getClientOriginalExtension();
+                        $fileName_absnet = $name_absent.'_'.time().'.'.$request->file('message_absent')->getClientOriginalExtension();
                  
-                        Input::file('message_absent')->move($drctry ,$fileName_absnet);
+                        $request->file('message_absent')->move($drctry ,$fileName_absnet);
 						sleep(2);
                         echo exec('sox '.$drctry.'/'.$fileName_absnet .' -b 16 -r 8000 -c 1 -e signed-integer '.$drctry.'/'.'absent.wav');
 						$name_ab          =  $drctry .'absent.wav';
@@ -208,11 +208,11 @@ class ictcoreController {
                         }else{
                         /////////// ictcore ///////////
 
-                        	//Input::file('message')->move($drctry,$fileName);
+                        	//$request->file('message')->move($drctry,$fileName);
 							//sleep(2);
 							$data_abs = array(
-							'name' => Input::get('title_abent'),
-							'description' => Input::get('description_absent'),
+							'name' => $request->input('title_abent'),
+							'description' => $request->input('description_absent'),
 							);
 				          $recording_id_absent  =  $this->ictcore_api('messages/recordings','POST',$data_abs );
 						//  echo "<pre>";print_r( $recording_id_absent);
@@ -229,7 +229,7 @@ class ictcoreController {
 							}
 							if(!is_array($recording_id_absent )){
 								$data = array(
-								'name' => Input::get('title'),
+								'name' => $request->input('title'),
 								'recording_id' => $recording_id_absent,
 								);
 								$program_id_absent = $this->ictcore_api('programs/voicemessage','POST',$data );
@@ -265,21 +265,21 @@ class ictcoreController {
                         $program_id_absent = '';
 
                 }
-                    if(Input::file('message_late')==''){
-                   //echo   $ictcore_attendance->late_file ."=======".Input::get('message_late1');
-                   $inpet_attendance_file = Input::get('message_late1');
+                    if($request->file('message_late')==''){
+                   //echo   $ictcore_attendance->late_file ."=======".$request->input('message_late1');
+                   $inpet_attendance_file = $request->input('message_late1');
                    }else{
-                   	                  // echo   $ictcore_attendance->late_file ."=======ee".Input::get('message_late');
-                     $inpet_attendance_file = Input::file('message_late');
+                   	                  // echo   $ictcore_attendance->late_file ."=======ee".$request->input('message_late');
+                     $inpet_attendance_file = $request->file('message_late');
 
                    }
                    // echo   $ictcore_attendance->late_file ."=======ee".$inpet_attendance_file;
                   // exit;
                     if($inpet_attendance_file!=''){
                     if(empty($ictcore_attendance) || $ictcore_attendance->late_file !=  $inpet_attendance_file){
-                        $fileName_late   =   $name_late.'_'.time().'.'.Input::file('message_late')->getClientOriginalExtension();
+                        $fileName_late   =   $name_late.'_'.time().'.'.$request->file('message_late')->getClientOriginalExtension();
                  
-                        Input::file('message_late')->move($drctry ,$fileName_late);
+                        $request->file('message_late')->move($drctry ,$fileName_late);
 						sleep(2);
                         echo exec('sox '.$drctry.'/'.$fileName_late .' -b 16 -r 8000 -c 1 -e signed-integer '.$drctry.'/'.'late.wav');
 
@@ -291,11 +291,11 @@ class ictcoreController {
                         if($ictcore_integration->method=="telenor" && $attendance_noti->type=='voice'){
                        	 	$upload_audio_lt       = $this->verification_number_telenor_voice($data_lt,$ictcore_integration->ictcore_user,$ictcore_integration->ictcore_password);
                         }else{
-                        	//Input::file('message')->move($drctry,$fileName);
+                        	//$request->file('message')->move($drctry,$fileName);
 							//sleep(2);
 							$data = array(
-							'name' => Input::get('title_late'),
-							'description' => Input::get('description_late'),
+							'name' => $request->input('title_late'),
+							'description' => $request->input('description_late'),
 							);
 				        $recording_id_late  =  $this->ictcore_api('messages/recordings','POST',$data );
 						if(!empty($recording_id_late->error)){
@@ -309,7 +309,7 @@ class ictcoreController {
 							}
 							if(!is_array($recording_id_late )){
 								$data = array(
-								'name' => Input::get('title'),
+								'name' => $request->input('title'),
 								'recording_id' => $recording_id_late,
 								);
 								$program_id_late = $this->ictcore_api('programs/voicemessage','POST',$data );
@@ -340,12 +340,12 @@ class ictcoreController {
 	                     $program_id_late   = '';
                 }
 
-                     if(Input::file('fee_message')==''){
-                   //echo   $ictcore_attendance->late_file ."=======".Input::get('message_late1');
-                   $inpet_attendance_file_fee = Input::get('fee_message1');
+                     if($request->file('fee_message')==''){
+                   //echo   $ictcore_attendance->late_file ."=======".$request->input('message_late1');
+                   $inpet_attendance_file_fee = $request->input('fee_message1');
                    }else{
-                   	                  // echo   $ictcore_attendance->late_file ."=======ee".Input::get('message_late');
-                     $inpet_attendance_file_fee = Input::file('fee_message');
+                   	                  // echo   $ictcore_attendance->late_file ."=======ee".$request->input('message_late');
+                     $inpet_attendance_file_fee = $request->file('fee_message');
 
                    }
                   //echo "<pre>";print_r($ictcore_fess);
@@ -353,8 +353,8 @@ class ictcoreController {
                   //exit;
                     if( $inpet_attendance_file_fee !=''){
                     if(empty($ictcore_fess) || $ictcore_fess->recording != $inpet_attendance_file_fee){
-                      $fileName_fee    =    $name_fee.'_'.time().'.'.Input::file('fee_message')->getClientOriginalExtension();
-                        Input::file('fee_message')->move($drctry ,$fileName_fee);
+                      $fileName_fee    =    $name_fee.'_'.time().'.'.$request->file('fee_message')->getClientOriginalExtension();
+                        $request->file('fee_message')->move($drctry ,$fileName_fee);
 						
 						sleep(2);
 						echo 'sox '.$drctry.'/'.$fileName_fee .' -b 16 -r 8000 -c 1 -e signed-integer '.$drctry.'/'.'fee.wav';
@@ -370,11 +370,11 @@ class ictcoreController {
                         }else{
                           /////////// ictcore ///////////
 
-                        	//Input::file('message')->move($drctry,$fileName);
+                        	//$request->file('message')->move($drctry,$fileName);
 							//sleep(2);
 							$data_abs = array(
-							'name' => Input::get('title_abent'),
-							'description' => Input::get('description_absent'),
+							'name' => $request->input('title_abent'),
+							'description' => $request->input('description_absent'),
 							);
 				          $recording_id_fee  =  $this->ictcore_api('messages/recordings','POST',$data_abs );
 						//  echo "<pre>";print_r( $recording_id_absent);
@@ -391,7 +391,7 @@ class ictcoreController {
 							}
 							if(!is_array($recording_id_fee )){
 								$data = array(
-								'name' => Input::get('title'),
+								'name' => $request->input('title'),
 								'recording_id' => $recording_id_fee,
 								);
 								$program_id_fee = $this->ictcore_api('programs/voicemessage','POST',$data );
@@ -428,11 +428,11 @@ class ictcoreController {
 					/*if(!empty($ictcore_attendance) && File::exists($drctry.$ictcore_attendance->recording)){
 						unlink($drctry .$ictcore_attendance->recording);
 					}
-						$sname = Input::get('title');
-						$remove_spaces =  str_replace(" ","_",Input::get('title'));
-						$fileName= $remove_spaces.'_'.time().'.'.Input::file('message')->getClientOriginalExtension();
+						$sname = $request->input('title');
+						$remove_spaces =  str_replace(" ","_",$request->input('title'));
+						$fileName= $remove_spaces.'_'.time().'.'.$request->file('message')->getClientOriginalExtension();
 						
-						Input::file('message')->move($drctry ,$fileName);
+						$request->file('message')->move($drctry ,$fileName);
 						sleep(2);
 					    echo exec('sox '.$drctry.'/'.$fileName .' -b 16 -r 8000 -c 1 -e signed-integer'.$drctry.'/'.$fileName);
 
@@ -447,9 +447,9 @@ class ictcoreController {
                         */
                          DB::table("ictcore_attendance")->delete();
 							$ictcore_attendance = new Ictcore_attendance;
-							$ictcore_attendance->name = Input::get('title_abent');
-							$ictcore_attendance->description = Input::get('description_absent');
-							$ictcore_attendance->late_description = Input::get('description_late');
+							$ictcore_attendance->name = $request->input('title_abent');
+							$ictcore_attendance->description = $request->input('description_absent');
+							$ictcore_attendance->late_description = $request->input('description_late');
 							$ictcore_attendance->recording =$fileName_absnet;
 							$ictcore_attendance->late_file =$fileName_late;
 							$ictcore_attendance->ictcore_recording_id = $recording_id_absent ;
@@ -462,9 +462,9 @@ class ictcoreController {
                          	
                          	DB::table("ictcore_fees")->delete();
 							$ictcore_fees = new Ictcore_fees;
-							$ictcore_fees->name = Input::get('fee_title');
-							$ictcore_fees->description = Input::get('fee_description');
-							if(Input::get('fee_description')==''){
+							$ictcore_fees->name = $request->input('fee_title');
+							$ictcore_fees->description = $request->input('fee_description');
+							if($request->input('fee_description')==''){
 			                	$ictcore_fees->description ='';
 							}
 							$ictcore_fees->recording =$fileName_fee;
@@ -485,10 +485,10 @@ class ictcoreController {
 				if(!empty($ictcore_attendance) && File::exists($drctry.$ictcore_attendance->recording)){
 					unlink($drctry .$ictcore_attendance->recording);
 				}
-				$sname = Input::get('title');
-				$remove_spaces =  str_replace(" ","_",Input::get('title'));
-				$fileName= $remove_spaces.'.'.Input::file('message')->getClientOriginalExtension();
-				Input::file('message')->move($drctry ,$fileName);
+				$sname = $request->input('title');
+				$remove_spaces =  str_replace(" ","_",$request->input('title'));
+				$fileName= $remove_spaces.'.'.$request->file('message')->getClientOriginalExtension();
+				$request->file('message')->move($drctry ,$fileName);
 				sleep(2);
 				$name          =  $drctry .$fileName;
 				$finfo         =  new \finfo(FILEINFO_MIME_TYPE);
@@ -502,7 +502,7 @@ class ictcoreController {
 				}
 				if(!is_array($recording_id )){
 					$data = array(
-					'name' => Input::get('title'),
+					'name' => $request->input('title'),
 					'recording_id' => $recording_id,
 					);
 					$program_id = $this->ictcore_api('programs/voicemessage','POST',$data );
@@ -520,8 +520,8 @@ class ictcoreController {
 
 				/*DB::table("ictcore_attendance")->delete();
 				$ictcore_attendance = new Ictcore_attendance;
-				$ictcore_attendance->name = Input::get('title');
-				$ictcore_attendance->description = Input::get('description');
+				$ictcore_attendance->name = $request->input('title');
+				$ictcore_attendance->description = $request->input('description');
 				$ictcore_attendance->recording =$fileName;
 				$ictcore_attendance->ictcore_recording_id =$recording_id;
 				$ictcore_attendance->ictcore_program_id  =$program_id;
@@ -534,7 +534,7 @@ class ictcoreController {
 		}*/
 	}
 	}
-	public function fee_message_index()
+	public function fee_message_index(Request $request)
 	{
 		$ictcore_fees= Ictcore_fees::select("*")->first();
 		if(is_null($ictcore_fees)){
@@ -552,7 +552,7 @@ class ictcoreController {
 		'title' => 'required',
 		'message' => 'required|mimes:wav',
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails()){
 			return Redirect::to('/ictcore/fees')->withErrors($validator);
 		}
@@ -568,10 +568,10 @@ class ictcoreController {
 					if(!empty($ictcore_fess) && File::exists($drctry.$ictcore_fess->recording)){
 						unlink($drctry .$ictcore_fess->recording);
 					}
-						$sname = Input::get('title');
-						$remove_spaces =  str_replace(" ","_",Input::get('title'));
-						$fileName= $remove_spaces.'.'.Input::file('message')->getClientOriginalExtension();
-						Input::file('message')->move($drctry ,$fileName);
+						$sname = $request->input('title');
+						$remove_spaces =  str_replace(" ","_",$request->input('title'));
+						$fileName= $remove_spaces.'.'.$request->file('message')->getClientOriginalExtension();
+						$request->file('message')->move($drctry ,$fileName);
 						sleep(2);
 						$php_dir =  exec('which php');
 						//echo 'sox '."$drctry"."$fileName" .' -b 16 -r 8000 -c 1 -e signed-integer '."$drctry"."$fileName";
@@ -588,9 +588,9 @@ class ictcoreController {
                          //echo $upload_audio;
                            DB::table("ictcore_fees")->delete();
 						$ictcore_fees = new Ictcore_fees;
-						$ictcore_fees->name = Input::get('title');
-						$ictcore_fees->description = Input::get('description');
-						if(Input::get('description')==''){
+						$ictcore_fees->name = $request->input('title');
+						$ictcore_fees->description = $request->input('description');
+						if($request->input('description')==''){
 		                	$ictcore_fees->description ='';
 						}
 						$ictcore_fees->recording =$fileName;
@@ -611,14 +611,14 @@ class ictcoreController {
 				if(count($ictcore_fees) > 0 && File::exists($drctry.$ictcore_fees->recording)){
 					unlink($drctry.$ictcore_fees->recording);
 				}
-				$sname = Input::get('title');
-				$remove_spaces =  str_replace(" ","_",Input::get('title'));
-				$fileName= $remove_spaces.'.'.Input::file('message')->getClientOriginalExtension();
-				Input::file('message')->move($drctry,$fileName);
+				$sname = $request->input('title');
+				$remove_spaces =  str_replace(" ","_",$request->input('title'));
+				$fileName= $remove_spaces.'.'.$request->file('message')->getClientOriginalExtension();
+				$request->file('message')->move($drctry,$fileName);
 				sleep(2);
 				$data = array(
-				'name' => Input::get('title'),
-				'description' => Input::get('description'),
+				'name' => $request->input('title'),
+				'description' => $request->input('description'),
 				);
 				$recording_id  =  $this->ictcore_api('messages/recordings','POST',$data );
 				if(!empty($recording_id->error)){
@@ -636,7 +636,7 @@ class ictcoreController {
 				}
 				if(!is_array($recording_id )){
 					$data = array(
-					'name' => Input::get('title'),
+					'name' => $request->input('title'),
 					'recording_id' => $recording_id,
 					);
 					$program_id = $this->ictcore_api('programs/voicemessage','POST',$data );
@@ -653,9 +653,9 @@ class ictcoreController {
 				}
 				DB::table("ictcore_fees")->delete();
 				$ictcore_fees = new Ictcore_fees;
-				$ictcore_fees->name = Input::get('title');
-				$ictcore_fees->description = Input::get('description');
-				if(Input::get('description')==''){
+				$ictcore_fees->name = $request->input('title');
+				$ictcore_fees->description = $request->input('description');
+				if($request->input('description')==''){
                 	$ictcore_fees->description ='';
 				}
 				$ictcore_fees->recording =$fileName;
@@ -794,7 +794,7 @@ class ictcoreController {
 	    return View('app.notifications',compact('notification_types','attendance_time','schedule','datee','year','diary_time'));
 	}
 
-	public function noti_create()
+	public function noti_create(Request $request)
 	{
        $rules=[
 		'fess' => 'required',
@@ -803,13 +803,13 @@ class ictcoreController {
 		'time' => 'required',
 		'date' => 'required',
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails()){
 			return Redirect::to('/notification_type')->withErrors($validator);
 		}
 		else {
 		
-			$data = array(Input::all());
+			$data = array($request->all());
 			//echo "<pre>";print_r($data[0]);
 			//exit;
 			//$contant = Storage::get('/public/cronsettings.txt');
@@ -844,8 +844,8 @@ class ictcoreController {
         //exit;
         $time = DATE("H:i", STRTOTIME($data[0]['time']));
             $setting = $time."<br>".'';
-        if(Input::get('diary_time')!=''){
-        $dairy_time = DATE("H:i", STRTOTIME(Input::get('diary_time')));
+        if($request->input('diary_time')!=''){
+        $dairy_time = DATE("H:i", STRTOTIME($request->input('diary_time')));
             $setting = $time."<br>".'';
              $dairy_setting  = $dairy_time."<br>".'';
              Storage::put('/public/cronsettingdiary.txt', $dairy_setting);

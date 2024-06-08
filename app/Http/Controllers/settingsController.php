@@ -1,12 +1,14 @@
 <?php
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Redirect;
-use App\User;
-use App\Schedule;
 use DB;
 use Auth;
 use Hash;
+use App\Models\User;
+use App\Models\Schedule;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Redirect;
+
 class settingsController extends BaseController 
 {
 	public function __construct() 
@@ -35,7 +37,7 @@ class settingsController extends BaseController
 	*
 	* @return Response
 	*/
-	public function save()
+	public function save(Request $request)
 	{
 		$rules=[
 			'firstname' => 'required',
@@ -49,24 +51,24 @@ class settingsController extends BaseController
 
 
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
-			return Redirect::to('/settings')->withinput(Input::all())->withErrors($validator);
+			return Redirect::to('/settings')->withinput($request->all())->withErrors($validator);
 		}
 		else {
-			if (Input::get('npassword') == Input::get('cnpassword')) {
+			if ($request->input('npassword') == $request->input('cnpassword')) {
 
-				// $u = User::select('*')->where('password',Hash::make(Input::get('cpassword')))->first();
-				//return Hash::make(Input::get('cpassword'));
+				// $u = User::select('*')->where('password',Hash::make($request->input('cpassword')))->first();
+				//return Hash::make($request->input('cpassword'));
 				//if(count($u)>0) {
-				$user = User::find(Input::get('id'));
-				$user->firstname = Input::get('firstname');
-				$user->lastname = Input::get('lastname');
-				//  $user->login = Input::get('login');
-				//$user->desc = Input::get('desc');
-				// $user->email = Input::get('email');
-				$user->password = Hash::make(Input::get('npassword'));
+				$user = User::find($request->input('id'));
+				$user->firstname = $request->input('firstname');
+				$user->lastname = $request->input('lastname');
+				//  $user->login = $request->input('login');
+				//$user->desc = $request->input('desc');
+				// $user->email = $request->input('email');
+				$user->password = Hash::make($request->input('npassword'));
 				$user->save();
 
 				return Redirect::to('/settings')->with('success', 'Settings is changed please relogin the site.');
@@ -100,22 +102,22 @@ class settingsController extends BaseController
 		return View('app.schedulesetting',compact('schedule','datee','year'));
 	}
 
-	public function post_schedule()
+	public function post_schedule(Request $request)
 	{
 		$rules=[
 		'time' => 'required',
 		'date' => 'required',
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails()){
 			return Redirect::to('/schedule')->withErrors($validator);
 		}
 		else{
-			   $time =  date("H:i", strtotime(Input::get('time')));
+			   $time =  date("H:i", strtotime($request->input('time')));
 			   
 				DB::table("cronschedule")->delete();
 				$schedule=new Schedule;
-				$schedule->date = Input::get('date');
+				$schedule->date = $request->input('date');
 				$schedule->time = $time;
 				$schedule->save();
 				return Redirect::to('/schedule')->with("success", "Schedule Created Succesfully.");

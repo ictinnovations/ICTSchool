@@ -1,11 +1,13 @@
 <?php
 namespace App\Http\Controllers;
+use DB;
+use App\Models\GPA;
+use App\Models\Subject;
+use App\Models\ClassModel;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use App\Subject;
-use App\ClassModel;
-use App\GPA;
-use DB;
+
 class subjectController extends BaseController {
 
 	public function __construct() {
@@ -35,11 +37,11 @@ class subjectController extends BaseController {
 	*
 	* @return Response
 	*/
-	public function create()
+	public function create(Request $request)
 	{
 
-//echo "<pre>";print_r(Input::get('class'));
-    $classes =  Input::get('class');
+//echo "<pre>";print_r($request->input('class'));
+    $classes =  $request->input('class');
 		$rules=[
 			'name'         => 'required',
 			'code'         => 'required',
@@ -59,13 +61,13 @@ class subjectController extends BaseController {
 			'spass'        => 'required',
 			'ppass'        => 'required'
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
 			return Redirect::to('/subject/create')->withErrors($validator);
 		}
 		else {
-			$exsubject = Subject::select('*')->where('class',Input::get('class'))->where('code',Input::get('code'))->get();
+			$exsubject = Subject::select('*')->where('class',$request->input('class'))->where('code',$request->input('code'))->get();
 			if(count($exsubject)>0)
 			{
 				$errorMessages = new Illuminate\Support\MessageBag;
@@ -77,23 +79,23 @@ class subjectController extends BaseController {
 			else {
 				foreach($classes as $class){
 				$subject = new Subject;
-				$subject->name = Input::get('name');
-				$subject->code = Input::get('code');
+				$subject->name = $request->input('name');
+				$subject->code = $request->input('code');
 				$subject->class = $class;
-				$subject->gradeSystem = Input::get('gradeSystem');
-				$subject->type = Input::get('type');
-				$subject->subgroup = Input::get('subgroup');
-				$subject->stdgroup = Input::get('stdgroup');
-				$subject->totalfull = Input::get('totalfull');
-				$subject->totalpass = Input::get('totalpass');
-				$subject->wfull = Input::get('wfull');
-				$subject->wpass = Input::get('wpass');
-				$subject->mfull = Input::get('mfull');
-				$subject->mpass = Input::get('mpass');
-				$subject->sfull = Input::get('sfull');
-				$subject->spass = Input::get('spass');
-				$subject->pfull = Input::get('pfull');
-				$subject->ppass = Input::get('ppass');
+				$subject->gradeSystem = $request->input('gradeSystem');
+				$subject->type = $request->input('type');
+				$subject->subgroup = $request->input('subgroup');
+				$subject->stdgroup = $request->input('stdgroup');
+				$subject->totalfull = $request->input('totalfull');
+				$subject->totalpass = $request->input('totalpass');
+				$subject->wfull = $request->input('wfull');
+				$subject->wpass = $request->input('wpass');
+				$subject->mfull = $request->input('mfull');
+				$subject->mpass = $request->input('mpass');
+				$subject->sfull = $request->input('sfull');
+				$subject->spass = $request->input('spass');
+				$subject->pfull = $request->input('pfull');
+				$subject->ppass = $request->input('ppass');
 
 				$subject->save();
 			}
@@ -149,7 +151,7 @@ class subjectController extends BaseController {
 	* @param  int  $id
 	* @return Response
 	*/
-	public function update()
+	public function update(Request $request)
 	{
 		$rules=[
 			'name' => 'required',
@@ -166,31 +168,31 @@ class subjectController extends BaseController {
 			'pfull' => 'required'
 
 		];
-		$validator = \Validator::make(Input::all(), $rules);
+		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
-			return Redirect::to('/subject/edit/'.Input::get('id'))->withErrors($validator);
+			return Redirect::to('/subject/edit/'.$request->input('id'))->withErrors($validator);
 		}
 		else {
-			$subject = Subject::find(Input::get('id'));
-			$subject->name= Input::get('name');
-			$subject->code=Input::get('code');
-			$subject->class=Input::get('class');
-			$subject->gradeSystem=Input::get('gradeSystem');
-			$subject->type=Input::get('type');
-			$subject->subgroup=Input::get('subgroup');
-			$subject->stdgroup=Input::get('stdgroup');
+			$subject = Subject::find($request->input('id'));
+			$subject->name= $request->input('name');
+			$subject->code=$request->input('code');
+			$subject->class=$request->input('class');
+			$subject->gradeSystem=$request->input('gradeSystem');
+			$subject->type=$request->input('type');
+			$subject->subgroup=$request->input('subgroup');
+			$subject->stdgroup=$request->input('stdgroup');
 
-			$subject->totalfull=Input::get('totalfull');
-			$subject->totalpass=Input::get('totalpass');
-			$subject->wfull=Input::get('wfull');
-			$subject->wpass=Input::get('wpass');
-			$subject->mfull=Input::get('mfull');
-			$subject->mpass=Input::get('mpass');
-			$subject->sfull=Input::get('sfull');
-			$subject->spass=Input::get('spass');
-			$subject->pfull=Input::get('pfull');
-			$subject->ppass=Input::get('ppass');
+			$subject->totalfull=$request->input('totalfull');
+			$subject->totalpass=$request->input('totalpass');
+			$subject->wfull=$request->input('wfull');
+			$subject->wpass=$request->input('wpass');
+			$subject->mfull=$request->input('mfull');
+			$subject->mpass=$request->input('mpass');
+			$subject->sfull=$request->input('sfull');
+			$subject->spass=$request->input('spass');
+			$subject->pfull=$request->input('pfull');
+			$subject->ppass=$request->input('ppass');
 			$subject->save();
 			return Redirect::to('/subject/list')->with("success","Subject Updated Succesfully.");
 

@@ -1,10 +1,12 @@
 <?php
 namespace App\Http\Controllers;
+use DB;
+use App\Models\Student;
+use App\Models\ClassModel;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use App\ClassModel;
-use App\Student;
-use DB;
+
 class promotionController extends BaseController {
 
 	public function __construct() {
@@ -34,35 +36,35 @@ class promotionController extends BaseController {
 	*
 	* @return Response
 	*/
-	public function store()
+	public function store(Request  $request)
 	{  $rules = [
 		'nclass' => 'required',
 		'nsection' => 'required',
 		'nshift' => 'required',
 		'nsession' => 'required'
 	];
-	$validator = \Validator::make(Input::all(), $rules);
+	$validator = \Validator::make($request->all(), $rules);
 	if ($validator->fails()) {
-		return Redirect::to('/promotion')->withInput(Input::all())->withErrors($validator);
+		return Redirect::to('/promotion')->withInput($request->all())->withErrors($validator);
 	} else {
-		if(Input::get('class')==Input::get('nclass'))
+		if($request->input('class')==$request->input('nclass'))
 		{
 			//$errorMessages = new Illuminate\Support\MessageBag;
 			$errorMessages = 'Promotion From and Promotion To class shouldn not be same!';
-			return Redirect::to('/promotion')->withInput(Input::all())->withErrors($errorMessages);
+			return Redirect::to('/promotion')->withInput($request->all())->withErrors($errorMessages);
 		}
 		else
 		{
-			$promotion = Input::get('promot');
+			$promotion = $request->input('promot');
 			$promotion=array_keys($promotion);
-			$newrollNo= Input::get('newrollNo');
+			$newrollNo= $request->input('newrollNo');
 			$ids= array_keys($newrollNo);
 			if(count($promotion)<1)
 			{
 				//$errorMessages = new Illuminate\Support\MessageBag;
 				//$errorMessages->add('validation', 'Select Student!');
 				$errorMessages = 'Select Student!';
-				return Redirect::to('/promotion')->withInput(Input::all())->withErrors($errorMessages);
+				return Redirect::to('/promotion')->withInput($request->all())->withErrors($errorMessages);
 			}
 			$realPromot=array();
 			for($i=0;$i<count($promotion);$i++)
@@ -72,7 +74,7 @@ class promotionController extends BaseController {
 				{
 					//$errorMessages = new Illuminate\Support\MessageBag;
 					$errorMessages = 'New Roll number can not be empty!';
-					return Redirect::to('/promotion')->withInput(Input::all())->withErrors($errorMessages);
+					return Redirect::to('/promotion')->withInput($request->all())->withErrors($errorMessages);
 				}
 				if($rollnumber!='No')
 				{
@@ -84,20 +86,20 @@ class promotionController extends BaseController {
 			foreach($realPromot as $rpromt) {
 				$studentIno = Student::select('*')->where('regiNo', $rpromt[0])->first();
 				$newStudent = new Student();
-				if (Input::get('nclass') == "cl10" || Input::get('nclass') == "cl12") {
+				if ($request->input('nclass') == "cl10" || $request->input('nclass') == "cl12") {
 					$newStudent->regiNo = $rpromt[0];
 				} else
 				{
 
-					$newRegNo = $this->getRegi(Input::get('nclass'), Input::get('nsession'), Input::get('nsection'));
+					$newRegNo = $this->getRegi($request->input('nclass'), $request->input('nsession'), $request->input('nsection'));
 					$newStudent->regiNo = $newRegNo[0];
 				}
 
 				$newStudent->rollNo=$rpromt[1];
-				$newStudent->session=trim(Input::get('nsession'));
-				$newStudent->class=Input::get('nclass');
-				$newStudent->section=Input::get('nsection');
-				$newStudent->shift=Input::get('nshift');
+				$newStudent->session=trim($request->input('nsession'));
+				$newStudent->class=$request->input('nclass');
+				$newStudent->section=$request->input('nsection');
+				$newStudent->shift=$request->input('nshift');
 				$newStudent->group=$studentIno->group;
 				$newStudent->firstName=$studentIno->firstName;
 				$newStudent->middleName=$studentIno->middleName;
