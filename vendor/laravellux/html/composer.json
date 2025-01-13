@@ -1,0 +1,61 @@
+{
+    "name": "laravellux/html",
+    "description": "HTML and Form Builders for the Laravel Framework",
+    "license": "MIT",
+    "homepage": "https://website.com.se",
+    "support": {
+        "issues": "https://github.com/laravellux/html/issues",
+        "source": "https://github.com/laravellux/html"
+    },
+    "authors": [
+        {
+            "name": "Adam Mudd",
+            "email": "admin@adammudd.co.uk"
+        },
+        {
+            "name": "Adam Engebretson",
+            "email": "adam@laravelcollective.com"
+        },
+        {
+            "name": "Taylor Otwell",
+            "email": "taylorotwell@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "illuminate/http": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+        "illuminate/routing": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+        "illuminate/session": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+        "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+        "illuminate/view": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0"
+    },
+    "require-dev": {
+        "illuminate/database": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+        "mockery/mockery": "~1.6.2",
+        "phpunit/phpunit": "~8.5|^9.5.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "LaravelLux\\Html\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "6.x-dev"
+        },
+        "laravel": {
+            "providers": [
+                "LaravelLux\\Html\\HtmlServiceProvider"
+            ],
+            "aliases": {
+                "Form": "LaravelLux\\Html\\FormFacade",
+                "Html": "LaravelLux\\Html\\HtmlFacade"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

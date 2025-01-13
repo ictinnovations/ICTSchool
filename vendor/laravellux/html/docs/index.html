@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laravel Lux HTML Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <nav class="bg-white shadow">
+        <div class="px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center justify-between w-full">
+                    <div class="flex-shrink-0">
+                        <img class="h-8 w-8" src="laravellux.png" alt="Laravel Lux - Your new best friend for laravel!">
+                    </div>
+                    <div class="ml-10 flex justify-content-end items-baseline space-x-4">
+                        <a href="https://github.com/LaravelLux/html" class="text-gray-700 hover:text-gray-900">GitHub</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Message -->
+    <div class="bg-yellow-200 p-4">
+        <p class="text-center text-black">This is a fork of the laravelcollective/html repo that has been taken over as it was abandoned.</p>
+    </div>
+
+    <!-- Content -->
+    <main class="max-w-9xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="flex flex-wrap">
+            <div class="w-full md:w-1/4 mb-6 bg-gray-200 rounded-md ">
+                <nav class="flex flex-col justify-start py-4 px-6 md:sticky md:top-0 static">
+                    <ul class="space-y-2 text-gray-700 text-md font-medium">
+                        <li class="hover:bg-gray-300"><a href="#installation" class="block py-1 px-2 text-gray-900">Installation</a></li>
+                        <li class="hover:bg-gray-300"><a href="#important" class="block py-1 px-2 text-gray-900">Important</a></li>
+                        <li class="hover:bg-gray-300"><a href="#opening-a-form" class="block py-1 px-2 text-gray-900">Opening A Form</a></li>
+                        <li class="hover:bg-gray-300"><a href="#csrf-protection" class="block py-1 px-2 text-gray-900">CSRF Protection</a></li>
+                        <li class="hover:bg-gray-300"><a href="#form-model-binding" class="block py-1 px-2 text-gray-900">Form Model Binding</a></li>
+                        <li class="hover:bg-gray-300"><a href="#form-model-accessors" class="block py-1 px-2 text-gray-900">Form Model Accessors</a></li>
+                        <li class="hover:bg-gray-300"><a href="#labels" class="block py-1 px-2 text-gray-900">Labels</a></li>
+                        <li class="hover:bg-gray-300"><a href="#text" class="block py-1 px-2 text-gray-900">Text, Text Area, Password &amp; Hidden Fields</a></li>
+                        <li class="hover:bg-gray-300"><a href="#checkboxes" class="block py-1 px-2 text-gray-900">Checkboxes</a></li>
+                        <li class="hover:bg-gray-300"><a href="#radio-buttons" class="block py-1 px-2 text-gray-900">Radio Buttons</a></li>
+                        <li class="hover:bg-gray-300"><a href="#file-input" class="block py-1 px-2 text-gray-900">File Input</a></li>
+                        <li class="hover:bg-gray-300"><a href="#number" class="block py-1 px-2 text-gray-900">Number Input</a></li>
+                        <li class="hover:bg-gray-300"><a href="#date" class="block py-1 px-2 text-gray-900">Date Input</a></li>
+                        <li class="hover:bg-gray-300"><a href="#select-box" class="block py-1 px-2 text-gray-900">Select Box</a></li>
+                        <li class="hover:bg-gray-300"><a href="#select-box-with-optgroup" class="block py-1 px-2 text-gray-900">Select Box with optgroup (Grouped list)</a></li>
+                        <li class="hover:bg-gray-300"><a href="#select-box-with-range" class="block py-1 px-2 text-gray-900">Select Box with range</a></li>
+                        <li class="hover:bg-gray-300"><a href="#select-box-with-months" class="block py-1 px-2 text-gray-900">Select Box with month names</a></li>
+                        <li class="hover:bg-gray-300"><a href="#buttons" class="block py-1 px-2 text-gray-900">Buttons</a></li>
+                        <li class="hover:bg-gray-300"><a href="#custom-macros" class="block py-1 px-2 text-gray-900">Custom Macros</a></li>
+                        <li class="hover:bg-gray-300"><a href="#custom-components" class="block py-1 px-2 text-gray-900">Custom Components</a></li>
+                        <li class="hover:bg-gray-300"><a href="#generating-urls" class="block py-1 px-2 text-gray-900">Generating URLs</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="w-full md:w-3/4 pl-7 pr-3">
+
+                <h1 class="font-bold text-4xl">Forms &amp; HTML</h1>
+
+                <a id="installation"></a>
+                <div class="font-bold text-xl mt-10">Installation</div>
+                <p>Begin by installing this package through Composer. Edit your project's <code>composer.json</code> file to require <code>laravellux/html</code>.</p>
+                <div class="relative">
+                    <pre class="p-2 bg-gray-800 text-white rounded-md overflow-x-auto">$<code id="code1"> composer require laravellux/html</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code1">
+                    </button>
+                </div>
+                <blockquote class="mt-2 px-4 py-2 border-l-4 border-blue-500 text-blue-600 bg-blue-100 rounded-md">
+                    <p>Looking to install this package in <a href="http://lumen.laravel.com" target="\_blank" class="text-blue-700 underline">Lumen</a>? First of all, making this package compatible with Lumen will require some core changes to Lumen, which we believe would dampen the effectiveness of having Lumen in the first place. Secondly, it is our belief that if you need this package in your application, then you should be using Laravel anyway.</p>
+                </blockquote>
+
+                <blockquote class="mt-5 px-4 py-2 border-l-4 border-yellow-500 text-yellow-600 bg-yellow-100 rounded-m">
+                    <a id="important"></a>
+                    <div class="font-bold text-xl mt-4">Important</div>
+                    <p>Since this package internally uses strict comparisons (<code>===</code> instead of <code>==</code>) be careful when passing numeric values into your forms.
+                        Values in HTML are submitted as strings and Laravel old values stored in flash session are strings.</p>
+                    <p>In this example, this package will correctly insert <code>selected</code> HTML attribute into the radio input - because the passed value <code>'1'</code> strictly equals to the old submitted value in the session <code>'1'</code>:</p>
+                    <div class="relative bg-gray-800 text-white rounded-md pr-10">
+                        <pre class="p-2 overflow-x-auto"><code id="code2">{!! Form::radio('category_id', '1') !!}</code> //  '1' === '1' - comparing passed value and old session value</pre>
+                        <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code2">
+                        </button>
+                    </div>
+                    <p>However, in this example, the passed integer value <code>1</code> is not strictly equal to the old submitted string value <code>'1'</code> in the session and the <code>selected</code> HTML attribute will not be inserted:</p>
+                    <div class="relative bg-gray-800 text-white rounded-md pr-10">
+                        <pre class="p-2 overflow-x-auto"><code id="code3">{!! Form::radio('category_id', 1) !!}</code> // 1 === '1' - comparing passed value and old session value</pre>
+                        <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code3">
+                        </button>
+                    </div>
+                </blockquote>
+                <a id="opening-a-form"></a>
+                <div class="font-bold text-2xl mb-4 mt-10">Opening A Form</div>
+                <div class="relative bg-gray-800 text-white rounded-md pr-10">
+                <pre class="p-2 overflow-x-auto"><code id="code4">{!! Form::open(['url' => 'foo/bar']) !!}
+//
+{!! Form::close() !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code4">
+                    </button>
+                </div>
+                <p class="my-2">By default, a <code>POST</code> method will be assumed; however, you are free to specify another method:</p>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                <pre class="p-2 overflow-x-auto"><code id="code5">{!! Form::open(['url' => 'foo/bar', 'method' => 'put']) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code5">
+                    </button>
+                </div>
+                <blockquote class="px-4 py-2 border-l-4 border-blue-500 text-blue-600 bg-blue-100 rounded-md">
+                    <p><strong>Note:</strong> Since HTML forms only support <code>POST</code> and <code>GET</code>, <code>PUT</code> and <code>DELETE</code> methods will be spoofed by automatically adding a <code>_method</code> hidden field to your form.
+                    </p>
+                </blockquote>
+                <p class="my-2">You may also open forms that point to named routes or controller actions:</p>
+                <div class="relative bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code6">{!! Form::open(['route' => 'route.name']) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code6">
+                    </button>
+                </div>
+                <div class="relative bg-gray-800 text-white rounded-md pr-10 mt-2">
+                    <pre class="p-2 overflow-x-auto"><code id="code7">{!! Form::open(['action' => 'Controller@method']) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code7">
+                    </button>
+                </div>
+
+
+                <p class="my-2">You may pass in route parameters as well:</p>
+                <div class="relative bg-gray-800 text-white rounded-md pr-10">
+                <pre class="p-2 overflow-x-auto"><code id="code8">{!! Form::open(['route' => ['route.name', $user->id]]) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code8">
+                    </button>
+                </div>
+                <div class="relative bg-gray-800 text-white rounded-md pr-10 mt-2">
+                    <pre class="p-2 overflow-x-auto"><code id="code9">{!! Form::open(['action' => ['Controller@method', $user->id]]) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code9">
+                    </button>
+                </div>
+
+
+                <p class="mb-2 mt-10">If your form is going to accept file uploads, add a <code>files</code> option to your array:</p>
+                <div class="relative bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code10">{!! Form::open(['url' => 'foo/bar', 'files' => true]) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code10">
+                    </button>
+                </div>
+
+                <p class="my-2">If you need to give the "_method" input attributes:</p>
+                <div class="relative bg-gray-800 text-white rounded-md pr-10 mt-2">
+                    <pre class="p-2 overflow-x-auto"><code id="code48">{!! Form::open(['action' => ['Controller@method', $user->id], 'method_attributes' => ['id' => 'controller_method_form']]) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code48">
+                    </button>
+                </div>
+
+                <a id="csrf-protection"></a>
+                <div class="font-bold text-2xl mt-10">CSRF Protection</div>
+                <div class="font-bold text-lg mt-2">Adding The CSRF Token To A Form</div>
+                <p class="my-2">Laravel provides an easy method of protecting your application from cross-site request forgeries. First, a random token is placed in your user's session. If you use the <em>Form::open</em> method with <code>POST</code>, <code>PUT</code> or <code>DELETE</code> the CSRF token will be added to your forms as a hidden field automatically. Alternatively, if you wish to generate the HTML for the hidden CSRF field, you may use the <code>token</code> method:</p>
+                <div class="relative">
+                    <pre class="p-2 bg-gray-800 text-white rounded-md overflow-x-auto"><code id="code11">{!! Form::token() !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code11">
+                    </button>
+                </div>
+
+                <a id="form-model-binding"></a>
+                <div class="font-bold text-2xl mt-10">Form Model Binding</div>
+                <div class="font-bold text-lg mt-2">Opening A Model Form</div>
+                <p class="my-2">Often, you will want to populate a form based on the contents of a model. To do so, use the <code>Form::model</code> method:</p>
+                <div class="relative bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code13">{!! Form::model($user, ['route' => ['user.update', $user->id]]) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code13">
+                    </button>
+                </div>
+
+                <p class="my-2">Now, when you generate a form element, like a text input, the model's value matching the field's name will automatically be set as the field value. So, for example, for a text input named email, the user model's email attribute would be set as the value. However, there's more! If there is an item in the Session flash data matching the input name, that will take precedence over the model's value. So, the priority looks like this:</p>
+                    <ol class="list list-decimal ml-10 my-2" type="1">
+                        <li>Session Flash Data (Old Input)</li>
+                        <li>Explicitly Passed Value</li>
+                        <li>Model Attribute Data</li>
+                    </ol>
+                <p>This allows you to quickly build forms that not only bind to model values, but easily re-populate if there is a validation error on the server!</p>
+                <blockquote class="px-4 py-2 border-l-4 border-blue-500 text-blue-600 bg-blue-100 rounded-md">
+                    <p><strong>Note:</strong> When using <code>Form::model</code>, be sure to close your form with <code>Form::close</code>!</p>
+                </blockquote>
+
+                <a id="form-model-accessors"></a>
+                <div class="font-bold text-2xl mt-2">Form Model Accessors</div>
+                <p class="my-2">
+                    Laravel <a href="http://laravel.com/docs/5.2/eloquent-mutators#accessors-and-mutators" target="_BLANK">Eloquent Accessors</a> allow you to manipulate a model attribute before returning it. This can be extremely useful for defining global date formats, for example. However, the date format used for display might not match the date format used for form elements. You can solve this by creating two separate accessors: a standard accessor, and/or a form accessor.
+                </p>
+                <p class="my-2">
+                    To define a form accessor, create a <code>formFooAttribute</code> method on your model where Foo is the "camel" cased name of the column you wish to access. In this example, we'll define an accessor for the <code>date_of_birth attribute</code>. The accessor will automatically be called by the HTML Form Builder when attempting to pre-fill a form field when <code>Form::model()</code> is used.
+                </p>
+                <p class="my-2">
+                    You must include the FormAccessible trait in your model definition for this to work.
+                </p>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+<pre class="p-2 overflow-x-auto">
+<code id="code14">
+&lt;?php
+
+namespace App;
+
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
+use LaravelLux\Html\Eloquent\FormAccessible;
+
+class User extends Model
+{
+    use FormAccessible;
+
+    /**
+     * Get the user's date of birth.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function getDateOfBirthAttribute($value)
+    {
+        return Carbon::parse($value)->format('m/d/Y');
+    }
+
+    /**
+     * Get the user's date of birth for forms.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function formDateOfBirthAttribute($value)
+    {
+        return Carbon::parse($value)->format('Y-m-d');
+    }
+}
+</code>
+</pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code14"></button>
+                </div>
+
+                <a id="labels"></a>
+                <div class="font-bold text-2xl mt-2">Labels</div>
+                <div class="font-bold text-lg mt-2">Generating a Label Element</div>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                <pre class="p-2 overflow-x-auto"><code id="code15">{!! Form::label('email', 'E-Mail Address') !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code15"></button>
+                </div>
+
+                <div class="font-bold text-lg mt-2">Specifying Extra HTML Attributes</div>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code16">{!! Form::label('email', 'E-Mail Address', ['class' => 'awesome']) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code16">
+                    </button>
+                </div>
+                <blockquote>
+                    <p><strong>Note:</strong> After creating a label, any form element you create with a name matching the label name will automatically receive an ID matching the label name as well.</p>
+                </blockquote>
+
+                <a id="text"></a>
+                <div class="font-bold text-2xl mt-2">Text, Text Area, Password &amp; Hidden Fields</div>
+
+                <div class="font-bold text-xl mt-2">Generating A Text Input</div>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code17">{!! Form::text('username') !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code17">
+                    </button>
+                </div>
+
+                <div class="font-bold text-xl mt-2">Specifying A Default Value</div>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code18">{!! Form::text('email', 'email@example.com') !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code18">
+                    </button>
+                </div>
+                <blockquote class="px-4 py-2 border-l-4 border-blue-500 text-blue-600 bg-blue-100 rounded-md">
+                    <p><strong>Note:</strong> The <em>hidden</em> and <em>textarea</em> methods have the same signature as the <em>text</em> method.</p>
+                </blockquote>
+
+                <div class="font-bold text-xl mt-2">Generating A Password Input</div>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code19">{!! Form::password('password', ['class' => 'awesome']) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code19">
+                    </button>
+                </div>
+                <blockquote class="px-4 py-2 border-l-4 border-blue-500 text-blue-600 bg-blue-100 rounded-md">
+                    <p><strong>Note:</strong> As passwords are <em>ALWAYS</em> sensitive these will not auto-populate in form models. Although this is configurable in <code>config/html-forms.php</code></p>
+                </blockquote>
+
+                <div class="font-bold text-xl mt-2">Generating Other Inputs</div>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code20">{!! Form::email($name, $value = null, $attributes = []) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code20">
+                    </button>
+                </div>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code21">{!! Form::file($name, $attributes = []) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code21">
+                    </button>
+                </div>
+
+                <a id="checkboxes"></a>
+                <div class="font-bold text-2xl mt-10">Checkboxes</div>
+                <div class="font-bold text-xl mt-2">Generating A Checkbox</div>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code22">{!! Form::checkbox($name, $value, $checked = false, $attributes = []) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code22">
+                    </button>
+                </div>
+
+
+                <a id="radio-buttons"></a>
+                <div class="font-bold text-2xl mt-10">Radio Buttons</div>
+                <div class="font-bold text-xl mt-2">Generating A Radio input</div>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code23">{!! Form::radio($name, $value, $checked = false, $attributes = []) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code23">
+                    </button>
+                </div>
+
+                <a id="number"></a>
+                <div class="font-bold text-2xl mt-10">Number</div>
+                <div class="font-bold text-xl mt-2">Generating A Number Input</div>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code24">{!! Form::number($name, $value, $attributes = []) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code24">
+                    </button>
+                </div>
+
+                <a id="date"></a>
+                <div class="font-bold text-2xl mt-10">Date</div>
+                <div class="font-bold text-xl mt-2">Generating A Date Input</div>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code25">{!! Form::date($name, $value, $attributes = []) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code25">
+                    </button>
+                </div>
+                <blockquote class="px-4 py-2 border-l-4 border-blue-500 text-blue-600 bg-blue-100 rounded-md">
+                    <p><strong>Note:</strong> You can pass in a Carbon object such as <code>now()</code> or <code>Carbon::now()->startOfWeek()</code> as the value and this will be parsed</p>
+                </blockquote>
+
+                <a id="file-input"></a>
+                <div class="font-bold text-2xl mt-10">File</div>
+                <div class="font-bold text-xl mt-2">Generating A File Input</div>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code26">{!! Form::file($name, $attributes = []) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code26">
+                    </button>
+                </div>
+
+                <a id="select-box"></a>
+                <div class="font-bold text-2xl mt-10">Select box</div>
+                <div class="font-bold text-xl mt-2">Generating A Dropdown / Select box</div>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code27">{!! Form::select($name, $values, $default, $attributes = []) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code27">
+                    </button>
+                </div>
+                <blockquote class="px-4 py-2 border-l-4 border-blue-500 text-blue-600 bg-blue-100 rounded-md">
+                    <p class="my-2">
+                        <strong>Note:</strong> <code>$values</code> should be an associative array where the key is the value you want the Laravel backend to receive when the form is submitted.<br />
+                        E.g. The following will have "Pick a size...", "Large", "Small" with "Small" selected by default.
+                    </p>
+                    <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                        <pre class="p-2 overflow-x-auto"><code id="code28">{!! Form::select('size', ['L' => 'Large', 'S' => 'Small'], 'S', ['placeholder' => 'Pick a size...']) !!}</code></pre>
+                        <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code28">
+                        </button>
+                    </div>
+                </blockquote>
+
+
+                <a id="select-box-with-optgroup"></a>
+                <div class="font-bold text-2xl mt-10">Select box with optgroup (Grouped list)</div>
+                <div class="font-bold text-xl mt-2">Generating A Dropdown / Select box</div>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code29">{!! Form::select($name,[
+    $group_name => [$key => $value],
+    $group_name => [$key => $value],
+]) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code29">
+                    </button>
+                </div>
+
+                <a id="select-box-with-range"></a>
+                <div class="font-bold text-2xl mt-10">Select box with range</div>
+                <blockquote class="px-4 py-2 border-l-4 border-red-500 text-red-600 bg-red-100 rounded-md my-5">
+                    <p class="my-2"><strong>WARNING:</strong> Use of this function is deprecated. Please use <code>{!! Form::select($name, range(10, 20)) !!}</code> to achieve this functionality.</p>
+                    <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                        <pre class="p-2 overflow-x-auto"><code id="code31">{!! Form::select('size', ['L' => 'Large', 'S' => 'Small'], 'S', ['placeholder' => 'Pick a size...']) !!}</code></pre>
+                        <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code31">
+                        </button>
+                    </div>
+                </blockquote>
+                <div class="font-bold text-xl mt-2">Generating A dropdown with a range</div>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code32">{!! Form::selectRange('number', 10, 20) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code32">
+                    </button>
+                </div>
+
+                <a id="select-box-with-months"></a>
+                <div class="font-bold text-2xl mt-10">Select box with months</div>
+                <div class="font-bold text-xl mt-2">Generating A dropdown with Month Names</div>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code33">{!! Form::selectMonth($name) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code33">
+                    </button>
+                </div>
+
+                <a id="buttons"></a>
+                <div class="font-bold text-2xl mt-10">Buttons</div>
+                <div class="font-bold text-xl mt-2">Generating A Submit Button</div>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code34">{!! Form::submit($name, $attributes = []) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code34">
+                    </button>
+                </div>
+
+                <div class="font-bold text-xl mt-2">Generating A Regular Button</div>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code35">{!! Form::button($name, $attributes = []) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code35">
+                    </button>
+                </div>
+
+                <a id="custom-macros"></a>
+                <div class="font-bold text-2xl mt-10">Custom Macros</div>
+                <div class="font-bold text-xl mt-2">Registering A Form Macro</div>
+                <p class="my-2">
+                    It's easy to define your own custom Form class helpers called "macros". Here's how it works. <br />
+                    Simply register the macro with a given name and a Closure inside a new service provider called <code>FormServiceProvider</code>.<br />
+                    You can generate this file using the following command:
+                </p>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto">$ <code id="code36">php artisan make:provider FormServiceProvider</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code36">
+                    </button>
+                </div>
+                <p class="my-2">Once you have run this go to <code>app/Providers/FormServiceProvider</code> and add your macros there inside of boot:</p>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code37">Form::macro('myField', function($name)
+{
+    return '&lt;input name="' . $name . ' type="awesome"&gt;';
+});</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code37">
+                    </button>
+                </div>
+                <blockquote class="px-4 py-2 border-l-4 border-blue-500 text-blue-600 bg-blue-100 rounded-md">
+                    <p class="my-2">
+                        <strong>Note:</strong> You are not required to have any function arguments, but you may add as many as you want.
+                    </p>
+                </blockquote>
+                <div class="font-bold text-xl mt-2">Calling A Custom Form Macro</div>
+                <p class="my-2">Once the macro is created you can call it in any blade template just like any other form element:</p>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code38">{!! Form::myField('name') !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code38">
+                    </button>
+                </div>
+
+
+                <a id="custom-components"></a>
+                <div class="font-bold text-2xl mt-10">Custom Components</div>
+                <div class="font-bold text-xl mt-2">Registering A Custom Component</div>
+                <p class="my-2">
+                    Custom Components are similar to Custom Macros, however instead of using a closure to generate the resulting HTML, Components utilize Laravel Blade Templates.
+                    Components can be incredibly useful for developers who use Twitter Bootstrap, or any other front-end framework, which requires additional markup to properly render forms.
+                </p>
+                <p class="my-2">
+                    Let's build a Form Component for a simple Bootstrap text input. You might consider registering your Components inside the FormServiceProvider's boot method.
+                </p>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code39">Form::component('bsText', 'components.form.text', ['name', 'value' => 'default value here', 'attributes' => 'value of attributes by default']);</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code39">
+                    </button>
+                </div>
+                <p class="my-2">
+                    Notice how we reference a view path of components.form.text.
+                    Also, the array we provided is a sort of method signature for your Component.
+                    This defines the names of the variables that will be passed to your view.
+                    Your view might look something like this:
+                </p>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto">// resources/views/components/form/text.blade.php<br /><code id="code40">&lt;div class="form-group"&gt;
+    {{ Form::label($name, null, ['class' => 'control-label']) }}
+    {{ Form::text($name, $value, array_merge(['class' => 'form-control'], $attributes)) }}
+&lt;/div&gt;</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code40">
+                    </button>
+                </div>
+                <blockquote class="px-4 py-2 border-l-4 border-blue-500 text-blue-600 bg-blue-100 rounded-md">
+                    <p class="my-2">
+                        <strong>Note:</strong> Custom Components can also be created on the <code>Html</code> facade in the same fashion as on the <code>Form</code> facade.
+                    </p>
+                </blockquote>
+                <div class="font-bold text-xl mt-2">Calling A Custom Form Component</div>
+                <p class="my-2">
+                    Using our example from above (specifically, the one with default values provided), you can call your Custom Component like so:
+                </p>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code42">{!! Form::bsText('first_name') !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code42">
+                    </button>
+                </div>
+                <p class="my-2">
+                    This would result in something like the following HTML output:
+                </p>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code43">&lt;div class="form-group"&gt;
+&lt;label for="first_name"&gt;First Name&lt;/label&gt;
+&lt;input type="text" name="first_name" value="" class="form-control"&gt;
+&lt;/div&gt;</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code43">
+                    </button>
+                </div>
+
+                <a id="generating-urls"></a>
+                <div class="font-bold text-2xl mt-10">Generating URLs</div>
+                <div class="font-bold text-xl mt-2">link_to</div>
+                <p class="my-2">
+                    This function generates HTML links to the given URL.
+                </p>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code44">{!! link_to('foo/bar', $title = null, $attributes = [], $secure = null) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code44">
+                    </button>
+                </div>
+
+                <div class="font-bold text-xl mt-2">link_to_asset</div>
+                <p class="my-2">
+                    This function generates HTML &lt;link&gt; tag to the asset
+                </p>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code45">{!! link_to_asset('foo/bar', $title = null, $attributes = [], $secure = null) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code45">
+                    </button>
+                </div>
+
+                <div class="font-bold text-xl mt-2">link_to_route</div>
+                <p class="my-2">
+                    This function generates HTML links to the given route.
+                </p>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code46">{!! link_to_route('route.name', $title = null, $parameters = [], $attributes = []) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code46">
+                    </button>
+                </div>
+
+                <div class="font-bold text-xl mt-2">link_to_action</div>
+                <p class="my-2">
+                    This function generates HTML links to the given controller action.
+                </p>
+                <div class="relative my-2 bg-gray-800 text-white rounded-md pr-10">
+                    <pre class="p-2 overflow-x-auto"><code id="code47">{!! link_to_action('HomeController@getIndex', $title = null, $parameters = [], $attributes = []) !!}</code></pre>
+                    <button class="md:inline hidden copyBtn absolute right-2 top-2" aria-label="Copy to Clipboard" title="Copy to Clipboard" data-clipboard-target="#code47">
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white shadow sm:fixed bottom-0 inset-x-0">
+        <div class="px-4 sm:px-6 lg:px-8">
+            <div class="text-center text-sm text-gray-500">
+                &copy; 2023 Laravel Lux. All rights reserved.
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script>
+    <script>
+        var clipboards = new ClipboardJS('.copyBtn');
+
+        const clipboard = '<svg class="fill-current text-white h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"></path><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"></path></svg>';
+
+        const filled_clipboard = '<svg fill="currentColor" class="fill-current text-white h-5 w-5" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>';
+
+        document.querySelectorAll('.copyBtn').forEach(function(btn) {
+            btn.innerHTML = clipboard;
+        });
+
+        clipboards.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = filled_clipboard;
+            setTimeout(function() {
+                e.trigger.innerHTML = clipboard;
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
