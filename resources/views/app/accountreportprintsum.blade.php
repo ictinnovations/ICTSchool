@@ -118,11 +118,8 @@
                         <td>{{$expence->description}}</td>
                         <td>{{date_format(date_create($expence->date), 'd/m/Y')}}</td>
                     </tr>
-
-
-
                 @endforeach
-                <td class="text-right"><strong>Total:</strong></td><td>{{$extotal[0]->total}} Rs.</td><td></td><td></td>
+                <td class="text-right"><strong>Total:</strong></td><td>{{$extotal ? $extotal->total : 0 }} Rs.</td><td></td><td></td>
                 </tbody>
             </table>
         </div>

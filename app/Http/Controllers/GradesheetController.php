@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 use App\Models\Ictcore_integration;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use App\Http\Controllers\ictcoreController;
+use App\Http\Controllers\ICTCoreController;
 Class formfoo5{
 
 }
@@ -193,11 +193,10 @@ class gradesheetController extends BaseController {
 
 public function send_sms($class,$section,$exam,$session)
 {
-
-	//echo "heelo";
-//echo $section;
         $examed    = DB::table('exam')->where('id',$exam)->first();
-		$exam_name =  $examed->type;
+		if($examed)  {
+			$exam_name =$examed->type;
+		}
 		
           $students = DB::table('Student')
                       ->where('Student.isActive', '=', 'Yes')

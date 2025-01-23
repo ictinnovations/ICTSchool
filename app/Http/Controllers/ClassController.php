@@ -213,9 +213,8 @@ class classController extends BaseController
 		$class = ClassModel::select(DB::raw('Class.id,Class.code,Class.name,Class.description,(select count(Student.id) from Student where class=Class.code)as students'))
 			->find($id);
 		echo "<pre>";
-		print_r($class->students);
-		if ($class->students == 0) {
-			//$class->delete();
+		if ($class && $class->students == 0) {
+			$class->delete();
 			return Redirect::to('/class/list')->with("success", "Class Deleted Succesfully.");
 		} else {
 

@@ -15,9 +15,7 @@ use App\Models\AccountingSetting;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 
-class Damidata
-{
-}
+class Damidata {}
 class accountingController extends BaseController
 {
 
@@ -453,11 +451,11 @@ class accountingController extends BaseController
 			$datas = Accounting::select('name', 'amount', 'date', 'description')->where('type', '=', $rtype)->where('date', '>=', $fdate)->where('date', '<=', $tdate)->get();
 			// $total = DB::select(DB::raw("SELECT sum(amount) as total FROM accounting where type='" . $rtype . "' and date >='" . $fdate . "' and date <='" . $tdate . "'"));
 			$total = DB::table('accounting')
-			->where('type', $rtype)
-			->where('date', '>=', $fdate)
-			->where('date', '<=', $tdate)
-			->sum('amount');
-		
+				->where('type', $rtype)
+				->where('date', '>=', $fdate)
+				->where('date', '<=', $tdate)
+				->sum('amount');
+
 			if ($rtype == 'Income') {
 				$tutionfees = FeeCol::join('billHistory', 'stdBill.billNo', '=', 'billHistory.billNo')->select(DB::RAW('sum(stdBill.payableAmount) as payTotal,IFNULL(sum(paidAmount),0) as paiTotal,(IFNULL(sum(payableAmount),0)- IFNULL(sum(paidAmount),0)) as dueamount'))
 					//->where('class',$request->input('class'))
@@ -502,8 +500,11 @@ class accountingController extends BaseController
 
 			$incomes = Accounting::select('name', 'amount', 'description', 'date')->where('type', '=', 'Income')->where('date', '>=', $fdate)->where('date', '<=', $tdate)->get();
 
-			$intotal = DB::select(DB::raw("SELECT sum(amount) as total FROM accounting where type='Income' and date >='" . $fdate . "' and date <='" . $tdate . "'"));
-
+			// $intotal = DB::select(DB::raw("SELECT sum(amount) as total FROM accounting where type='Income' and date >='" . $fdate . "' and date <='" . $tdate . "'"));
+			$intotal = DB::table('accounting')
+				->where('type', 'Income')
+				->whereBetween('date', [$fdate, $tdate])
+				->sum('amount');
 			$tutionfees = FeeCol::join('billHistory', 'stdBill.billNo', '=', 'billHistory.billNo')->select(DB::RAW('sum(stdBill.payableAmount) as payTotal,IFNULL(sum(paidAmount),0) as paiTotal,(IFNULL(sum(payableAmount),0)- IFNULL(sum(paidAmount),0)) as dueamount'))
 				//->where('class',$request->input('class'))
 				//->groupBy('month')
@@ -521,14 +522,18 @@ class accountingController extends BaseController
 			//echo "<pre>";print_r($tutionfees->toArray());exit;
 
 			$expences = Accounting::select('name', 'amount', 'description', 'date')->where('type', '=', 'Expence')->where('date', '>=', $fdate)->where('date', '<=', $tdate)->get();
-			$extotal = DB::select(DB::raw("SELECT sum(amount) as total FROM accounting where type='Expence' and date >='" . $fdate . "' and date <='" . $tdate . "'"));
-			$intotals = $intotal[0]->total + $tutionfees->paiTotal + $otherfees->paiTotal;
+			// $extotal = DB::select(DB::raw("SELECT sum(amount) as total FROM accounting where type='Expence' and date >='" . $fdate . "' and date <='" . $tdate . "'"));
+			$extotal = DB::table('accounting')->where('type', 'Expence')->whereBetween('date', [$fdate, $tdate])->sum('amount');
+
+			$intotals = $intotal[0]->total ?? 0 + $tutionfees->paiTotal + $otherfees->paiTotal;
+			// echo "<pre>";print_r($extotal[0]);exit;
 			//$balance = array($intotal[0]->total-$extotal[0]->total);
-			$balance = array($intotals - $extotal[0]->total);
+			$balance = array($intotals ?? 0 - $extotal[0]->total ?? 0);
 
 
 			$formdata = array($this->getAppdate($fdate), $this->getAppdate($tdate));
 			$institute = Institute::select('*')->first();
+			$datas = [];
 
 			//return View::Make('app.accountreportprintsum', compact('datas','formdata','incomes','expences','intotal','extotal','balance','institute'));
 			return View('app.accountreportprintsum', compact('datas', 'formdata', 'incomes', 'expences', 'intotal', 'extotal', 'balance', 'institute', 'intotals', 'tutionfees', 'otherfees'));

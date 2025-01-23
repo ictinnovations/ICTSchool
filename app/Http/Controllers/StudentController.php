@@ -1031,7 +1031,7 @@ if(isset($match[0])){
 
 			$student = Student::find($request->input('id'));
 
-			if (Input::hasFile('photo')) {
+			if ($request->hasFile('photo')) {
 
 				if (substr($request->file('photo')->getMimeType(), 0, 5) != 'image') {
 					$messages = $validator->errors();

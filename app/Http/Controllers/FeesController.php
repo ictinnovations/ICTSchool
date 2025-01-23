@@ -25,7 +25,7 @@ use App\Models\Ictcore_integration;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use App\Console\Commands\Invoicegenrated;
-use App\Http\Controllers\ictcoreController;
+use App\Http\Controllers\ICTCoreController;
 
 class studentfdata
 {

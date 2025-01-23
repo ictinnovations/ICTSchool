@@ -56,7 +56,7 @@
                 
               </div>
               <div class="col-md-4">
-                <img class="img responsive-img" style="height:150px;width:200px;" src="{{url('/public/images/'.$student->photo)}}" alt="Photo">
+                <img class="img responsive-img" style="height:150px;width:200px;" src="{{asset('images/'.$student->photo)}}" alt="Photo">
               </div>
               <div class="col-md-4">
 
@@ -315,7 +315,7 @@
             <div class="col-md-12">
               <div class="col-md-2"></div>
               <div class="col-md-3">
-                <strong class="text-info font-16" >Present Address :</strong>
+                <strong class="text-info font-16" >Present Address:</strong>
               </div>
               <div class="col-md-7">
                 <label>{{$student->presentAddress}} </label>
@@ -326,7 +326,7 @@
             <div class="col-md-12">
               <div class="col-md-2"></div>
               <div class="col-md-3">
-                <strong class="text-info font-16" >Parmanent Address :</strong>
+                <strong class="text-info font-16" >Parmanent Address:</strong>
               </div>
               <div class="col-md-7">
                 <label>{{$student->parmanentAddress}} </label>

@@ -5,11 +5,11 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use DB;
 use Carbon\Carbon;
-use App\FeeCol;
-use App\FeeSetup;
-use App\FeeHistory;
-use App\Voucherhistory;
-use App\FamilyVouchar;
+use App\Models\FeeCol;
+use App\Models\FeeSetup;
+use App\Models\FeeHistory;
+use App\Models\Voucherhistory;
+use App\Models\FamilyVouchar;
 class Invoicegenrated extends Command
 {
     /**
