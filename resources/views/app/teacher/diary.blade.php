@@ -120,7 +120,7 @@
           $.each(json, function(i, subject) {
              console.log(subject);
 
-            $('#subject').append($('<option>').text(subject.name).attr('value', subject.code));
+            $('#subject').append($('<option>').text(subject.name).attr('value', subject.id));
           });
         }
       });

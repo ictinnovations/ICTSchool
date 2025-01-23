@@ -21,12 +21,8 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use App\Http\Controllers\ictcoreController;
 
-class foobar1
-{
-}
-class formfoo3
-{
-}
+class foobar1 {}
+class formfoo3 {}
 class teacherController extends BaseController
 {
 
@@ -83,7 +79,6 @@ class teacherController extends BaseController
 	 */
 	public function create(Request $request)
 	{
-
 		$rules = [ //'regiNo' => 'required',
 			'fname' => 'required',
 			//'lname' => 'required',
@@ -198,7 +193,7 @@ class teacherController extends BaseController
 					$user->lastname = '';
 				}
 
-				$user->email     =     $request->input('emails');
+				$user->email = $request->input('emails');
 				if ($request->input('emails') == '') {
 					$user->email = "";
 				}
@@ -504,7 +499,7 @@ class teacherController extends BaseController
 
 			$teacher = Teacher::find($request->input('id'));
 
-			if (Input::hasFile('photo')) {
+			if ($request->hasFile('photo')) {
 
 				if (substr($request->file('photo')->getMimeType(), 0, 5) != 'image') {
 					$messages = $validator->errors();
@@ -678,8 +673,7 @@ class teacherController extends BaseController
 		} else {
 			try {
 				$toInsert = 0;
-				$data = \Excel::load($request->file('fileUpload'), function ($reader) {
-				})->get();
+				$data = \Excel::load($request->file('fileUpload'), function ($reader) {})->get();
 				if (!empty($data) && $data->count()) {
 					DB::beginTransaction();
 					try {
@@ -935,15 +929,12 @@ class teacherController extends BaseController
 		return Redirect::to('/teacher/view-timetable/' . $teacher_id)->with("success", "Time Table deleted Succesfully.");
 	}
 
-
-
-
 	public function access($id)
 	{
 		$teacher = Teacher::find($id);
 		if (!empty($teacher) && $teacher->count() > 0) {
 			$chk_teacher  = User::where('login', $teacher->firstName . $teacher->lastName)->where('group_id', $teacher->id)->first();
-			if ($chk_teacher  = User::where('login', $teacher->firstName . $teacher->lastName)->where('group_id', $teacher->id)->count() > 0) {
+			if ($chk_teacher) {
 				return Redirect::to('/teacher/list')->with("error", "Already have Accessed .");
 			}
 			if ($teacher->email != '') {
@@ -954,7 +945,7 @@ class teacherController extends BaseController
 			$user = new User;
 			$user->firstname = $teacher->firstName;
 			$user->lastname  = $teacher->lastName;
-			$user->email     = NULL;
+			$user->email     = $teacher->email;
 			$user->login     = $teacher->firstName . $teacher->lastName;
 			$user->group     =  'Teacher';
 			$user->group_id  = $teacher->id;
@@ -1019,6 +1010,7 @@ class teacherController extends BaseController
 			->where('diaries.diary_date', Carbon::today()->toDateString())
 			->where('diaries.teacher_id', $teacher_id)
 			->get();
+
 		return view('app.teacher.index', compact('diaries', 'teacher_id'));
 	}
 	/**
@@ -1045,9 +1037,8 @@ class teacherController extends BaseController
 			$teacher_sections = DB::table('section')->whereIn('id', $sections)->get();
 			$teachers_class   = DB::table('Class')->whereIn('code', $classes)->get();
 			$teacher_subjects = DB::table('Subject')->whereIn('id', $subjects)->get();
-			//echo "<pre>";print_r($teachers_class);exit;
 		}
-
+		// echo "<pre>";print_r($teacher_subjects);exit; 
 		return view('app.teacher.diary', compact('teacher_sections', 'teachers_class', 'teacher_subjects', 'teacher_id'));
 	}
 
