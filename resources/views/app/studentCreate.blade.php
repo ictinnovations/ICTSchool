@@ -14,7 +14,7 @@ color: red;
 @if (Session::get('success'))
 <div class="alert alert-success">
   <button data-dismiss="alert" class="close" type="button">×</button>
-  <strong>Process Success.</strong> {{ Session::get('success')}}<br><a href="/student/list">View List</a><br>
+  <strong>Process Success.</strong> {{ Session::get('success')}}<br><a href={{url("/student/list")}}>View List</a><br>
 </div>
 @endif
 <div class="row">

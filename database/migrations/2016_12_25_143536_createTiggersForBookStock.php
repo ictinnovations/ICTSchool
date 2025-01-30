@@ -79,12 +79,12 @@ class CreateTiggersForBookStock extends Migration {
 	*/
 	public function down()
 	{
-		DB::unprepared('DROP IF EXISTS TRIGGER `afterBookAdd`');
-		DB::unprepared('DROP IF EXISTS TRIGGER `afterBookDelete`');
-		DB::unprepared('DROP IF EXISTS TRIGGER `afterBookUpdate`');
-		DB::unprepared('DROP IF EXISTS TRIGGER `afterBorrowBookAdd`');
-		DB::unprepared("DROP IF EXISTS TRIGGER `afterBorrowBookDelete`");
-		DB::unprepared("DROP IF EXISTS TRIGGER `afterBorrowBookUpdate`");
+		DB::unprepared('DROP TRIGGER IF EXISTS `afterBookAdd`');
+		DB::unprepared('DROP TRIGGER IF EXISTS `afterBookDelete`');
+		DB::unprepared('DROP TRIGGER IF EXISTS `afterBookUpdate`');
+		DB::unprepared('DROP TRIGGER IF EXISTS `afterBorrowBookAdd`');
+		DB::unprepared('DROP TRIGGER IF EXISTS `afterBorrowBookDelete`');
+		DB::unprepared('DROP TRIGGER IF EXISTS `afterBorrowBookUpdate`');
 	}
 
 }

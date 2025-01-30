@@ -238,7 +238,10 @@ class accountingController extends BaseController
 		}
 		if ($mn != '' && $year != '') {
 
-			$incomes = DB::select(DB::raw("SELECT * FROM accounting WHERE type ='Income' and YEAR(date)='" . $year . "'  and MONTH(date)='" . $month . "'"));
+			$incomes = DB::select(
+				"SELECT * FROM accounting WHERE type = ? AND YEAR(date) = ? AND MONTH(date) = ?",
+				['Income', $year, $month]
+			);
 		}
 		//echo "<pre>".$mn.$year;print_r($incomes);
 		//return View::Make('app.accountIncomeView',compact('incomes'));
@@ -249,10 +252,12 @@ class accountingController extends BaseController
 		$year = trim($request->input('year'));
 		$mn   = trim($request->input('month'));
 		$month  = date('m', strtotime($mn));
+		$incomes = DB::select(
+			"SELECT * FROM accounting WHERE type = ? AND YEAR(date) = ? AND MONTH(date) = ?",
+			['Income', $year, $month]
+		);
 
 
-
-		$incomes = DB::select(DB::raw("SELECT * FROM accounting WHERE type ='Income' and YEAR(date)='" . $year . "'  and MONTH(date)='" . $month . "'"));
 		//return View::Make('app.accountIncomeView',compact('incomes'));
 		return View('app.accountIncomeView', compact('incomes', 'year', 'mn'));
 	}
@@ -378,7 +383,11 @@ class accountingController extends BaseController
 		}
 		if ($mn != '' && $year != '') {
 
-			$expences = DB::select(DB::raw("SELECT * FROM accounting WHERE type ='Expence' and YEAR(date)='" . $year . "'  and MONTH(date)='" . $month . "'"));
+			// $expences = DB::select(DB::raw("SELECT * FROM accounting WHERE type ='Expence' and YEAR(date)='" . $year . "'  and MONTH(date)='" . $month . "'"));
+			$expences = DB::select(
+				"SELECT * FROM accounting WHERE type = ? AND YEAR(date) = ? AND MONTH(date) = ?",
+				['Income', $year, $month]
+			);
 		}
 		return View('app.accountExpenceView', compact('expences', 'year', 'mn'));
 	}
@@ -387,7 +396,11 @@ class accountingController extends BaseController
 		$year     = trim($request->input('year'));
 		$mn       = trim($request->input('month'));
 		$month    = date('m', strtotime($mn));
-		$expences = DB::select(DB::raw("SELECT * FROM accounting WHERE type ='Expence' and YEAR(date)='" . $year . "' and MONTH(date)='" . $month . "'"));
+		// $expences = DB::select(DB::raw("SELECT * FROM accounting WHERE type ='Expence' and YEAR(date)='" . $year . "' and MONTH(date)='" . $month . "'"));
+		$expences = DB::select(
+			"SELECT * FROM accounting WHERE type = ? AND YEAR(date) = ? AND MONTH(date) = ?",
+			['Income', $year, $month]
+		);
 		//return View::Make('app.accountExpenceView',compact('expences'));
 		return View('app.accountExpenceView', compact('expences', 'year', 'mn'));
 	}

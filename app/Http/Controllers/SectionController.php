@@ -239,7 +239,6 @@ class sectionController extends BaseController {
        ->where('section.class_code','=',$class)
       // ->where('isActive','yes')
 		->get();
-		//print_r($section);exit;
 	return $section;
 	}
 

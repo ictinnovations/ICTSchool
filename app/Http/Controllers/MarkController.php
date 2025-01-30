@@ -46,7 +46,7 @@ class markController extends BaseController
 		if ($class_code != '') {
 			$sections = DB::table('section')->where('class_code', $class_code)->get();
 		} else {
-			$eections = array();
+			$sections = array();
 		}
 
 		$section   = $request->input('section');
@@ -58,6 +58,9 @@ class markController extends BaseController
 		} else {
 			$exams = array();
 		}
+		// echo "<pre>";
+        // print_r($sections);
+        // exit;
 		//return View::Make('app.markCreate',compact('classes','subjects'));
 		return View('app.markCreate', compact('classes', 'subjects', 'class_code', 'section', 'session', 'exam', 'sections', 'exams'));
 	}
@@ -660,7 +663,7 @@ class markController extends BaseController
 	public function createmarks(Request $request)
 	{
 
-		//echo "<pre>";print_r(getsubjecclass('cl1'));exit;
+		// echo "<pre>";print_r($request->all());exit;
 		$class = ClassModel::select('id', 'name')->where('code', $request->get('class'))->first();
 
 		$exams = DB::table('exam')->where('section_id', $request->get('section'))->where('class_id', $class->id)->get();
@@ -689,8 +692,8 @@ class markController extends BaseController
 				->groupBy('Student.regiNo')
 				->get();
 
-			//echo "<pre>hgg";print_r($students);exit;
-		}
+			}
+			// echo "<pre>";print_r($students);exit;
 		//return View::Make('app.markCreate',compact('classes','subjects'));
 		return View('app.markscreate', compact('class', 'exams', 'subject_id', 'students', 'param1', 'param2', 'session', 'class_code', 'section'));
 	}

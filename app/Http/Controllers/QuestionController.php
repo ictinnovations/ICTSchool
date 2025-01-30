@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -10,17 +11,17 @@ use App\Models\QuestionTemp;
 use App\Models\Subject;
 use Carbon\Carbon;
 use DB;
-Class formfoo1{
 
-}
+class formfoo1 {}
 class QuestionController extends Controller
 {
     /**
-    * Show the form for creating a new quiz event.
-    *
-    * @return \Illuminate\Http\Response
-    */
-    public function create(){
+     * Show the form for creating a new quiz event.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
         $classes = ClassModel::all();
 
         /*$query =DB::table('Student1')
@@ -34,15 +35,15 @@ class QuestionController extends Controller
     }
 
     /**
-    * Store a newly created quiz event in storage.
-    *
-    * @param  \Illuminate\Http\Request  $request
-    * @return \Illuminate\Http\Response
-    */
+     * Store a newly created quiz event in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function store(Request $request)
     {
 
-        $rules=[
+        $rules = [
 
             'q_name' => 'required',
             'class_id' => 'required',
@@ -52,20 +53,18 @@ class QuestionController extends Controller
             'level' => 'required',
         ];
 
-       /*$messsages = array(
+        /*$messsages = array(
         'lname.required'=>'The Last Name field is required',
         'fname.required'=>'The First Name field is required',
         
         );*/
 
-    
+
 
         $validator = \Validator::make($request->all(), $rules);
-        if ($validator->fails())
-        {
+        if ($validator->fails()) {
             return Redirect::to('/question/create')->withErrors($validator)->withInput();
-        }
-        else {
+        } else {
             $quiz_name  = $request->input('q_name');
             $class_code = $request->input('class_id');
 
@@ -78,35 +77,35 @@ class QuestionController extends Controller
             $tf   = $request->input('tf'); //Correct answer for true or false
             $p    = $request->input('points'); //Question point
 
-           /* Questionnaire::create([
+            /* Questionnaire::create([
                 'questionnaire_name' => $quiz_name,
             ]);*/
 
             //$q_id = Questionnaire::count(); //Questionnaire id.
 
-            for($x = 0; $x < count($questions); $x++){
+            for ($x = 0; $x < count($questions); $x++) {
                 $question = $questions[$x];
                 $choices = ""; //For multiple choice use.
                 $answer = null; //Obviously.
                 $points = $p[$x];
 
-                if($types[$x] == 0){
+                if ($types[$x] == 0) {
                     //ERROR
-                }else if ($types[$x] == 1){//Identification
+                } else if ($types[$x] == 1) { //Identification
                     $answer = $i[$x];
-                }else if($types[$x] == 2){//Multiple choice
+                } else if ($types[$x] == 2) { //Multiple choice
                     $choices = $mc[$x][0] . ";" . $mc[$x][1] . ";" . $mc[$x][2] . ";" . $mc[$x][3];
                     $answer = $c_mc[$x];
-                }else if($types[$x] == 3){//True or False
+                } else if ($types[$x] == 3) { //True or False
                     $answer = $tf[$x];
                 }
 
-                if(trim($question) == "" || is_null($question))
+                if (trim($question) == "" || is_null($question))
                     continue;
-                     //echo $question;
-                         //print_r(Question::all());exit;
+                //echo $question;
+                //print_r(Question::all());exit;
                 Question::create([
-                   // 'questionnaire_id'  => $q_id,
+                    // 'questionnaire_id'  => $q_id,
                     'quize_name'     => $quiz_name,
                     'question_name'     => $question,
                     'session'           => $request->input('session'),
@@ -119,7 +118,7 @@ class QuestionController extends Controller
                     'answer'            => $answer,
                     'points'            => $points
                 ]);
-               // exit;
+                // exit;
             }
 
             /*QuizEvent::create([
@@ -129,181 +128,178 @@ class QuestionController extends Controller
                 'quiz_event_status' => 0,
             ]);*/
 
-            return Redirect::to('/question/create')->with("success","Paper Created Succesfully.");
+            return Redirect::to('/question/create')->with("success", "Paper Created Succesfully.");
         }
     }
 
 
     public function generate(Request $request)
     {
-    	$formdata = new formfoo1;
-		$formdata->class="";
-		$formdata->section="00";
-		$formdata->shift="";
-		$formdata->exam="";
-		$formdata->session="";
-		$formdata->type="";
-    	$classes = ClassModel::all();
-    	$students =array();
-    	return view('app.generatepaper',compact('classes','formdata','students'));
+        $formdata = new formfoo1;
+        $formdata->class = "";
+        $formdata->section = "00";
+        $formdata->shift = "";
+        $formdata->exam = "";
+        $formdata->session = "";
+        $formdata->type = "";
+        $classes = ClassModel::all();
+        $students = array();
+        return view('app.generatepaper', compact('classes', 'formdata', 'students'));
     }
 
     public function post_generate(Request $request)
     {
-    	$getmcqs = Question::where('class_code',$request->class)
-    						->where('subject_id',$request->subject) 
-    						->whereIn('chapter',$request->chapter) 
-    						->where('session',$request->session) 
-    						->where('question_type',2)
-    						->whereIn('level',$request->level) 
-    						->orderByRaw('RAND()')
-    						->take($request->mcqs)
-    						->get();
-    	$getshorts = Question::where('class_code',$request->class)
-    						->where('subject_id',$request->subject) 
-    						->whereIn('chapter',$request->chapter) 
-    						->where('session',$request->session) 
-    						->where('question_type',3)
-    						->whereIn('level',$request->level) 
-    						->orderByRaw('RAND()')
-    						->take($request->short)
-    						->get();
-		$getlongs = Question::where('class_code',$request->class)
-					->where('subject_id',$request->subject) 
-					->whereIn('chapter',$request->chapter) 
-					->where('session',$request->session) 
-					->where('question_type',1)
-					->whereIn('level',$request->level) 
-					->orderByRaw('RAND()')
-					->take($request->long)
-					//->inRandomOrder()
-					->get();
+        $getmcqs = Question::where('class_code', $request->class)
+            ->where('subject_id', $request->subject)
+            ->whereIn('chapter', $request->chapter)
+            ->where('session', $request->session)
+            ->where('question_type', 2)
+            ->whereIn('level', $request->level)
+            ->orderByRaw('RAND()')
+            ->take($request->mcqs)
+            ->get();
+        $getshorts = Question::where('class_code', $request->class)
+            ->where('subject_id', $request->subject)
+            ->whereIn('chapter', $request->chapter)
+            ->where('session', $request->session)
+            ->where('question_type', 3)
+            ->whereIn('level', $request->level)
+            ->orderByRaw('RAND()')
+            ->take($request->short)
+            ->get();
+        $getlongs = Question::where('class_code', $request->class)
+            ->where('subject_id', $request->subject)
+            ->whereIn('chapter', $request->chapter)
+            ->where('session', $request->session)
+            ->where('question_type', 1)
+            ->whereIn('level', $request->level)
+            ->orderByRaw('RAND()')
+            ->take($request->long)
+            //->inRandomOrder()
+            ->get();
         //INSERT INTO connection2.table (SELECT * from connection1.table);
-    	QuestionTemp::truncate();
-    	//echo "<pre>";print_r($getmcqs->toArray());
-    	if($getmcqs){
-	    	foreach ($getmcqs->toArray() as $item) 
-	        {
-	           unset($item['id']); 
-	            $item['created_at'] = Carbon::now();
-	            $item['updated_at'] = Carbon::now();
-	            //echo "<pre>";print_r($item);
-	            QuestionTemp::insert($item);
-	        }
-    	}
-    	if($getshorts){
-	        foreach ($getshorts->toArray() as $item) 
-	        {
-	           unset($item['id']); 
-	            $item['created_at'] = Carbon::now();
-	            $item['updated_at'] = Carbon::now();
-	            //echo "<pre>";print_r($item);
-	            QuestionTemp::insert($item);
-	        }
-    	}
-    	if($getlongs){
-	        foreach ($getlongs->toArray() as $item) 
-	        {
-	           unset($item['id']); 
-	            $item['created_at'] = Carbon::now();
-	            $item['updated_at'] = Carbon::now();
-	            //echo "<pre>";print_r($item);
-	            QuestionTemp::insert($item);
-	        }
-    	}
+        QuestionTemp::truncate();
+        //echo "<pre>";print_r($getmcqs->toArray());
+        if ($getmcqs) {
+            foreach ($getmcqs->toArray() as $item) {
+                unset($item['id']);
+                $item['created_at'] = Carbon::now();
+                $item['updated_at'] = Carbon::now();
+                //echo "<pre>";print_r($item);
+                QuestionTemp::insert($item);
+            }
+        }
+        if ($getshorts) {
+            foreach ($getshorts->toArray() as $item) {
+                unset($item['id']);
+                $item['created_at'] = Carbon::now();
+                $item['updated_at'] = Carbon::now();
+                //echo "<pre>";print_r($item);
+                QuestionTemp::insert($item);
+            }
+        }
+        if ($getlongs) {
+            foreach ($getlongs->toArray() as $item) {
+                unset($item['id']);
+                $item['created_at'] = Carbon::now();
+                $item['updated_at'] = Carbon::now();
+                //echo "<pre>";print_r($item);
+                QuestionTemp::insert($item);
+            }
+        }
         $gmcqs = array();
         //echo $request->print;
-        for($i=0;$i<$request->print;$i++){
+        for ($i = 0; $i < $request->print; $i++) {
 
-        	$tempararymcq   = QuestionTemp::where('question_type',2)->orderByRaw('RAND()')->get();
-        	$tempararylong  = QuestionTemp::where('question_type',1)->get();
-        	$tempararyshort = QuestionTemp::where('question_type',3)->get();
-    		//echo $i;
-    		//echo "===============================================================================================";
-    		//$gmcqs[$i];
-    		foreach ($tempararymcq as $items){
+            $tempararymcq   = QuestionTemp::where('question_type', 2)->orderByRaw('RAND()')->get();
+            $tempararylong  = QuestionTemp::where('question_type', 1)->get();
+            $tempararyshort = QuestionTemp::where('question_type', 3)->get();
+            //echo $i;
+            //echo "===============================================================================================";
+            //$gmcqs[$i];
+            foreach ($tempararymcq as $items) {
 
-    			$gmcqs[$i][] = $items;
-    		}
-    		foreach ($tempararylong as $items){
+                $gmcqs[$i][] = $items;
+            }
+            foreach ($tempararylong as $items) {
 
-    			$gmcqs[$i][] = $items;
-    		}
-    		foreach ($tempararyshort as $items){
+                $gmcqs[$i][] = $items;
+            }
+            foreach ($tempararyshort as $items) {
 
-    			$gmcqs[$i][] = $items;
-    		}
-    		//echo "===============================================================================================";
-    	}
-    	if(empty($gmcqs)){
-    		return Redirect::back()->withInput()->with("error", "No questions found");
-    	}
-    	//echo "<pre>".count($gmcqs);exit;
-    	return view('app.printpaper',compact('gmcqs'));
-    	//echo "<pre>";print_r(array_rand($getmcqs->toArray()));
-    	//foreach()
+                $gmcqs[$i][] = $items;
+            }
+            //echo "===============================================================================================";
+        }
+        if (empty($gmcqs)) {
+            return Redirect::back()->withInput()->with("error", "No questions found");
+        }
+        //echo "<pre>".count($gmcqs);exit;
+        return view('app.printpaper', compact('gmcqs'));
+        //echo "<pre>";print_r(array_rand($getmcqs->toArray()));
+        //foreach()
     }
 
     public function list()
     {
-    	$formdata = new formfoo1;
-		$formdata->class="";
-		$formdata->section="00";
-		$formdata->shift="";
-		$formdata->exam="";
-		$formdata->session="";
-		$formdata->type="";
-    	$classes = ClassModel::all();
-    	$questions =array();
-    	return view('app.paperlist',compact('formdata','classes','questions'));
+        $formdata = new formfoo1;
+        $formdata->class = "";
+        $formdata->section = "00";
+        $formdata->shift = "";
+        $formdata->exam = "";
+        $formdata->session = "";
+        $formdata->type = "";
+        $classes = ClassModel::all();
+        $questions = array();
+        return view('app.paperlist', compact('formdata', 'classes', 'questions'));
     }
     public function getlist(Request $request)
     {
-    	$formdata = new formfoo1;
-		$formdata->class="";
-		$formdata->section="00";
-		$formdata->shift="";
-		$formdata->exam="";
-		$formdata->session="";
-		$formdata->type="";
-    	$classes = ClassModel::all();
-    	//$students =array();
+        $formdata = new formfoo1;
+        $formdata->class = "";
+        $formdata->section = "00";
+        $formdata->shift = "";
+        $formdata->exam = "";
+        $formdata->session = "";
+        $formdata->type = "";
+        $classes = ClassModel::all();
+        //$students =array();
 
-    	$questions = Question::join('Subject','questions.subject_id','=','Subject.id')
-    						->select('questions.*','Subject.name')
-    						->where('class_code',$request->class)
-    						->where('subject_id',$request->subject) 
-    						->whereIn('chapter',$request->chapter) 
-    						->where('session',$request->session) 
-    						//->where('question_type',2)
-    						->whereIn('level',$request->level) 
-    						->orderBy('question_type','ASC')
-    						//->take($request->mcqs)
-    						->get();
-    	return view('app.paperlist',compact('formdata','classes','questions'));
+        $questions = Question::join('Subject', 'questions.subject_id', '=', 'Subject.id')
+            ->select('questions.*', 'Subject.name')
+            ->where('class_code', $request->class)
+            ->where('subject_id', $request->subject)
+            ->whereIn('chapter', $request->chapter)
+            ->where('session', $request->session)
+            //->where('question_type',2)
+            ->whereIn('level', $request->level)
+            ->orderBy('question_type', 'ASC')
+            //->take($request->mcqs)
+            ->get();
+        return view('app.paperlist', compact('formdata', 'classes', 'questions'));
     }
 
     public function edit($id)
     {
-    	$formdata = new formfoo1;
-		$formdata->class="";
-		$formdata->section="00";
-		$formdata->shift="";
-		$formdata->exam="";
-		$formdata->session="";
-		$formdata->type="";
-    	$classes = ClassModel::all();
-    	
-    	$questions = Question::where('id',$id)
-    						->first();
-    	$subjects = Subject::where('class',$questions->class_code)->get();
-    	
-    	return view('app.questionedit',compact('formdata','classes','questions','subjects'));
+        $formdata = new formfoo1;
+        $formdata->class = "";
+        $formdata->section = "00";
+        $formdata->shift = "";
+        $formdata->exam = "";
+        $formdata->session = "";
+        $formdata->type = "";
+        $classes = ClassModel::all();
+
+        $questions = Question::where('id', $id)
+            ->first();
+        $subjects = Subject::where('class', $questions->class_code)->get();
+
+        return view('app.questionedit', compact('formdata', 'classes', 'questions', 'subjects'));
     }
 
     public function update(Request $request)
     {
-    	/*$rules=[
+        /*$rules=[
 
             'q_name' => 'required',
             'class_id' => 'required',
@@ -333,35 +329,35 @@ class QuestionController extends Controller
 
         $p = $request->input('points'); //Question point
 
-       /* Questionnaire::create([
+        /* Questionnaire::create([
             'questionnaire_name' => $quiz_name,
         ]);*/
 
         //$q_id = Questionnaire::count(); //Questionnaire id.
 
-        for($x = 0; $x < count($questions); $x++){
+        for ($x = 0; $x < count($questions); $x++) {
             $question = $questions[$x];
             $choices = ""; //For multiple choice use.
             $answer = null; //Obviously.
             $points = $p[$x];
 
-            if($types[$x] == 0){
+            if ($types[$x] == 0) {
                 //ERROR
-            }else if ($types[$x] == 1){//Identification
+            } else if ($types[$x] == 1) { //Identification
                 $answer = $i[$x];
-            }else if($types[$x] == 2){//Multiple choice
+            } else if ($types[$x] == 2) { //Multiple choice
                 $choices = $mc[$x][0] . ";" . $mc[$x][1] . ";" . $mc[$x][2] . ";" . $mc[$x][3];
                 $answer = $c_mc[$x];
-            }else if($types[$x] == 3){//True or False
+            } else if ($types[$x] == 3) { //True or False
                 $answer = $tf[$x];
             }
 
-            if(trim($question) == "" || is_null($question))
+            if (trim($question) == "" || is_null($question))
                 continue;
-//echo $question;
-//print_r(Question::all());exit;
+            //echo $question;
+            //print_r(Question::all());exit;
             Question::where('id', $request->id)->update([
-               // 'questionnaire_id'  => $q_id,
+                // 'questionnaire_id'  => $q_id,
                 'quize_name'     => $quiz_name,
                 'question_name'     => $question,
                 'session'           => $request->input('session'),
@@ -375,7 +371,7 @@ class QuestionController extends Controller
                 'points'            => $points
             ]);
             //$question = Question::find($request->id);
-           // exit;
+            // exit;
         }
 
         /*QuizEvent::create([
@@ -385,22 +381,21 @@ class QuestionController extends Controller
             'quiz_event_status' => 0,
         ]);*/
 
-        return Redirect::to('/question/list')->with("success","Question Updated Succesfully.");
+        return Redirect::to('/question/list')->with("success", "Question Updated Succesfully.");
     }
 
     public function delete($id)
     {
-    	$del =  Question::where('id', $id)->delete();
-    	return Redirect::to('/question/list')->with("success","Question Deleted Succesfully.");
-
+        $del =  Question::where('id', $id)->delete();
+        return Redirect::to('/question/list')->with("success", "Question Deleted Succesfully.");
     }
 
-    public function chapters(Request $request,$class){
-    	          $getmcqs = Question::where('class_code',$request->class)
-    						->where('subject_id',$request->subject) 
-    						->groupBy('chapter')
-    						->get();
-    	return $getmcqs;
+    public function chapters(Request $request, $class)
+    {
+        $getmcqs = Question::where('class_code', $class)
+            ->where('subject_id', $request->subject)
+            ->groupBy('chapter')
+            ->get();
+        return $getmcqs;
     }
-
 }

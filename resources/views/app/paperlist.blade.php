@@ -324,7 +324,8 @@ function getchapter()
 {
      var aclass = $('#class').val();
      var subject = $('#subject').val();
-
+console.log(aclass);
+console.log(subject);
      //alert(section);
     $.ajax({
       url: "{{url('/chapter/getList')}}"+'/'+aclass+'?subject='+subject,

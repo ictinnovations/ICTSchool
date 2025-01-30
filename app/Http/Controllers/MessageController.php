@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Ictcore_integration;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use App\Http\Controllers\ictcoreController;
+use App\Http\Controllers\ICTCoreController;
 
 class messageController extends BaseController {
 
@@ -107,8 +107,8 @@ class messageController extends BaseController {
 					if($request->input('message')=='other'){
 
 						$drctry = storage_path('app/public/messages/');
-					    $fileName = 'othernoti_'.time().'.'.Input::file('message_file')->getClientOriginalExtension();
-                        Input::file('message_file')->move($drctry ,$fileName);
+					    $fileName = 'othernoti_'.time().'.'.$request->file('message_file')->getClientOriginalExtension();
+                        $request->file('message_file')->move($drctry ,$fileName);
 						sleep(2);
                         echo exec('sox '.$drctry.'/'.$fileName .' -b 16 -r 8000 -c 1 -e signed-integer '.$drctry.'/'.'other.wav');
 						$name_ab          =  $drctry .'other.wav';

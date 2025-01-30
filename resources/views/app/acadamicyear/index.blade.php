@@ -61,7 +61,7 @@
                              <a title='Active' class='btn btn-info' href='{{url("/academicYear/status")}}/{{$year->id}}?status=1' onclick="return confirm('Are you sure?')"> <i class="glyphicon glyphicon-edit icon-white"></i></a>&nbsp&nbsp
                               @endif
                               <a title='Edit' class='btn btn-info' href='{{url("/academicYear/edit")}}/{{$year->id}}'> <i class="glyphicon glyphicon-pencil"></i></a>&nbsp&nbsp
-                              <a title='Delete' class='btn btn-danger' href='{{url("/academicYear/delete")}}/{{$year->id}}'> <i class="glyphicon glyphicon-trash icon-white"></i></a>
+                              <a title='Delete' class='btn btn-danger' href=#> <i class="glyphicon glyphicon-trash icon-white"></i></a>
                               </td>
                             </tr>
                             @endforeach
