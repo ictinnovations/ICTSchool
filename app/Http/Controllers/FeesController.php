@@ -27,12 +27,8 @@ use Illuminate\Support\Facades\Redirect;
 use App\Console\Commands\Invoicegenrated;
 use App\Http\Controllers\ICTCoreController;
 
-class studentfdata
-{
-}
-class formfoo0
-{
-}
+class studentfdata {}
+class formfoo0 {}
 class feesController extends BaseController
 {
 
@@ -605,8 +601,8 @@ class feesController extends BaseController
 						      ->where('billNo','<>',$bill)
 						      ->first();*/
 
-		//echo "<pre>";print_r($totals);exit;
-		return View('app.vouchar.fee_vouchar', compact( 'institute', 'due_date', 'month', 'late_fee', 'discount', 'student', 'fees', 'vouchar_details', 'fees'));
+		// echo "<pre>";print_r($fee);exit;
+		return View('app.vouchar.fee_vouchar', compact('institute', 'due_date', 'month', 'late_fee', 'discount', 'student', 'fees', 'vouchar_details', 'fees'));
 		//http://localhost/apschool/fee/get_vouchar?class=cl1&section=7&session=2018&type=Monthly&month=10&fee_name=2&regiNo=180101                   
 
 
@@ -664,7 +660,7 @@ class feesController extends BaseController
 						      ->where('billNo','<>',$bill)
 						      ->first();*/
 
-		//echo "<pre>";print_r($totals);exit;
+		// echo "<pre>";print_r($institute);exit;
 		return View('app.vouchar.fee_vouchar', compact('classes', 'institute', 'due_date', 'month', 'late_fee', 'discount', 'total_fee', 'student', 'fees', 'vouchar_details', 'totals', 'fees'));
 		//http://localhost/apschool/fee/get_vouchar?class=cl1&section=7&session=2018&type=Monthly&month=10&fee_name=2&regiNo=180101                   
 
@@ -1901,7 +1897,7 @@ class feesController extends BaseController
 		return $fee;
 	}
 
-	public function getDue($class, $stdId)
+	public function getDue(Request $request, $class, $stdId)
 	{
 		$now             =  Carbon::now();
 		$year1           =  $now->year;
@@ -1977,7 +1973,7 @@ class feesController extends BaseController
 			->whereYear('stdBill.created_at', $year)
 			//->where('Student.section',$request->input('section'))
 			->get();
-		//echo "<pre>";print_r($fees);exit;
+		// echo "<pre>";print_r($fees);exit;
 		//return View::Make('app.feeviewstd',compact('classes','student','fees'));
 		return View('app.invoice', compact('classes', 'student', 'fees', 'section', 'month', 'year'));
 	}
@@ -2095,6 +2091,7 @@ class feesController extends BaseController
 			->get();
 		return $billDeatils;
 	}
+
 	public function invoiceDetails($billNo)
 	{
 

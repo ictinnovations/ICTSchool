@@ -314,7 +314,7 @@ if (! function_exists('gfee_setup')) {
 		    $now            =  Carbon::now();
 			$year           =  $now->year;
         	$month          =  $now->month;
-			$fee_setup      = FeeSetup::select('id','title')->where('class','=',$class)->where('title','LIKE',"%".$type."%")->first();
+			$fee_setup      = FeeSetup::select('id','title')->where('class','=',$class)->where('type','LIKE',"%".$type."%")->first();
 
 		return $fee_setup;
 	}
