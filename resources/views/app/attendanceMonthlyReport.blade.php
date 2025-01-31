@@ -85,7 +85,7 @@
             </h5>
             <h6>
                 <span class="rInfo"><strong>Class: </strong> {{$className}}</span>
-                <span class="rInfo"><strong>Session: </strong> {{get_current_session()->title}}</span>
+                <span class="rInfo"><strong>Session: </strong> {{isset(get_current_session()->title)? get_current_session()->title : 'Session not found'}}</span>
                 <span class="rInfo"><strong>Section: </strong> {{$section_data->name}}</span>
                 <!--<span class="rInfo"><strong>Shift: </strong> {{$shift}}</span>-->
             </h6>

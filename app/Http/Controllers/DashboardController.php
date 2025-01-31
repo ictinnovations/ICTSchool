@@ -306,16 +306,16 @@ class DashboardController extends BaseController
 
 			$i++;
 		}
-
+		// echo "<pre>";print_r($attendances_b);
+		// exit;
 
 		// $test = $resultArray1 + $scetionarray;
 		// $result = array_merge_recursive($scetionarray , $resultArray1);
 		//echo "<pre>".$ourallpaid;print_r($resultArray1);
 		//exit;
-		//echo "<pre>";print_r($scetionarray);
+	
 		//echo "<pre>";print_r($resultArray1);
 		//echo "<pre>";print_r($total);
-
 		$month_n = $now->format('F');
 		if ($request->input('month') != "") {
 			$month_n = \DateTime::createFromFormat('!m', $request->input('month'))->format('F');

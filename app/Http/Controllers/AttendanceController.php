@@ -1180,7 +1180,7 @@ class attendanceController extends BaseController
 				->where('date', Carbon::today()->toDateString())
 				->get();
 
-			//echo "<pre>";print_r( $attendances_detail);
+			// echo "<pre>";print_r($attendances_detail);exit;
 			return View('app.attendace_detail', compact('attendances_detail'));
 
 		endif;
