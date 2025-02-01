@@ -1,44 +1,45 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\UsersController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\InstituteController;
-use App\Http\Controllers\AttendanceController;
-use App\Http\Controllers\ClassController;
-use App\Http\Controllers\SectionController;
-use App\Http\Controllers\LevelController;
-use App\Http\Controllers\QuestionController;
-use App\Http\Controllers\SubjectController;
-use App\Http\Controllers\StudentController;
-use App\Http\Controllers\TeacherController;
-use App\Http\Controllers\PaperController;
-use App\Http\Controllers\ExamController;
-use App\Http\Controllers\GpaController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GpaController;
 use App\Http\Controllers\SmsController;
-use App\Http\Controllers\MarkController;
-use App\Http\Controllers\GradesheetController;
-use App\Http\Controllers\TabulationController;
-use App\Http\Controllers\SettingsController;
-use App\Http\Controllers\ICTCoreController;
-use App\Http\Controllers\PromotionController;
-use App\Http\Controllers\TemplateController;
-use App\Http\Controllers\MessageController;
-use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\AccountingController;
+use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\ExamController;
 use App\Http\Controllers\FeesController;
-use App\Http\Controllers\AdmissionController;
-use App\Http\Controllers\LibraryController;
-use App\Http\Controllers\DormitoryController;
-use App\Http\Controllers\BarcodeController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MarkController;
 use App\Http\Controllers\SiteController;
+use Illuminate\Support\Facades\Redirect;
+use App\Http\Controllers\ClassController;
+use App\Http\Controllers\LevelController;
+use App\Http\Controllers\PaperController;
+use App\Http\Controllers\UsersController;
 use App\Http\Controllers\SliderController;
+use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\CronjobController;
+use App\Http\Controllers\ICTCoreController;
+use App\Http\Controllers\LibraryController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\SectionController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\TemplateController;
+use App\Http\Controllers\AdmissionController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DormitoryController;
+use App\Http\Controllers\InstituteController;
+use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\AccountingController;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\GradesheetController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\TabulationController;
 use App\Http\Controllers\AcadamicYearController;
 
 
@@ -328,9 +329,9 @@ Route::group(['middleware' => 'auth'], function () {
         return Redirect::to('/dashboard')->with('success', "Invoice Created Successfully");
     })->name('cron.run');
 
-    Route::get('/cron/invoices/months', function () {
-        $months = Input::get('month');
-        $f_id = Input::get('family_id');
+    Route::get('/cron/invoices/months', function (Request $request) {
+        $months = $request->input('month');
+        $f_id = $request->input('family_id');
         Log::info('Executed at ' . date('Y-m-d H:i:s'));
         Artisan::call("Invoice:months", ['arg_name' => ['month' => $months, 'family_id' => $f_id]]);
         return Redirect::to('/dashboard')->with('success', "Invoice Created Successfully");
