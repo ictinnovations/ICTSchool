@@ -766,15 +766,15 @@ class attendanceController extends BaseController
 			echo $sundays = intval($days / 7) + ($start->format('N') + $days % 7 >= 7);
 			echo "<br>";
 		}
-		echo "<pre>";
-		print_r($attendances);
+		// echo "<pre>";
+		// print_r($attendances);
 
 
 		//echo "<pre>";print_r($yer);
 		$institute = Institute::select('*')->first();
 		$pdf = \PDF::loadView('app.attendancestdreportprint', compact('attendances', 'stdinfo', 'institute'));
 		return $pdf->stream('student-Payments.pdf');
-		exit;
+		// exit;
 		$institute = Institute::select('*')->first();
 		//$rdata =array('payTotal'=>$totals->payTotal,'paiTotal'=>$totals->paiTotal,'dueAmount'=>$totals->dueamount);
 		//$pdf = \PDF::loadView('app.attendancestdreportprint',compact('datas','rdata','stdinfo','institute'));

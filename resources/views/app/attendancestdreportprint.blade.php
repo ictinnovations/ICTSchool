@@ -129,7 +129,7 @@ left:0;
 <tr>
  
   <td></td>
-  <td>Session: <strong>{{get_current_session()->title}}</strong></td>
+  <td>Session: <strong>{{get_current_session()->id}}</strong></td>
 
 </tr>
 <tr>
