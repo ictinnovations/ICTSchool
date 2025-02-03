@@ -1,27 +1,26 @@
 <?php
 namespace App\Http\Controllers\Api;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 
-use App\Http\Controllers\Controller;
-use App\Http\Controllers\ictcoreController;
-
-//use App\Api_models\User;
-
-use Illuminate\Support\Facades\Auth;
-
-use Validator;
-use App\ClassModel;
-use App\Message;
-use App\Subject;
-use App\Attendance;
-use App\Student;
-use App\Ictcore_integration;
-use App\SectionModel;
 use DB;
 use Excel;
-use Illuminate\Support\Collection;
+use Validator;
 use Carbon\Carbon;
+use App\Models\ClassModel;
+use App\Models\Message;
+use App\Models\Subject;
+use App\Models\Attendance;
+use App\Models\Student;
+use App\Models\Ictcore_integration;
+use App\Models\SectionModel;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\ictcoreController;
+
+
+
+use Illuminate\Support\Collection;
 
 class BranchController extends Controller
 {

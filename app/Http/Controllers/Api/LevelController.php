@@ -1,23 +1,16 @@
 <?php
 namespace App\Http\Controllers\Api;
 
+use DB;
+use Validator;
+use App\Models\Level;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
-
 use App\Http\Controllers\Controller;
-
-//use App\Api_models\User;
-
 use Illuminate\Support\Facades\Auth;
-
-use Validator;
-use App\Level;
-use DB;
-
 
 class LevelController extends Controller
 {
-
     public function __construct() 
     {
 

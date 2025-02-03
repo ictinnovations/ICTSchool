@@ -3,27 +3,30 @@
 namespace App\Http\Controllers\Api;
 
 use DB;
+use Excel;
 use Validator;
-use App\Models\Message;
+use Carbon\Carbon;
 use App\Models\Subject;
+use App\Models\Message;
 use App\Models\Student;
-use App\Models\ClassModel;
 use App\Models\Attendance;
+use App\Models\ClassModel;
 use App\Models\SectionModel;
 use App\Models\Ictcore_integration;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Collection;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use App\Http\Controllers\ictcoreController;
 use App\Http\Controllers\Api\NotificationController;
 
-class ClassController extends Controller
+class sectionController extends Controller
 {
     public function __construct()
     {
 
-        //  $this->middleware('auth:api');
-
+        $this->middleware('auth:api');
     }
     public $successStatus = 200;
 
@@ -32,61 +35,56 @@ class ClassController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function classes()
+    public function section()
     {
-        $classes = DB::table('Class')->select('id', 'code', 'name', 'description')->get();
-        if (count($classes) < 1) {
-            return response()->json(['error' => 'No Class Found!'], 404);
+        $section = DB::table('section');
+        $section->when(request('class', false), function ($q, $class) {
+
+            $classc = DB::table('Class')->select('*')->where('id', '=', $class)->first();
+
+            return $q->where('class_code',  $classc->code);
+        });
+
+        $section = $section->paginate(20);
+        if (count($section) < 1) {
+            return response()->json(['error' => 'No Section Found!'], 404);
         } else {
-            return response()->json($classes, 200);
-        }
-    }
-    /**
-     * student_classwise api
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function classes_count()
-    {
-        $tclass          =  ClassModel::count();
-        if (count($tclass) == 0) {
-            return response()->json(['error' => 'No Class Found!'], 404);
-        } else {
-            return response()->json($tclass, 200);
+            return response()->json($section, 200);
         }
     }
 
-    public function getclass($class_id)
+    public function getsection($section_id)
     {
-        $class = ClassModel::select('id', 'code', 'name', 'description')->where('id', $class_id)->first();
-
-        if (!is_null($class) && $class->count() > 0) {
-            return response()->json($class);
+        //$section = SectionModel::find($section_id);
+        $now   = Carbon::now();
+        $year  =  $now->year;
+        $section = DB::table('section')->leftjoin('Student', 'section.id', '=', 'Student.section')
+            ->select('section.id', 'section.name', 'section.class_code', DB::raw("count(DISTINCT(Student.id)) as total_student"))->where('section.id', $section_id)->where('Student.session', $year)->where('Student.isActive', 'Yes')->groupBy('Student.section');
+        // ,DB::raw("GROUP_CONCAT(estimation.id SEPARATOR ',') as estimations")
+        if (!is_null($section) && $section->count() > 0) {
+            return response()->json($section->first(), 200);
         } else {
-            return response()->json(['error' => 'Class Not Found'], 404);
+            return response()->json(['error' => 'Section Not Found'], 404);
         }
     }
-
-    public function getclass_section($class_id)
+    public function putsection(Request $request, $section_id)
     {
-        $classes = ClassModel::find($class_id);
 
+        $section = SectionModel::find($section_id);
+        if (!is_null($section) && $section->count() > 0) {
 
-        $section = DB::table('section')->select('name', 'description')->where('class_code', $classes->code)->get();
-
-
-
-        if (!is_null($classes) && $classes->count() > 0) {
+            $section = SectionModel::find($section_id);
+            $section->name = $request->input('name');
+            $section->description = $request->input('description');
+            $section->save();
             return response()->json($section, 200);
         } else {
-            return response()->json(['error' => 'Class Sections Not Found'], 404);
+            return response()->json(['error' => 'Section Not Found'], 404);
         }
     }
-
     public function update_class(Request $request, $class_id)
     {
         $rules = [
-            'code' => 'required',
             'name' => 'required',
             'description' => 'required'
         ];
@@ -94,49 +92,131 @@ class ClassController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         } else {
-            $class = ClassModel::select('id', 'code', 'name', 'description')->where('id', $class_id)->first();
-            $class->code = $request->input('code');
+            $class = ClassModel::find($class_id);
             $class->name = $request->input('name');
             $class->description = $request->input('description');
             $class->save();
-            return response()->json($class, 200);
+            return response()->json(['success' => "Class Updated Succesfully."]);
+        }
+    }
+    public function getsectionsubject($section_id)
+    {
+
+        $section = SectionModel::find($section_id);
+        $subject = DB::table('Subject')->select('code', 'name', 'type', 'class', 'stdgroup')->where('class', $section->class_code)->get();
+        //
+        /*->join('Class', 'Student.class', '=', 'Class.code')
+          ->select('Student.id', 'Student.regiNo', 'Student.rollNo', 'Student.firstName', 'Student.middleName', 'Student.lastName', 'Student.fatherName', 'Student.motherName', 'Student.fatherCellNo', 'Student.motherCellNo', 'Student.localGuardianCell',
+          'Class.Name as class','Student.section' ,'Student.presentAddress', 'Student.gender', 'Student.religion')
+            ->where('Student.id',$student_id)->first();*/
+        if (!is_null($subject) && count($subject) > 0) {
+            return response()->json($subject);
+        } else {
+            return response()->json(['error' => 'Subject Not Found'], 401);
+        }
+    }
+    public function getsectionstudent($section_id)
+    {
+        $section = SectionModel::find($section_id);
+        // $student = DB::table('Student')->select('*')->where('class',$section->class_code)->where('section',$section_id)->get();
+        $student = DB::table('Student')
+            ->join('Class', 'Student.class', '=', 'Class.code')
+            ->select(
+                'Student.id',
+                'Student.regiNo',
+                'Student.rollNo',
+                'Student.firstName',
+                'Student.middleName',
+                'Student.lastName',
+                'Student.fatherName',
+                'Student.motherName',
+                'Student.fatherCellNo',
+                'Student.motherCellNo',
+                'Student.localGuardianCell',
+                'Class.Name as class',
+                'Student.section',
+                'Student.group',
+                'Student.session',
+                'Student.presentAddress',
+                'Student.gender',
+                'Student.religion'
+            )
+            ->where('Student.isActive', 'Yes')
+            ->get();
+
+        /*->join('Class', 'Student.class', '=', 'Class.code')
+          ->select('Student.id', 'Student.regiNo', 'Student.rollNo', 'Student.firstName', 'Student.middleName', 'Student.lastName', 'Student.fatherName', 'Student.motherName', 'Student.fatherCellNo', 'Student.motherCellNo', 'Student.localGuardianCell',
+          'Class.Name as class','Student.section' ,'Student.presentAddress', 'Student.gender', 'Student.religion')
+            ->where('Student.id',$student_id)->first();*/
+        if (!is_null($student) && count($student) > 0) {
+
+            return response()->json($student, 200);
+        } else {
+            return response()->json(['error' => 'Student Not Found'], 404);
         }
     }
 
+    public function getsectionteacher($section_id)
+    {
 
-    public function classwisenotification(Request $request, $class_id)
+        $section = SectionModel::find($section_id);
+        $student = DB::table('Student')->select('*')->where('class', $section->class_code)->where('section', $section_id)->get();
+
+        $teacher = DB::table('teacher')
+            ->join('timetable', 'teacher.id', '=', 'timetable.teacher_id')
+            ->join('Subject', 'timetable.subject_id', '=', 'Subject.id')
+            ->select(
+                'teacher.id',
+                'teacher.firstName',
+                'teacher.lastName',
+                'teacher.fatherName',
+                'teacher.fatherCellNo',
+                'teacher.fatherCellNo',
+                'teacher.presentAddress',
+                'Subject.name as Subject'
+            )->groupby('timetable.teacher_id')
+            ->where('timetable.section_id', $section_id)->get();
+        /*->join('Class', 'Student.class', '=', 'Class.code')
+           ->select('Student.id', 'Student.regiNo', 'Student.rollNo', 'Student.firstName', 'Student.middleName', 'Student.lastName', 'Student.fatherName', 'Student.motherName', 'Student.fatherCellNo', 'Student.motherCellNo', 'Student.localGuardianCell',
+          'Class.Name as class','Student.section' ,'Student.presentAddress', 'Student.gender', 'Student.religion')
+            ->where('Student.id',$student_id)->first();*/
+        if (!is_null($teacher) && count($teacher) > 0) {
+            return response()->json($teacher, 200);
+        } else {
+            return response()->json(['error' => 'Teacher Not Found'], 404);
+        }
+    }
+    //
+    public function sectionwisenotification(Request $request, $section_id)
     {
         $rules = [
             'name'    => 'required',
             'type'    => 'required',
             'message' => 'required'
-        ];
 
+        ];
         $validator = \Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         } else {
-            /*$drctry = storage_path('app/public/messages/');
+            /* $drctry = storage_path('app/public/messages/');
                  $mimetype      = mime_content_type($drctry.$request->input('message'));
                 if($mimetype =='audio/x-wav' || $mimetype=='audio/wav'){ */
             $ictcore_integration = Ictcore_integration::select("*")->first();
 
             if (!empty($ictcore_integration) && $ictcore_integration->ictcore_url != '' && $ictcore_integration->ictcore_user != '' && $ictcore_integration->ictcore_password != '') {
+
                 $ict  = new ictcoreController();
                 $postmethod  = new NotificationController();
-                $classes = ClassModel::find($class_id);
-                $class_code = $classes->code;
-
                 $data = array(
                     'name' => $request->input('name'),
-                    'description' => 'this is class ' . $class_code . ' group',
+                    'description' => 'this is section wise group',
                 );
                 $group_id = $ict->ictcore_api('groups', 'POST', $data);
-
                 $student =   DB::table('Student')
                     ->select('*')
                     ->where('isActive', 'Yes')
-                    ->where('class', $class_code)
+                    ->where('section', $section_id)
                     ->get();
                 foreach ($student as $std) {
                     $data = array(
@@ -150,8 +230,8 @@ class ClassController extends Controller
                 }
                 return $postmethod->postnotificationmethod($request->input('name'), $request->input('type'), $request->input('message'), 'group', $group_id);
                 /*}else{
-                     return response()->json("ERROR:Please Upload Correct file",415 );
-                 }*/
+                 return response()->json("ERROR:Please Upload Correct file",415 );
+             }*/
             } else {
 
                 return response()->json(['Error' => "Please Add Intigration  in Setting. Notification not send"], 400);
@@ -159,7 +239,7 @@ class ClassController extends Controller
         }
     }
 
-    /* public function classwisenotification($class_id){
+    /*public function sectionwisenotification($section_id){
 
         $rules=[
             'name'        => 'required',
@@ -172,6 +252,13 @@ class ClassController extends Controller
          return response()->json($validator->errors(), 422);
         }
         else{
+
+                      $section = SectionModel::find($section_id);
+
+                      if(is_null($section)){
+                         return response()->json(['error'=>'Section Not Found'], 404);
+                         exit;
+                      }
                     $finfo = new \finfo(FILEINFO_MIME_TYPE);
                     $mimetype      = $finfo->buffer(base64_decode($request->input('recording')));
 
@@ -194,8 +281,11 @@ class ClassController extends Controller
 
                          $recording_id  =  $ict->ictcore_api('messages/recordings','POST',$data );
                          $name          =  base_path() .'/public/recording/'.$filename.".wav";
+
+
                          $finfo         =  new \finfo(FILEINFO_MIME_TYPE);
                          $mimetype      =  $finfo->file($name);
+
                          $cfile         =  curl_file_create($name, $mimetype, basename($name));
                          $data          =  array( $cfile);
                          $result        =  $ict->ictcore_api('messages/recordings/'.$recording_id.'/media','PUT',$data );
@@ -234,14 +324,14 @@ class ClassController extends Controller
                         );
                     $group_id= $ict->ictcore_api('groups','POST',$data );
 
-                    $classes = ClassModel::find($class_id);
+                  //  $classes = ClassModel::find($class_id);
 
-                    $class_code = $classes->code;
+                  //  $class_code = $classes->code;
 
                     $student=   DB::table('Student')
                         ->select('*')
                         ->where('isActive','Yes')
-                        ->where('class', $class_code)
+                        ->where('section', $section_id)
                         ->get();
                         foreach($student as $std){
 
@@ -276,5 +366,5 @@ class ClassController extends Controller
 
             }
         }
-    }*/
+    } */
 }
