@@ -202,6 +202,9 @@ class StudentController extends Controller
     {
         //$student = Student::find($student_id);
         $student = Student::find($student_id);
+        if (!$student) {
+            return response()->json(['error' => 'Student Not Found of ID: ' . $student_id], 404);
+        }
 
         $subject = DB::table('Subject')->select('code', 'name', 'type', 'class', 'stdgroup')->where('class', $student->class)->where('stdgroup', $student->group)->get();
 

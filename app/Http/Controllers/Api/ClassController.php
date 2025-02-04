@@ -49,7 +49,7 @@ class ClassController extends Controller
     public function classes_count()
     {
         $tclass          =  ClassModel::count();
-        if (count($tclass) == 0) {
+        if ($tclass == 0) {
             return response()->json(['error' => 'No Class Found!'], 404);
         } else {
             return response()->json($tclass, 200);
@@ -70,11 +70,10 @@ class ClassController extends Controller
     public function getclass_section($class_id)
     {
         $classes = ClassModel::find($class_id);
-
-
+        if (!$classes) {
+            return response()->json(['error' => 'Class Sections Not Found of ID: ' . $class_id], 404);
+        }
         $section = DB::table('section')->select('name', 'description')->where('class_code', $classes->code)->get();
-
-
 
         if (!is_null($classes) && $classes->count() > 0) {
             return response()->json($section, 200);
@@ -95,6 +94,9 @@ class ClassController extends Controller
             return response()->json($validator->errors(), 422);
         } else {
             $class = ClassModel::select('id', 'code', 'name', 'description')->where('id', $class_id)->first();
+            if (!$class) {
+                return response()->json(['error' => 'Class Not Found of ID: ' . $class_id], 404);
+            }
             $class->code = $request->input('code');
             $class->name = $request->input('name');
             $class->description = $request->input('description');
