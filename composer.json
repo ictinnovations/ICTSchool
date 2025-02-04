@@ -9,7 +9,7 @@
         "barryvdh/laravel-dompdf": "^2.2",
         "jeremykenedy/laravel-logger": "^9.0",
         "laravel/framework": "^11.9",
-        "laravel/passport": "^12.0",
+        "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "maatwebsite/excel": "^3.1",
         "nesbot/carbon": "^3.5",

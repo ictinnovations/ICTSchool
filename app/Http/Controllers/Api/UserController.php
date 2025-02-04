@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Input;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -43,11 +44,13 @@ class UserController extends Controller
             $user = $request->input('username');
             $parameter = 'login';
         }
-        if (Auth::attempt([$parameter => $user, 'password' => request('password')])) {
-
+        if (Auth::attempt([$parameter => $user, 'password' => $request->input('password')])) {
+            
             $user = Auth::user();
-            $success['token'] =  $user->createToken('MyApp')->accessToken;
+            // $success['token'] =  $user->createToken('MyApp')->accessToken;
+            $success['token'] =  $user->createToken('DefaultToken')->plainTextToken;
             if ($user->group == 'Teacher') {
+                // echo"<pre>";print_r($user);exit; 
                 $success['teacher_id'] =  $user->group_id;
             }
             return response()->json(['success' => $success], $this->successStatus);
