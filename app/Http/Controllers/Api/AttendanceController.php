@@ -25,6 +25,7 @@ use Illuminate\Support\Collection;
 use App\Http\Controllers\ictcoreController;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class AttendanceController extends Controller
 {
@@ -433,6 +434,9 @@ class AttendanceController extends Controller
 	public function get_attendance_classes($class_id)
 	{
 		$classc = DB::table('Class')->select('*')->where('id', '=', $class_id)->first();
+		if (!$classc) {
+			return response()->json(['error' => 'Class Not Found of ID: ' . $class_id], 404);
+		}
 		$attendance = DB::table('Student')
 			->join('Attendance', 'Student.regiNo', '=', 'Attendance.regiNo')
 			->select('Attendance.id', 'Student.regiNo', 'Student.rollNo', 'Student.firstName', 'Student.middleName', 'Student.lastName', 'Student.class', 'Attendance.status', 'Attendance.date')
@@ -493,6 +497,11 @@ class AttendanceController extends Controller
 	public function get_attendance_class_today($class_id)
 	{
 		$classc = DB::table('Class')->select('*')->where('id', '=', $class_id)->first();
+
+		if (!$classc) {
+			return response()->json(['error' => 'Class Not Found of ID: ' . $class_id], 404);
+		}
+
 		$attendance = DB::table('Student')
 			->select(DB::raw("Student.id as student_id ,Student.regiNo, Student.rollNo, Student.firstName, Student.middleName, Student.lastName,Student.class,Attendance.status,Attendance.date,Class.id as class_id"))
 			->join('Class', 'Student.class', '=', 'Class.code')
