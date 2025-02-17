@@ -391,7 +391,7 @@ $get_data = branchesapi($branch->username,$branch->password,$branch->branch_url,
                                             </div>
                                             <div class="text">
                                              {{--<h1>{{Voucharcheck()}}dsds</h1>--}}
-                                                <h2>{{$fee_check_status->payTotal - $fee_check_status->paiTotal}}</h2>
+                                                <h2>{{($fee_check_status->payTotal - $fee_check_status->paiTotal)- $fee_check_status->adjustTotal}}</h2>
                                                 <span>Pending Amount <small>[{{$month_n}}]</small></span>
                                             </div>
                                         </div>

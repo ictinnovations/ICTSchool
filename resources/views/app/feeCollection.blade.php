@@ -12,7 +12,7 @@
     @if (Session::get('success'))
         <div class="alert alert-success">
             <button data-dismiss="alert" class="close" type="button">×</button>
-            <strong>Process Success.</strong> {{ Session::get('success') }}<br><a href="/fees/view">View List</a><br>
+            <strong>Process Success.</strong> {{ Session::get('success') }}<br><a href="{{ url('/fees/view') }}">View List</a><br>
         </div>
     @endif
     @if (count($errors) > 0)

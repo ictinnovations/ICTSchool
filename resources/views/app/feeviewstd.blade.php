@@ -150,6 +150,7 @@
                   <th>Bill No</th>
                   <th>Payable Amount</th>
                   <th>Paid Amount</th>
+                  <th>Adjust Amount</th>
                   <th>Due Amount</th>
                   <th>Pay Date</th>
                   <th>Action</th>
@@ -161,6 +162,7 @@
                   <td><a class="btnbill" href="#">{{$fee->billNo}}</a></td>
                   <td>{{$fee->payableAmount}}</td>
                   <td>{{$fee->paidAmount}}</td>
+                  <td>{{$fee->adjusted}}</td>
                   <td>{{$fee->dueAmount}}</td>
                   <td>{{$fee->date}}</td>
 

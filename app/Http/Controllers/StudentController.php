@@ -885,7 +885,6 @@ if(isset($match[0])){
 
 	public function add_family_discount(Request $request, $family_id)
 	{
-
 		$ids = $request->input('student_id');
 		$dis = $request->input('discount');
 		$i = 0;
@@ -900,24 +899,19 @@ if(isset($match[0])){
 			if ($dis[$i] == '') {
 				$student->discount_id = 0;
 			}
-
 			$student->save();
 			$i++;
 		}
 		//exit;
-
 		return Redirect::to('/family/students/' . $family_id)->with("success", "Family Discount Added Succesfully.");
 	}
-
-
-
 
 	public function view($id)
 	{
 		$student = DB::table('Student')
 			->join('Class', 'Student.class', '=', 'Class.code')
 			->join('section', 'Student.section', '=', 'section.id')
-			->join('acadamic_year', 'Student.session', '=', 'acadamic_year.id')
+			->leftjoin('acadamic_year', 'Student.session', '=', 'acadamic_year.id')
 			//->leftjoin('Attendance', 'Student.regiNo', '=', 'Attendance.regiNo')
 			->select(
 				'Student.id',
@@ -953,7 +947,7 @@ if(isset($match[0])){
 			)
 			->where('Student.id', '=', $id)
 			->first();
-		$attendances = DB::table('Attendance')->where('Attendance.date', Carbon::today()->toDateString())->where('regiNo', $student->regiNo)->first();
+			$attendances = DB::table('Attendance')->where('Attendance.date', Carbon::today()->toDateString())->where('regiNo', $student->regiNo)->first();
 		//return View::Make("app.studentView",compact('student'));
 		$fees  = FeeSetup::select('id', 'title')->where('class', '=', $student->class_code)->where('type', '=', 'Monthly')->first();
 

@@ -486,6 +486,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/fees/history/{billNo}', [FeesController::class, 'invoicehist']);
     Route::get('/fees/invoice/details/{billNo}', [FeesController::class, 'invoiceDetails']);
     Route::post('/fees/invoice/collect/{billNo}', [FeesController::class, 'invoiceCollect']);
+    Route::post('/fees/invoice/adjust/{billNo}', [FeesController::class, 'invoiceAdjust']);
     Route::get('/fees/classreport', [FeesController::class, 'classreportindex']);
     // Route::post('/fees/classreport','feesController@classreport');
     Route::post('/fees/classreport', [FeesController::class, 'classview']);

@@ -103,6 +103,9 @@ class sectionController extends Controller
     {
 
         $section = SectionModel::find($section_id);
+        if (!$section) {
+            return response()->json(['error' => 'Section Not Found of ID: ' . $section_id], 401);
+        }
         $subject = DB::table('Subject')->select('code', 'name', 'type', 'class', 'stdgroup')->where('class', $section->class_code)->get();
         //
         /*->join('Class', 'Student.class', '=', 'Class.code')
@@ -142,6 +145,7 @@ class sectionController extends Controller
                 'Student.religion'
             )
             ->where('Student.isActive', 'Yes')
+            ->where('Student.section', $section_id)
             ->get();
 
         /*->join('Class', 'Student.class', '=', 'Class.code')
@@ -158,8 +162,10 @@ class sectionController extends Controller
 
     public function getsectionteacher($section_id)
     {
-
         $section = SectionModel::find($section_id);
+        if (!$section) {
+            return response()->json(['error' => 'Section Not Found of ID: ' . $section_id], 401);
+        }
         $student = DB::table('Student')->select('*')->where('class', $section->class_code)->where('section', $section_id)->get();
 
         $teacher = DB::table('teacher')

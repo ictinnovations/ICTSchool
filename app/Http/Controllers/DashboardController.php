@@ -51,8 +51,8 @@ class DashboardController extends BaseController
 		$year             =  get_current_session()->id;
 		// $year             =  get_current_session();
 		// echo "<pre>";
-        // print_r($year);
-        // exit;
+		// print_r($year);
+		// exit;
 		if ($request->input('month') == "") {
 			$month            =  $now->month;
 		} else {
@@ -68,7 +68,7 @@ class DashboardController extends BaseController
 		// echo get_current_session()->id. $tstudent;exit;
 		// dd($year);
 
-	
+
 		$teacher         =  Teacher::count();
 		$totalAttendance = Attendance::groupBy('date')
 			->select('date')
@@ -177,10 +177,18 @@ class DashboardController extends BaseController
 		//echo "<pre>";print_r($monthlyexp);exit;
 
 
-		$fee_check_status   = FeeCol::join('billHistory', 'stdBill.billNo', '=', 'billHistory.billNo')->select(DB::RAW('IFNULL(sum(payableAmount),0) as payTotal,IFNULL(sum(total_fee),0) as Totalpay,IFNULL(sum(paidAmount),0) as paiTotal,(IFNULL(sum(total_fee),0)- IFNULL(sum(paidAmount),0)) as dueAmount,(IFNULL(sum(payableAmount),0)- IFNULL(sum(paidAmount),0)) as dueamount'))
+		$fee_check_status   = FeeCol::join('billHistory', 'stdBill.billNo', '=', 'billHistory.billNo')
+			->select(DB::RAW('IFNULL(sum(payableAmount),0) as payTotal,
+			IFNULL(sum(total_fee),0) as Totalpay,
+			IFNULL(sum(paidAmount),0) as paiTotal,
+			IFNULL(sum(adjusted),0) as adjustTotal,
+			(IFNULL(sum(total_fee),0)- IFNULL(sum(paidAmount),0)) as dueAmount,
+			(IFNULL(sum(payableAmount),0)- IFNULL(sum(paidAmount),0)) as dueamount'))
 			->where('month', '=', $month)
 			->first();
-		//  echo "<pre>";print_r($fee_check_status);exit;
+		// echo "<pre>";
+		// print_r($fee_check_status);
+		// exit;
 		//return View::Make('dashboard',compact('error','success','total','incomes','expences','balance'));
 
 		//paid or unpaid fee list
@@ -227,11 +235,15 @@ class DashboardController extends BaseController
 							->select('billHistory.billNo', 'billHistory.month', 'billHistory.fee', 'billHistory.lateFee', 'stdBill.class as class1', 'stdBill.payableAmount', 'stdBill.billNo', 'stdBill.payDate', 'stdBill.regiNo', 'stdBill.paidAmount')
 							// ->whereYear('stdBill.payDate', '=', 2017)
 							->where('stdBill.regiNo', '=', $stdfees->regiNo)
-							->where('stdBill.paidAmount', '<>', '0.00')
 							->where('stdBill.regiNo', '=', $stdfees->regiNo)
 							->whereYear('stdBill.payDate', '=', $year1)
 							->where('billHistory.month', '=', $month)
 							->where('billHistory.month', '<>', '-1')
+							// ->where('stdBill.paidAmount', '<>', '0.00')
+							->where(function ($query) {
+								$query->where('stdBill.paidAmount', '<>', '0.00')
+									->orWhere('stdBill.adjusted', '>', 0);
+							})
 							//->orderby('stdBill.payDate')
 							->get();
 						if (count($student) > 0) {
@@ -313,7 +325,7 @@ class DashboardController extends BaseController
 		// $result = array_merge_recursive($scetionarray , $resultArray1);
 		//echo "<pre>".$ourallpaid;print_r($resultArray1);
 		//exit;
-	
+
 		//echo "<pre>";print_r($resultArray1);
 		//echo "<pre>";print_r($total);
 		$month_n = $now->format('F');

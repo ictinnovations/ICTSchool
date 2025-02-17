@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use App\Console\Commands\Invoicegenrated;
 use App\Http\Controllers\ICTCoreController;
+use Illuminate\Support\Facades\Log;
 
 class studentfdata {}
 class formfoo0 {}
@@ -1611,19 +1612,15 @@ class feesController extends BaseController
 	}
 	public function postCollection(Request $request)
 	{
-
 		$rules = [
-
 			'class'      => 'required',
 			'student'    => 'required',
 			//'date'     => 'required',
 			'paidamount' => 'required',
 			'dueamount'  => 'required',
 			'ctotal'     => 'required'
-
 		];
-		//echo "<pre>";print_r($request->all());
-		//exit;
+
 		$validator = \Validator::make($request->all(), $rules);
 
 		if ($validator->fails()) {
@@ -1654,7 +1651,8 @@ class feesController extends BaseController
 				$type            = $request->input('type1');
 				$month           = $feeMonths[0];
 				$counter         = count($feeTitles);
-
+				// echo "<pre>";print_r($request->all());
+				// exit;
 				if ($counter > 0) {
 					$rows = FeeCol::count();
 					if ($rows < 9) {
@@ -1665,8 +1663,8 @@ class feesController extends BaseController
 
 						$billId = 'B' . ($rows + 1);
 					}
-
-					DB::transaction(function () use ($billId, $counter, $feeTitles, $feeAmounts, $feeLateAmounts, $feeTotalAmounts, $feeMonths, $feetype, $type) {
+					$studentRegiNo = $request->student;
+					DB::transaction(function () use ($request, $studentRegiNo, $billId, $counter, $feeTitles, $feeAmounts, $feeLateAmounts, $feeTotalAmounts, $feeMonths, $feetype, $type) {
 						$j    = 0;
 						$item = '';
 						for ($i = 0; $i < $counter; $i++) {
@@ -1680,7 +1678,7 @@ class feesController extends BaseController
 								->first();
 							$chk = DB::table('stdBill')
 								->join('billHistory', 'stdBill.billNo', '=', 'billHistory.billNo')
-								->where('stdBill.regiNo', $request->input('student'))
+								->where('stdBill.regiNo', $studentRegiNo)
 								->where('billHistory.month', $feeMonths[$i]);
 							if ($feetype->type == 'Monthly') {
 								$chk = $chk->where('billHistory.title', $feetype->title);
@@ -1711,7 +1709,7 @@ class feesController extends BaseController
 								$voucharhistory->ref_id     = $item;
 								$voucharhistory->amount   = $feeAmounts[$i];
 								//$voucharhistory->due_amount   = $feeAmounts[$i];
-								$voucharhistory->rgiNo    = $request->input('student');
+								$voucharhistory->rgiNo    = $studentRegiNo;
 								$voucharhistory->status   = 'unpaid';
 								$voucharhistory->date    =   Carbon::now();
 								$voucharhistory->save();
@@ -1771,8 +1769,6 @@ class feesController extends BaseController
 							$feeCol->payDate       = Carbon::now()->format('Y-m-d');
 							//echo "<pre>";print_r(Carbon::now()->format('Y-m-d'));exit;
 							$feeCol->save();
-
-
 							\Session::put('not_save', $j);
 						} else {
 							\Session::put('not_save', 0);
@@ -1936,7 +1932,7 @@ class feesController extends BaseController
 		$student->regiNo  = $request->input('student');
 
 		$fees = DB::Table('stdBill')
-			->select(DB::RAW("billNo,payableAmount,paidAmount,dueAmount,DATE_FORMAT(payDate,'%D %M,%Y') AS date"))
+			->select(DB::RAW("billNo,payableAmount,paidAmount,adjusted,dueAmount,DATE_FORMAT(payDate,'%D %M,%Y') AS date"))
 			->where('class', $request->input('class'))
 			->where('regiNo', $request->input('student'))
 			->get();
@@ -1967,7 +1963,8 @@ class feesController extends BaseController
 		$fees = DB::Table('stdBill')
 			->join('Student', 'stdBill.regiNo', '=', 'Student.regiNo')
 			->join('billHistory', 'stdBill.billNo', '=', 'billHistory.billNo')
-			->select(DB::RAW("stdBill.billNo,stdBill.payableAmount,stdBill.paidAmount,stdBill.dueAmount,DATE_FORMAT(stdBill.payDate,'%D %M,%Y') AS date"), 'Student.firstName', 'Student.lastName', 'Student.class', 'Student.section', 'Student.regiNo', 'billHistory.month', 'billHistory.title', 'billHistory.fee', 'billHistory.lateFee')
+			->leftjoin('invoice_history', 'stdBill.billNo', '=', 'invoice_history.billNo')
+			->select(DB::RAW("stdBill.billNo,stdBill.payableAmount,stdBill.paidAmount,stdBill.adjusted,stdBill.dueAmount,DATE_FORMAT(stdBill.payDate,'%D %M,%Y') AS date"), 'invoice_history.status', 'Student.firstName', 'Student.lastName', 'Student.class', 'Student.section', 'Student.regiNo', 'billHistory.month', 'billHistory.title', 'billHistory.fee', 'billHistory.lateFee')
 			//->where('stdBill.class',$request->input('class'))
 			->where('billHistory.month', $month)
 			->whereYear('stdBill.created_at', $year)
@@ -1995,7 +1992,7 @@ class feesController extends BaseController
 		$fees = DB::Table('stdBill')
 			->join('Student', 'stdBill.regiNo', '=', 'Student.regiNo')
 			->join('billHistory', 'stdBill.billNo', '=', 'billHistory.billNo')
-			->select(DB::RAW("stdBill.billNo,stdBill.payableAmount,stdBill.paidAmount,stdBill.dueAmount,DATE_FORMAT(stdBill.payDate,'%D %M,%Y') AS date"), 'Student.firstName', 'Student.lastName', 'Student.class', 'Student.section', 'Student.regiNo', 'billHistory.month', 'billHistory.title', 'billHistory.fee', 'billHistory.lateFee')
+			->select(DB::RAW("stdBill.billNo,stdBill.payableAmount,stdBill.paidAmount,stdBill.dueAmount,DATE_FORMAT(stdBill.payDate,'%D %M,%Y') AS date"), 'Student.firstName', 'Student.lastName', 'Student.class', 'Student.section', 'Student.regiNo', 'billHistory.month', 'billHistory.title', 'billHistory.fee', 'billHistory.lateFee', 'stdBill.adjusted')
 			->where('stdBill.class', $request->input('class'));
 		if ($request->input('fee_type') == 'monthly') {
 			$fees = $fees->where('billHistory.month', $request->input('month'));
@@ -2140,6 +2137,8 @@ class feesController extends BaseController
                               <div class="form-group m-b-0">
                                   <div class="offset-sm-3 col-sm-9">
                                       <button type="button" onclick="feecollection();" class="btn btn-info waves-effect waves-light " >Collect Invoice</button>
+                                 
+                                      <button type="button" onclick="feecollectionadjust();" class="btn btn-warning waves-effect waves-light " >Adjust Invoice</button>
                                   </div>
                               </div>';
 			//</form>
@@ -2311,7 +2310,188 @@ class feesController extends BaseController
 
 			//<button value="{{$fee->billNo}}" title='Collect Invoice' class='btn btn-primary @if( $fee->paidAmount<$fee->payableAmount) btninvoice @endif' @if($fee->payableAmount===$fee->paidAmount || $fee->paidAmount>=$fee->payableAmount ) onclick = "alert('Invoice Fully Paid')" @endif> <i class="fas fa-dollar-sign icon-white"></i></button>
 			$html .= '<button value="' . $fee->billNo . '" title="Collect Invoice" class="btn btn-primary  ' . $fun . '" onclick="' . $alrt . '"> <i class="fas fa-dollar-sign icon-white"></i></button>
-                      <a title="Edit" class="btn btn-warning" href="' . url('/fees/invoice/update/' . $fee->billNo) . '"> <i class="glyphicon glyphicon-pencil icon-white"></i></a>
+                    </td>
+                  </tr>';
+		}
+		$html .= '</tbody>
+            </table>';
+		//echo "<pre>";print_r($totals);
+		//return Redirect::back()->with('success','Invoice paid');
+		return $html;
+
+		exit;
+	}
+
+	public function invoiceAdjust(Request $request, $billNo)
+	{
+		$now              =  Carbon::now();
+		$year             =  $now->year;
+		$month            =  $now->month;
+
+		$paidamount = $request->input('collectionAmount') . '.00';
+		$totals = FeeCol::select('*')
+			->where('billNo', $billNo)
+			//->where('regiNo',$request->input('regiNo'))
+			->first();
+
+		$paid      = FeeCol::find($totals->id);
+		$vouchers  = Voucherhistory::where('bill_id', $billNo)->first();
+		$getmonth  = DB::table('billHistory')->where('billNo', $billNo)->where('month', '<>', '-1')->first();
+
+		$totalpaid = $paid->paidAmount + $paidamount;
+		// Log::info($totalpaid);exit;
+		/*if((int)$totalpaid > (int)$request->input('payableAmount') ){
+			echo  $totalpaid ."ww======ww".$request->input('payableAmount');
+		}
+		echo  $totalpaid ."======".$request->input('payableAmount');exit;*/
+		if ($totalpaid > $request->input('payableAmount')) {
+			return 419;
+		}
+		if ($paidamount < 0) {
+			return 404;
+		}
+		if ($paidamount == '' || $paidamount == '0.00' /*||  $paidamount>0*/) {
+			return 404;
+		}
+		if ($request->input('s') != 'unpaid') {
+			$paid->adjusted = $totalpaid;
+			//$paid->dueAmount  = $totals->total_fee;
+			if ($paidamount >= $totalpaid) {
+				$status = 'adjust';
+			} elseif ($paidamount === 0) {
+
+				$status = 'unpaid';
+			} else {
+				$status = 'partially adjust';
+			}
+			$vouchers->status = $status;
+		} else {
+
+			$paid->paidAmount = '0.00';
+			$vouchers->status = 'unpaid';
+		}
+
+
+		// $paid->dueAmount = $paid->dueAmount - $paidamount;
+		$paid->save();
+		$vouchers->save();
+		$totals1 = FeeCol::select(DB::RAW('IFNULL(sum(payableAmount),0) as payTotal,IFNULL(sum(paidAmount),0) as paiTotal,(IFNULL(sum(payableAmount),0)- IFNULL(sum(adjusted),0)) as dueamount'))
+			->where('billNo', $billNo)
+			//->where('regiNo',$paid->regiNo)
+			->first();
+		if ($request->input('s') != 'unpaid') {
+			$paid->dueAmount  =  $totals1->dueamount;
+		} else {
+
+			$paid->dueAmount  = $totals1->payTotal;
+		}
+		$paid->save();
+
+		// Log::info($paid);
+		$invoicehistory = InvoiceHistory::where('billNo', $paid->billNo)->first();
+		if (!$invoicehistory) {
+			$invoicehistory->billNo = $billNo;
+			$invoicehistory->amount = $paidamount;
+			$invoicehistory->date   = Carbon::now();
+			$invoicehistory->status = $status;
+			$invoicehistory->save();
+		}
+		$student = DB::table('Student')->where('regiNo', $paid->regiNo)->first();
+		$fees = DB::Table('stdBill')
+			->join('Student', 'stdBill.regiNo', '=', 'Student.regiNo')
+			->join('billHistory', 'stdBill.billNo', '=', 'billHistory.billNo')
+			->select(DB::RAW("stdBill.billNo,stdBill.payableAmount,stdBill.paidAmount,stdBill.adjusted,stdBill.dueAmount,DATE_FORMAT(stdBill.payDate,'%D %M,%Y') AS date"), 'Student.firstName', 'Student.lastName', 'Student.class', 'Student.section', 'billHistory.month', 'billHistory.title', 'billHistory.fee', 'billHistory.lateFee')
+			->where('stdBill.class', $paid->class)
+			->where('Student.section', $student->section)
+			->where('billHistory.month', $getmonth->month)
+			->whereYear('stdBill.created_at', $year)
+			->get();
+
+		$html = '<table id="feeList1" class="table table-striped table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>Bill No</th>
+                  <th>Student</th>
+                  <th>Fee Type</th>
+                  <th>Payable Amount</th>
+                  <th>Paid Amount</th>
+                  <th>Due Amount</th>
+                  <th>Month</th>
+                  <th>Pay Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="ajax_data">';
+		foreach ($fees as $fee) {
+			$bilid = "'" . $fee->billNo . "'";
+			$html .= ' <tr>
+                    <td><a class="btnbill" href="#" onclick="invoicepaidhistory(' . $bilid . ');">' . $fee->billNo . '</a></td>
+                    <td>' . $fee->firstName . $fee->lastName . '</td>
+                    <td>' . $fee->title . '</td>
+                    <td>' . $fee->payableAmount . '</td>
+                    <td>' . $fee->paidAmount . '</td>
+                    <td>' . $fee->dueAmount . '</td>';
+			if ($fee->title == "monthly") {
+				$month = \DateTime::createFromFormat('!m', $fee->month)->format('F');
+			} else {
+				$month = "other";
+			}
+			/* <td>'. \DateTime::createFromFormat('m', $fee->month)->format('F').' </td>*/
+			$html .= ' <td>' . $month . ' </td>
+                    <td>' . $fee->date . '</td>';
+
+			if ($fee->payableAmount === $fee->paidAmount || $fee->paidAmount >= $fee->payableAmount) {
+				$status = 'paid';
+			} elseif ($fee->payableAmount == $fee->adjusted) {
+				$status = 'adjust';
+			} elseif ($fee->paidAmount == '0.00' || $fee->paidAmount == '') {
+
+				$status = 'unpaid';
+			} else {
+				$status = 'partially paid';
+			}
+
+			$html .= '<td>';
+			if ($status == 'paid') {
+				$html .= '<button  class="btn btn-success" >';
+				$html .=  $status;
+				$html .= '</button>';
+			} elseif ($status == 'adjust') {
+				$html .= '<button  class="btn btn-primary" >';
+				$html .= $status;
+				$html .= '</button>';
+			} elseif ($status == 'partially paid') {
+				$html .= '<button  class="btn btn-warning" >';
+				$html .= $status;
+				$html .= '</button>';
+			} else {
+				$html .= '<button class="btn btn-danger" >';
+				$html .= $status;
+				$html .= '</button>';
+			}
+			$html .= '</td>
+                    <td>';
+
+			if ($fee->paidAmount < $fee->payableAmount) {
+
+				$fun    = "btninvoice";
+			} else {
+
+				$fun = '';
+			}
+			if ($fee->payableAmount === $fee->paidAmount || $fee->paidAmount >= $fee->payableAmount) {
+				$alrt = "alert('Invoice Fully Paid')";
+			} else {
+				$alrt = "";
+			}
+
+
+			//<a title='Delete' class='btn btn-danger' href='{{url("/fees/delete")}}/{{$fee->billNo}}'> <i class="glyphicon glyphicon-trash icon-red"></i></a>--}}
+
+			//<button value="{{$fee->billNo}}" title='Collect Invoice' class='btn btn-primary @if( $fee->paidAmount<$fee->payableAmount) btninvoice @endif' @if($fee->payableAmount===$fee->paidAmount || $fee->paidAmount>=$fee->payableAmount ) onclick = "alert('Invoice Fully Paid')" @endif> <i class="fas fa-dollar-sign icon-white"></i></button>
+			$html .= '<button value="' . $fee->billNo . '" title="Collect Invoice" class="btn btn-primary  ' . $fun . '" onclick="' . $alrt . '"> <i class="fas fa-dollar-sign icon-white"></i></button>
+                      
                     </td>
                   </tr>';
 		}
@@ -2335,7 +2515,7 @@ class feesController extends BaseController
 	}
 
 
-	public function classreportindex()
+	public function classreportindex_old()
 	{
 		$classes 			= ClassModel::pluck('name', 'code');
 		$class   			= '';
@@ -2374,7 +2554,7 @@ class feesController extends BaseController
 
 				$student =	DB::table('billHistory')
 					->Join('stdBill', 'billHistory.billNo', '=', 'stdBill.billNo')
-					->select('billHistory.billNo', 'billHistory.month', 'billHistory.fee', 'billHistory.lateFee', 'stdBill.class as class1', 'stdBill.payableAmount', 'stdBill.billNo', 'stdBill.payDate', 'stdBill.regiNo', 'stdBill.paidAmount')
+					->select('billHistory.billNo', 'billHistory.month', 'billHistory.fee', 'billHistory.lateFee', 'stdBill.class as class1', 'stdBill.payableAmount', 'stdBill.billNo', 'stdBill.payDate', 'stdBill.regiNo', 'stdBill.paidAmount', 'stdBill.adjusted')
 					// ->whereYear('stdBill.payDate', '=', 2017)
 					->where('stdBill.paidAmount', '<>', '0.00')
 					->where('stdBill.regiNo', '=', $stdfees->regiNo)
@@ -2405,11 +2585,166 @@ class feesController extends BaseController
 		} else {
 			$resultArray = array();
 		}
-
 		return View('app.feestdreportclass', compact('classes', 'student', 'fees', 'class', 'section', 'month', 'session', 'paid_student', 'year', 'resultArray'));
 	}
+	public function classreportindex()
+	{
+		$classes = ClassModel::pluck('name', 'code');
+		$now = Carbon::now();
+		$year = $now->year;
+		$month = $now->month;
+		$student = new studentfdata();
+
+		$defaultValues = [
+			'class' => '',
+			'section' => '',
+			'shift' => '',
+			'session' => '',
+			'regiNo' => ''
+		];
+
+		foreach ($defaultValues as $key => $value) {
+			$student->$key = $value;
+		}
+
+		$fees = [];
+		$paid_student = [];
+		$class = '';
+		$section = '';
+		$session = '';
+
+		$student_all = DB::table('Student')
+			->join('Class', 'Student.class', '=', 'Class.code')
+			->join('section', 'Student.section', '=', 'section.id')
+			->select('Student.*', 'Class.name as class', 'section.name as section')
+			->where('Student.isActive', 'Yes')
+			->where('Student.session', '=', get_current_session()->id)
+			->orderBy('Student.regiNo', 'ASC')
+			->get();
+
+		$resultArray = [];
+
+		foreach ($student_all as $stdfees) {
+			$student_fees = DB::table('billHistory')
+				->join('stdBill', 'billHistory.billNo', '=', 'stdBill.billNo')
+				->select(
+					'billHistory.billNo',
+					'billHistory.month',
+					'billHistory.fee',
+					'billHistory.lateFee',
+					'stdBill.class as class1',
+					'stdBill.payableAmount',
+					'stdBill.billNo',
+					'stdBill.payDate',
+					'stdBill.regiNo',
+					'stdBill.paidAmount',
+					'stdBill.adjusted'
+				)
+				->where('stdBill.paidAmount', '<>', '0.00')
+				->where('stdBill.regiNo', '=', $stdfees->regiNo)
+				->whereYear('stdBill.payDate', '=', $year)
+				->where('billHistory.month', '=', $month)
+				->where('billHistory.month', '<>', '-1')
+				->get();
+
+			$record = get_object_vars($stdfees);
+
+			if ($student_fees->isNotEmpty()) {
+				foreach ($student_fees as $fee) {
+					$record['status'] = 'Paid';
+					$record['payDate'] = $fee->payDate;
+					$record['billNo'] = $fee->billNo;
+					$record['fee'] = $fee->fee;
+					$resultArray[] = $record;
+				}
+			} else {
+				$record['status'] = 'unPaid';
+				$resultArray[] = $record;
+			}
+		}
+
+		return view('app.feestdreportclass', compact('classes', 'student', 'fees', 'class', 'section', 'month', 'session', 'paid_student', 'year', 'resultArray'));
+	}
+
 
 	public function classview(Request $request)
+	{
+		$classes = ClassModel::pluck('name', 'code');
+
+		$class    = $request->input('class');
+		$section  = $request->input('section');
+		$shift    = $request->input('shift');
+		$session  = $request->input('session');
+		$studentRegNo = $request->input('student');
+		$year     = $request->input('year');
+		$month    = $request->input('month');
+		$direct   = $request->input('direct');
+
+		$studentsQuery = DB::table('Student')
+			->where('isActive', 'Yes')
+			->where('class', $class)
+			->where('session', $session);
+
+		if (!empty($section) && $direct !== 'yes') {
+			$studentsQuery->where('section', $section);
+		}
+
+		$students = $studentsQuery->get();
+
+		$resultArray = [];
+
+		if ($students->isNotEmpty()) {
+			foreach ($students as $index => $student) {
+				$payments = DB::table('billHistory')
+					->join('stdBill', 'billHistory.billNo', '=', 'stdBill.billNo')
+					->select(
+						'billHistory.billNo',
+						'billHistory.month',
+						'billHistory.fee',
+						'billHistory.lateFee',
+						'stdBill.class as class1',
+						'stdBill.payableAmount',
+						'stdBill.billNo',
+						'stdBill.payDate',
+						'stdBill.regiNo',
+						'stdBill.paidAmount',
+						'stdBill.adjusted'
+					)
+					->where('stdBill.regiNo', $student->regiNo)
+					->whereYear('stdBill.payDate', $year)
+					->where('billHistory.month', $month)
+					->where('billHistory.month', '<>', '-1')
+					->where(function ($query) {
+						$query->where('stdBill.paidAmount', '>', 0)
+							->orWhere('stdBill.adjusted', '>', 0);
+					})
+					->get();
+
+				$studentData = (array) $student;
+				$studentData['status'] = 'Unpaid';
+
+				if ($payments->isNotEmpty()) {
+					foreach ($payments as $payment) {
+						$studentData['status'] =  $payment->adjusted > 0 ? 'Adjust' : 'Paid';
+						$studentData['payDate'] = $payment->payDate;
+						$studentData['billNo'] = $payment->billNo;
+						$studentData['fee'] = $payment->fee;
+					}
+				}
+
+				$resultArray[] = $studentData;
+			}
+		}
+		// echo "<pre>";
+		// print_r($resultArray);
+		// exit;
+
+		return view('app.feestdreportclass', compact('resultArray', 'class', 'month', 'section', 'classes', 'session', 'year'));
+	}
+
+
+
+	public function classview_old(Request $request)
 	{
 
 		$classes = ClassModel::pluck('name', 'code');
@@ -2472,7 +2807,7 @@ class feesController extends BaseController
 		$section = $request->input('section');
 		$session = $request->input('session');
 		$year    = $request->input('year');
-		//echo "<pre>".$request->input('month');print_r($resultArray);
+		// echo "<pre>";print_r($resultArray);
 		// exit;
 		return View('app.feestdreportclass', compact('resultArray', 'class', 'month', 'section', 'classes', 'session', 'year'));
 	}
@@ -2620,8 +2955,90 @@ class feesController extends BaseController
 		return Redirect::to('/fees/classreport')->with("success", "Voice campaign Created Succesfully.");
 		//return View('app.feestdreportclass',compact('resultArray','class','month','section','classes','session','year'));
 	}
-
 	public function fee_detail(Request $request)
+	{
+		$action = $request->input('action');
+
+		if (empty($action)) {
+			return redirect()->back()->with('error', 'Invalid action provided.');
+		}
+
+		$now = Carbon::now();
+		$currentYear = get_current_session()->id;
+		$currentMonth = $now->month;
+		$currentYearNumber = $now->year;
+
+		$sections = DB::table('Class')->select('*')->get();
+		$paidStudents = [];
+		$unpaidStudents = [];
+
+		foreach ($sections as $section) {
+			$students = DB::table('Student')
+				->join('section', 'Student.section', '=', 'section.id')
+				->select('Student.*', 'section.name as section_name')
+				->where([
+					['class', '=', $section->code],
+					['session', '=', $currentYear],
+					['Student.isActive', '=', 'Yes']
+				])
+				->get();
+
+			foreach ($students as $student) {
+				$payments = DB::table('billHistory')
+					->join('stdBill', 'billHistory.billNo', '=', 'stdBill.billNo')
+					->leftjoin('invoice_history', 'billHistory.billNo', '=', 'invoice_history.billNo')
+					->select(
+						'billHistory.billNo',
+						'billHistory.month',
+						'billHistory.fee',
+						'billHistory.lateFee',
+						'stdBill.class as class1',
+						'stdBill.payableAmount',
+						'stdBill.billNo',
+						'stdBill.payDate',
+						'stdBill.regiNo',
+						'stdBill.paidAmount',
+						'invoice_history.status'
+					)
+					->where([
+						['stdBill.regiNo', '=', $student->regiNo],
+						['billHistory.month', '=', $currentMonth],
+						['billHistory.month', '<>', '-1']
+					])
+					->whereYear('stdBill.payDate', '=', $currentYearNumber)
+					->where(function ($query) {
+						$query->where('stdBill.paidAmount', '<>', '0.00')
+							->orWhere('stdBill.adjusted', '>', 0);
+					})
+					->get();
+
+				if ($payments->isNotEmpty()) {
+					foreach ($payments as $payment) {
+						$paidStudents["{$section->code}_{$section->name}_paid_{$student->regiNo}"] = (object) array_merge((array) $student, (array) $payment);
+					}
+				} else {
+					$unpaidStudents["{$section->code}_{$section->name}_unpaid_{$student->regiNo}"] = $student;
+				}
+			}
+		}
+		// echo "<pre>";print_r($paidStudents);exit;
+		$feeDetails = $action === 'unpaid' ? $unpaidStudents : $paidStudents;
+		$status = $action === 'unpaid' ? 'Unpaid' : 'Paid';
+
+		if ($action === 'unpaid') {
+			session()->forget('unpaid');
+			session(['unpaid' => $feeDetails]);
+		}
+
+		return view('app.fee_detail', [
+			'fee_detail' => $feeDetails,
+			'status' => $status,
+			'month_n' => $now->format('F'),
+			'year' => $currentYear,
+			'statusn' => $status
+		]);
+	}
+	public function fee_detail_old(Request $request)
 	{
 		$action = $request->input('action');
 		if ($action != '') :
