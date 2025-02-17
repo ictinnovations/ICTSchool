@@ -92,7 +92,7 @@
                            @else
                                 <div class="alert alert-warning">
                                     <strong>Whoops!</strong> There are no income sector created yet!.<br><br>
-                                    <strong><a href="/accounting/sectors">Create Here</a></strong>
+                                    <strong><a href="{{url('accounting/sectors')}}">Create Here</a></strong>
                                 </div>
 
                             @endif
