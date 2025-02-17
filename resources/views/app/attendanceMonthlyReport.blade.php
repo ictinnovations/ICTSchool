@@ -67,7 +67,7 @@
 
         <div class="col-md-1 col-sm-1">
            
-            <img class="logo" src="{{url('')}}/img/logo.png">
+            <img class="logo" src="{{asset('/img/logo.png')}}">
        <?php //echo "adeeel"; exit;?>
         </div>
         <div class="col-md-11 col-sm-11">

@@ -947,6 +947,9 @@ if(isset($match[0])){
 			)
 			->where('Student.id', '=', $id)
 			->first();
+			if(!$student){
+				return Redirect::to('student/list')->withErrors('error', 'Student not found');
+			}
 			$attendances = DB::table('Attendance')->where('Attendance.date', Carbon::today()->toDateString())->where('regiNo', $student->regiNo)->first();
 		//return View::Make("app.studentView",compact('student'));
 		$fees  = FeeSetup::select('id', 'title')->where('class', '=', $student->class_code)->where('type', '=', 'Monthly')->first();

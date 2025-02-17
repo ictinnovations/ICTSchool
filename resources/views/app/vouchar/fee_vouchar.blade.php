@@ -127,7 +127,8 @@
                             $fe_title = [];
                             $other = [];
                             $ofees = [];
-                            echo 'count' . count($vouchar_details);
+                            // echo 'count' . count($vouchar_details);s
+                            // dd($vouchar_details)
                         @endphp
                         @foreach ($vouchar_details as $vouchar_detail)
                             <?php
@@ -145,10 +146,15 @@
                                 <?php
                                 $other[] = $vouchar_detail->title;
                                 $ofees[] = $vouchar_detail->fee;
+                                // dd($other)
                                 ?>
                             @endif
+                            
                         @endforeach
-
+                        @php
+                        $toal = count($other);
+                        // dd($other)s
+                    @endphp
                         @php
                             $fe_title = array_unique($fe_title);
                             sort($fe_title);
@@ -180,9 +186,7 @@
                         <td>Pending Amount</td>
                         <td>{{ $due }}</td>
                     </tr>
-                    @php
-                        $toal = count($other);
-                    @endphp
+                   
                     @for ($j = 0; $j < $toal; $j++)
                         <tr>
                             <td>{{ $other[$j] }}</td>

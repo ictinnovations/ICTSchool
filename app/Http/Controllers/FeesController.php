@@ -602,7 +602,7 @@ class feesController extends BaseController
 						      ->where('billNo','<>',$bill)
 						      ->first();*/
 
-		// echo "<pre>";print_r($fee);exit;
+		// echo "<pre>";print_r($vouchar_details);exit;
 		return View('app.vouchar.fee_vouchar', compact('institute', 'due_date', 'month', 'late_fee', 'discount', 'student', 'fees', 'vouchar_details', 'fees'));
 		//http://localhost/apschool/fee/get_vouchar?class=cl1&section=7&session=2018&type=Monthly&month=10&fee_name=2&regiNo=180101                   
 

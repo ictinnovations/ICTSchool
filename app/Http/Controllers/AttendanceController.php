@@ -1072,7 +1072,7 @@ class attendanceController extends BaseController
 			// echo "<pre>";print_r($students->toArray());
 			// echo implode(',', $students->toArray());
 			// exit;
-			if (empty($students)) {
+			if ($students->isEmpty()) {
 				$errorMessages = new \Illuminate\Support\MessageBag;
 				$errorMessages->add('Error', 'Students not found!');
 				return Redirect::to('/attendance/monthly-report')->withErrors($errorMessages);
@@ -1113,8 +1113,8 @@ class attendanceController extends BaseController
 
 
 			$SelectCol = self::getSelectColumns($myPart[0], $myPart[1]);
-			//echo "<pre>";print_r($SelectCol);
-			//exit;
+			// echo "<pre>";print_r($students);
+			// exit;
 			$fullSql   = "SELECT CONCAT(MAX(s.firstName),' ',MAX(s.middleName),' ',MAX(s.lastName)) as name,
              CAST(MAX(s.rollNo) as UNSIGNED) as rollNo," . $SelectCol . " FROM Attendance as sa left join Student as s ON sa.regiNo=s.regiNo";
 			$fullSql .= " WHERE sa.regiNo IN(" . implode(',', $students->toArray()) . ") AND sa.status !='Absent' GROUP BY sa.regiNo ORDER BY rollNo;";
