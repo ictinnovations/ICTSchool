@@ -104,7 +104,7 @@ class sectionController extends Controller
 
         $section = SectionModel::find($section_id);
         if (!$section) {
-            return response()->json(['error' => 'Section Not Found of ID: ' . $section_id], 401);
+            return response()->json(['error' => 'Section Not Found of ID: ' . $section_id], 404);
         }
         $subject = DB::table('Subject')->select('code', 'name', 'type', 'class', 'stdgroup')->where('class', $section->class_code)->get();
         //
@@ -115,7 +115,7 @@ class sectionController extends Controller
         if (!is_null($subject) && count($subject) > 0) {
             return response()->json($subject);
         } else {
-            return response()->json(['error' => 'Subject Not Found'], 401);
+            return response()->json(['error' => 'Subject Not Found'], 404);
         }
     }
     public function getsectionstudent($section_id)
@@ -164,7 +164,7 @@ class sectionController extends Controller
     {
         $section = SectionModel::find($section_id);
         if (!$section) {
-            return response()->json(['error' => 'Section Not Found of ID: ' . $section_id], 401);
+            return response()->json(['error' => 'Section Not Found of ID: ' . $section_id], 404);
         }
         $student = DB::table('Student')->select('*')->where('class', $section->class_code)->where('section', $section_id)->get();
 
