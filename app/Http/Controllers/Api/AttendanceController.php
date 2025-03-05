@@ -147,6 +147,7 @@ class AttendanceController extends Controller
 			$presentDate = Carbon::parse($request->input('date'))->format('Y-m-d');
 			// return response()->json($presentDate);
 
+			// echo "<pre>";print_r($presentDate);exit;
 			$std = DB::table('Student')->where('regiNo', $students)->count();
 			if ($std == 0) {
 				return response()->json(['error' => 'Student not found'], 404);
@@ -649,7 +650,7 @@ class AttendanceController extends Controller
 			}
 			return response()->json("Section Attendance Complete today", 200);
 		} else {
-			return response()->json("Already Done", 200);
+			return response()->json("Already Done", 409);
 		}
 	}
 	public function get_attendance_done($section_id)
@@ -720,7 +721,7 @@ class AttendanceController extends Controller
 			})
 			->where('Student.isActive', 'Yes')
 			->where('Student.id',  $id)
-			->where('Student.session', 2018)
+			->where('Student.session', get_current_session()->id)
 			->first();
 
 		if (empty($attendance)) {
@@ -753,7 +754,8 @@ class AttendanceController extends Controller
 			$status = $request->input('status');
 			$class_id = $request->input('class_id');
 			$section_id = $request->input('section_id');
-			$presentDate = $this->parseAppDate($request->input('date'));
+			// $presentDate = $this->parseAppDate($request->input('date'));
+			$presentDate = Carbon::parse($request->input('date'))->format('Y-m-d');;
 
 			if ($status == 'Absent' || $status == 'absent') {
 
@@ -922,8 +924,6 @@ class AttendanceController extends Controller
 
 				// return Redirect::to('/fees/classreport')->withErrors("Please Add ictcore integration in Setting Menu");
 				return response()->json(['error' => 'Please Add ictcore integration in Setting Menu'], 404);
-
-				exit();
 			}
 			foreach ($attendance as $student) {
 

@@ -23,7 +23,7 @@ class CheckPermission
          // so now check permission
          $permission = DB::table('permission')->where('permission_group', strtolower($role))->where('permission_name',$permission_name)->where('permission_type','yes')->first();
         
-        //echo "<pre>";print_r($permission);exit;
+        // echo "<pre>";print_r($permission);exit;
             if($permission){
                  return $next($request);
               //if Permission not assigned for this user  show what you need

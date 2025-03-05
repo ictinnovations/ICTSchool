@@ -8,17 +8,18 @@ use Excel;
 use Validator;
 use Carbon\Carbon;
 use App\Models\User;
-use App\Models\Subject;
 use App\Models\Student;
+use App\Models\Subject;
 use App\Models\Attendance;
 use App\Models\ClassModel;
 use App\Models\SectionModel;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
@@ -36,6 +37,13 @@ class UserController extends Controller
      */
     public function login(Request $request)
     {
+
+        $request->validate([
+            'password' => 'required',
+            'email' => 'email|string|required_without:username',
+            'username' => 'string|required_without:email',
+        ]);
+
         if ($request->input('email') != '') {
             $user = $request->input('email');
             $parameter = 'email';
@@ -45,17 +53,18 @@ class UserController extends Controller
             $parameter = 'login';
         }
         if (Auth::attempt([$parameter => $user, 'password' => $request->input('password')])) {
-            
+
             $user = Auth::user();
             // $success['token'] =  $user->createToken('MyApp')->accessToken;
             $success['token'] =  $user->createToken('DefaultToken')->plainTextToken;
             if ($user->group == 'Teacher') {
                 // echo"<pre>";print_r($user);exit; 
                 $success['teacher_id'] =  $user->group_id;
+                $success['user_id'] =  $user->id;
             }
             return response()->json(['success' => $success], $this->successStatus);
         } else {
-            return response()->json(['error' => 'Unauthorised'], 400);
+            return response()->json(['error' => 'Unauthorised'], 401);
         }
     }
     /**

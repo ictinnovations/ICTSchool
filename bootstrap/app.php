@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Foundation\Application;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
@@ -24,6 +26,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'checkPermission' => \App\Http\Middleware\CheckPermission::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions) {
-        //
-    })->create();
+    ->withExceptions(function ($exceptions) {
+       
+    })
+        
+    ->create();

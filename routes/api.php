@@ -54,7 +54,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('branches/data', [BranchController::class, 'branches_data']);
     Route::get('students', [StudentController::class, 'all_students']);
     Route::get('students/count', [StudentController::class, 'count_students']);
-    Route::get('students/fess', [StudentController::class, 'count_student_fee']);
+    Route::get('students/fee', [StudentController::class, 'count_student_fee']);
     Route::get('students/{class_code}/{section}/{shift}/{session}', [StudentController::class, 'student_classwise']);
     Route::get('students/{student_id}', [StudentController::class, 'getstudent']);
     Route::put('students/{student_id}', [StudentController::class, 'update_student']);
@@ -62,8 +62,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('students/{student_id}/notifications', [StudentController::class, 'studentnotification']);
 
     //Teachers counts
-    Route::get('teachers/count', [TeacherController::class, 'count_teachers']);
-
+    
     //Classes
     Route::get('classes', [ClassController::class, 'classes']);
     Route::get('classes/count', [ClassController::class, 'classes_count']);
@@ -71,11 +70,11 @@ Route::middleware('auth:api')->group(function () {
     Route::get('classes/{class_id}/sections', [ClassController::class, 'getclass_section']);
     Route::put('classes/{class_id}', [ClassController::class, 'update_class']);
     Route::post('classes/{class_id}/notifications', [ClassController::class, 'classwisenotification']);
-
+    
     //Levels
     Route::get('levels', [LevelController::class, 'levels']);
     Route::get('levels/{level_id}', [LevelController::class, 'getlevel']);
-
+    
     //Section
     Route::get('sections', [SectionController::class, 'section']);
     Route::get('sections/{section_id}', [SectionController::class, 'getsection']);
@@ -84,9 +83,10 @@ Route::middleware('auth:api')->group(function () {
     Route::get('sections/{section_id}/students', [SectionController::class, 'getsectionstudent']);
     Route::get('sections/{section_id}/teachers', [SectionController::class, 'getsectionteacher']);
     Route::post('sections/{section_id}/notifications', [SectionController::class, 'sectionwisenotification']);
-
+    
     //Teachers
     Route::get('teachers', [TeacherController::class, 'all_teachers']);
+    Route::get('teachers/count', [TeacherController::class, 'count_teachers']);
     Route::get('teachers/{teacher_id}', [TeacherController::class, 'getteacher']);
     Route::put('teachers/{teacher_id}', [TeacherController::class, 'update_teacher']);
     Route::get('teachers/{teacher_id}/sections', [TeacherController::class, 'getsectionteacher']);

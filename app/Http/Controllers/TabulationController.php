@@ -12,6 +12,15 @@ use Illuminate\Support\Facades\Redirect;
 class formfoo0
 {
 }
+
+class Meritdata
+{
+	public $regiNo;
+	public $point;
+	public $grade;
+	public $position;
+	public $totalNo;
+}
 class tabulationController extends BaseController {
 
 	public function __construct() {

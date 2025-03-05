@@ -8,6 +8,7 @@ use App\Models\Student;
 use App\Models\Subject;
 use App\Models\MeritList;
 use App\Models\ClassModel;
+use Illuminate\Support\Arr;
 use App\Models\Ictcore_fees;
 use Illuminate\Http\Request;
 use App\Models\Ictcore_integration;
@@ -152,7 +153,8 @@ class gradesheetController extends BaseController {
 			    	$formdata->exam = $request->input('exam');
 			    }
 				$formdata->type = $request->input('type');
-				$formdata->postclass = array_get($classes, $request->input('class'));
+				// $formdata->postclass = array_get($classes, $request->input('class'));
+				$formdata->postclass = Arr::get($classes, $request->input('class'));
 
 				//return View::Make('app.gradeSheet', compact('classes', 'formdata', 'students'));
 				 if(Storage::disk('local')->exists('/public/grad_system.txt')){
@@ -1257,7 +1259,8 @@ public function send_sms($class,$section,$exam,$session)
                //exit;
 				$extra = array($exam_name, $subgrpbl, $totalHighest, $subgrpen, $student->extraActivity,$totalourall);
 				$query="select left(MONTHNAME(STR_TO_DATE(m, '%m')),3) as month, count(regiNo) AS present from ( select 01 as m union all select 02 union all select 03 union all select 04 union all select 05 union all select 06 union all select 07 union all select 08 union all select 09 union all select 10 union all select 11 union all select 12 ) as months LEFT OUTER JOIN Attendance ON MONTH(Attendance.date)=m and Attendance.regiNo ='".$regiNo."' and  Attendance.status IN ('Present','present','late','Late') GROUP BY m";
-				$attendance=DB::select(DB::RAW($query));
+				// $attendance=DB::select(DB::RAW($query));
+				$attendance=DB::select($query);
 				////////////echo "<pre>";print_r($meritdata);
 				//exit;
 				if($request->input('type')=='sigle' || $request->input('type')==''):

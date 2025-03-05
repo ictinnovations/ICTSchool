@@ -947,10 +947,10 @@ if(isset($match[0])){
 			)
 			->where('Student.id', '=', $id)
 			->first();
-			if(!$student){
-				return Redirect::to('student/list')->withErrors('error', 'Student not found');
-			}
-			$attendances = DB::table('Attendance')->where('Attendance.date', Carbon::today()->toDateString())->where('regiNo', $student->regiNo)->first();
+		if (!$student) {
+			return Redirect::to('student/list')->withErrors('error', 'Student not found');
+		}
+		$attendances = DB::table('Attendance')->where('Attendance.date', Carbon::today()->toDateString())->where('regiNo', $student->regiNo)->first();
 		//return View::Make("app.studentView",compact('student'));
 		$fees  = FeeSetup::select('id', 'title')->where('class', '=', $student->class_code)->where('type', '=', 'Monthly')->first();
 
@@ -1244,12 +1244,7 @@ if(isset($match[0])){
 
 	public function add_family_student(Request $request, $f_id)
 	{
-
-		//..echo $f_id;
-		//print_r($request->input('regino'));
-
 		$fm = DB::table('Student')
-
 			->where(function ($q) use ($f_id) {
 				$q->where('Student.family_id', '=', $f_id)
 					->orWhere('Student.fatherCellNo', '=', $f_id);
@@ -1260,12 +1255,15 @@ if(isset($match[0])){
 		$fatherName = $fm->fatherName;
 		$fatherCellNo = $fm->fatherCellNo;
 
+		if (!$request->input('regino')) {
+			return Redirect::to('/family/students/' . $f_id)->with("error", "Please select student.");
+		}
+		// echo "<pre>";print_r($request->input('regino'));exit;
 		DB::table('Student')
 			->whereIn('id', $request->input('regino'))
 			->update(['family_id' => $family_id, 'fatherName' => $fatherName, 'fatherCellNo' => $fatherCellNo]);
 
 		return Redirect::to('/family/students/' . $f_id)->with("success", "Family Updated Succesfully.");
-		//echo "<pre>";print_r($fm);
 		//->update(['about_family' => $request->input('familb'),'family_id' => $family_idn,'fatherName' =>$fathername,'fatherCellNo' =>$cell_phone ]);
 	}
 	public function shift_student_family(Request $request, $f_id)
