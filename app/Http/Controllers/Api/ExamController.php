@@ -49,7 +49,7 @@ class ExamController extends Controller
          ->join('section', 'exam.section_id', '=', 'section.id')
          ->select('exam.id', 'exam.type', 'Class.name as class', 'section.name as section')
          ->where('exam.id', '=', $exam_id)->first();
-      if (!is_null($exam) && count($exam) > 0) {
+      if ($exam) {
          return response()->json($exam);
       } else {
          return response()->json(['error' => 'exam Not Found'], 404);

@@ -81,8 +81,8 @@ class TeacherController extends Controller
 	public function getteacher($teacher_id)
 	{
 		$teacher = DB::table('teacher')->select('id', 'firstName', 'lastName', 'gender', 'dob', 'email', 'phone', 'fatherName', 'fatherCellNo', 'presentAddress')->where('id', '=', $teacher_id)->first();
-
-		if (!is_null($teacher) && count($teacher) > 0) {
+		
+		if ($teacher) {
 			return response()->json($teacher, 200);
 		} else {
 			return response()->json(['error' => 'teacher Not Found'], 404);
