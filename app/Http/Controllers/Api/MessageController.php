@@ -99,7 +99,7 @@ class MessageController extends Controller
       Storage::disk('public')->put('messages/' . $filename . '.wav', $filedata);
       return $filename . '.wav';
     } else {
-      return response()->json("ERROR:Please Upload Correct file", 415);
+      return response()->json(['error' => 'Please upload a valid WAV file'], 415);
     }
   }
 
@@ -119,10 +119,10 @@ class MessageController extends Controller
         Storage::disk('public')->put('messages/' . $filename . '.wav', $filedata);
         return $filename . '.wav';
       } else {
-        return response()->json("ERROR:Please Upload Correct file", 415);
+        return response()->json(['error' => 'Please upload a valid WAV file'], 415);
       }
     } else {
-      return response()->json("ERROR:file not found", 404);
+      return response()->json(['error' => 'File not found'], 404);
     }
   }
   public function deletemessage($filename)
@@ -131,9 +131,9 @@ class MessageController extends Controller
     if (Storage::exists($drctry . $filename)) {
       //Storage::delete($drctry.$filename);
       unlink($drctry . $filename);
-      return response()->json('File Deleted', 200);
+      return response()->json(['message' => 'File Deleted'], 200);
     } else {
-      return response()->json("ERROR:File Already Deleted");
+      return response()->json(['error' => 'File not found or already deleted'], 404);
     }
   }
 }
