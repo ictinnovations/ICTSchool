@@ -15,7 +15,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\ictcoreController;
+use App\Http\Controllers\ICTCoreController;
 
 class NotificationController extends Controller
 {
@@ -52,7 +52,7 @@ class NotificationController extends Controller
         $message = Message::find($notification_id);
 
 
-        if (!is_null($message) && count($message) > 0) {
+        if ($message) {
             return response()->json(['notification' => $message]);
         } else {
             return response()->json(['error' => 'Notification Not Found'], 404);

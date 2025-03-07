@@ -225,7 +225,7 @@ class ResultController extends Controller
 	public function deleteresult($result_id)
 	{
 		$result = Marks::find($result_id);
-		if (!is_null($result) && $result->count() > 0) {
+		if ($result) {
 			DB::table('Marks')->where('id', '=', $result_id)->delete();
 			return response()->json(['success' => "Result deleted Succesfully."], 200);
 		} else {

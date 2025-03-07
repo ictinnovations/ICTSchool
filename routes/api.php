@@ -27,7 +27,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('users/profile', [UserController::class, 'profile']);
     Route::get('users/{user_id}', [UserController::class, 'get_user']);
     Route::get('users', [UserController::class, 'get_alluser']);
-    Route::get('authenticate/cancel', [UserController::class, 'logout']);
+    Route::get('logout', [UserController::class, 'logout']);
     Route::put('users/{user_id}', [UserController::class, 'put_user']);
 
     // Attendance api routes
