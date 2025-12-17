@@ -71,8 +71,18 @@ School management system feature list
 -------------------
 * __teacher show dashboard attendance and teachers portion__
 
-## ICTSchool Installation
-
+#### ICTSchool Installation
+-----------------------------------------
+System Dependencies
+- Operating System: Linux (RHEL 9 compatible, e.g., CentOS Stream 9, Rocky Linux 9)
+- Database: MySQL 8
+- PHP version 8.2.0
+- Composer version 2.7.6
+- OpenSSL PHP Extension
+- PDO PHP Extension
+- Mbstring PHP Extension
+- Tokenizer PHP Extension
+- XML PHP Extension
 
 ** First git clone
 ```
