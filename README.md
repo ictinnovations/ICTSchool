@@ -159,6 +159,9 @@ crontab -e
 
 System Dependencies
 ===================
+
+- Operating System: Linux (RHEL 9 compatible, e.g., CentOS Stream 9, Rocky Linux 9)
+- Database: MySQL 8
 - PHP version 8.2.0
 - Composer version 2.7.6
 - OpenSSL PHP Extension
