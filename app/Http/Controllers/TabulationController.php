@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 
-class tabulationController extends BaseController {
+class TabulationController extends BaseController {
 
 	public function __construct() {
 		//$this->beforeFilter('auth');

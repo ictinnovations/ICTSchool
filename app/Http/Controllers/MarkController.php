@@ -17,12 +17,12 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Controllers\ictcoreController;
+use App\Http\Controllers\ICTCoreController;
 
 class foobar4
 {
 }
-class markController extends BaseController
+class MarkController extends BaseController
 {
 
 
@@ -849,7 +849,7 @@ class markController extends BaseController
 
 
 		$body    = $message;
-		$ict     = new ictcoreController();
+		$ict     = new ICTCoreController();
 		$i       = 0;
 		$attendance_noti     = DB::table('notification_type')->where('notification', 'fess')->first();
 		$ictcore_fees        = Ictcore_fees::select("*")->first();

@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Database\Eloquent\Collection;
 
-class dormitoryController extends BaseController {
+class DormitoryController extends BaseController {
 
 	public function __construct() {
 		/*$this->beforeFilter('csrf', array('on'=>'post'));

@@ -14,7 +14,7 @@ use App\Models\AdmissionfeeCollection;
 use Hash;
 use DB;
 use App\Models\Ictcore_integration;
-use App\Http\Controllers\ictcoreController;
+use App\Http\Controllers\ICTCoreController;
 use Carbon\Carbon;
 class foobar{
 
@@ -22,7 +22,7 @@ class foobar{
 Class formfoo2{
 
 }
-class studentController extends BaseController {
+class StudentController extends BaseController {
 
 	public function __construct() {
 		/*$this->beforeFilter('csrf', array('on'=>'post'));
@@ -618,7 +618,7 @@ if( preg_match( '!\(([^\)]+)\)!', $query, $match ) ){
                  
 			if(!empty($ictcore_integration) && $ictcore_integration->ictcore_url !='' && $ictcore_integration->ictcore_user !='' && $ictcore_integration->ictcore_password !=''){ 
 
-							 $ict  = new ictcoreController();
+							 $ict  = new ICTCoreController();
 							 	$data = array(
 								'first_name' => $student->firstName,
 								'last_name' => $student->lastName,
@@ -1426,7 +1426,7 @@ public function access($id)
                  
 			if(!empty($ictcore_integration) && $ictcore_integration->ictcore_url !='' && $ictcore_integration->ictcore_user !='' && $ictcore_integration->ictcore_password !=''){ 
 
-				 $ict  = new ictcoreController();
+				 $ict  = new ICTCoreController();
 				 	$data = array(
 					'first_name' => $student->firstName,
 					'last_name'  => $student->lastName,
@@ -1474,7 +1474,7 @@ public function access($id)
 public function send_sms(Request $request)
 {
     $ictcore_integration  = Ictcore_integration::select("*")->where('type','sms')->first();
-    $ict                  = new ictcoreController();
+    $ict                  = new ICTCoreController();
     $snd_msg  = $ict->verification_number_telenor_sms($request->input('phone'),$request->input('message'),'SidraSchool',$ictcore_integration->ictcore_user,$ictcore_integration->ictcore_password,'sms');
     //echo "<pre>";print_r( $snd_msg);
     //exit;

@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
-use App\Http\Controllers\cronjobController;
+use App\Http\Controllers\CronjobController;
 
 class feeNotification extends Command
 {
@@ -42,7 +42,7 @@ class feeNotification extends Command
         //
        
 
-        $cron_job = new cronjobController();
+        $cron_job = new CronjobController();
 
         $cron_job->feenotification();
     }

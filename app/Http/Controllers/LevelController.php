@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 
-class levelController extends BaseController {
+class LevelController extends BaseController {
 
 	public function __construct() {
 		/*$this->beforeFilter('csrf', array('on'=>'post'));

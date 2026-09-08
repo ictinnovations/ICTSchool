@@ -19,7 +19,7 @@ use Illuminate\Http\Request;
 use App\Models\Ictcore_integration;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use App\Http\Controllers\ictcoreController;
+use App\Http\Controllers\ICTCoreController;
 
 class foobar1
 {
@@ -27,7 +27,7 @@ class foobar1
 class formfoo3
 {
 }
-class teacherController extends BaseController
+class TeacherController extends BaseController
 {
 
 	public function __construct()
@@ -212,7 +212,7 @@ class teacherController extends BaseController
 				/*$ictcore_integration = Ictcore_integration::select("*")->first();
 			if(!empty($ictcore_integration) && $ictcore_integration->ictcore_url && $ictcore_integration->ictcore_user && $ictcore_integration->ictcore_password){ 
 
-				$ict  = new ictcoreController();
+				$ict  = new ICTCoreController();
 				$data = array(
 				'first_name' => $teacher->firstName,
 				'last_name' => $teacher->lastName,
@@ -966,7 +966,7 @@ class teacherController extends BaseController
 
 			if (!empty($ictcore_integration) && $ictcore_integration->ictcore_url != '' && $ictcore_integration->ictcore_user != '' && $ictcore_integration->ictcore_password != '') {
 
-				$ict  = new ictcoreController();
+				$ict  = new ICTCoreController();
 				$data = array(
 					'first_name' => $teacher->firstName,
 					'last_name' => $teacher->lastName,

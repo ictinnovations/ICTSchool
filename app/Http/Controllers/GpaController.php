@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 
-class gpaController extends BaseController
+class GpaController extends BaseController
 {
 
 	public function __construct()

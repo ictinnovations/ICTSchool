@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 
-class smsController extends BaseController {
+class SmsController extends BaseController {
 
 	public function __construct() {
 		/*$this->beforeFilter('csrf', array('on'=>'post'));

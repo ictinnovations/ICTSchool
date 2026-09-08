@@ -11,7 +11,7 @@ use DB;
 class formfoo6
 {
 }
-class admissionController extends BaseController
+class AdmissionController extends BaseController
 {
 	public function __construct()
 	{

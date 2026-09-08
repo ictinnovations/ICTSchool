@@ -1,9 +1,9 @@
 <?php 
-use App\Http\Controllers\instituteController;
-use App\Http\Controllers\permissionController;
-$get_grad = new instituteController;
+use App\Http\Controllers\InstituteController;
+use App\Http\Controllers\PermissionController;
+$get_grad = new InstituteController;
 $system_grade = $get_grad->index1();
-$get_permission = new permissionController;
+$get_permission = new PermissionController;
 $permissions  = $get_permission->get_permission_by_role();
 $permision =array();
 foreach($permissions as $permission){

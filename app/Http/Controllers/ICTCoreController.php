@@ -20,7 +20,7 @@ use Exception;
 class excption {
 
 }
-class ictcoreController {
+class ICTCoreController {
 
 	public function __construct() {
 

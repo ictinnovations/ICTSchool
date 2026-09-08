@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 
-class classController extends BaseController
+class ClassController extends BaseController
 {
 
 	public function __construct()

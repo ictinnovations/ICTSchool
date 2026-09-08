@@ -25,7 +25,7 @@ use App\Models\Ictcore_integration;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use App\Console\Commands\Invoicegenrated;
-use App\Http\Controllers\ictcoreController;
+use App\Http\Controllers\ICTCoreController;
 
 class studentfdata
 {
@@ -33,7 +33,7 @@ class studentfdata
 class formfoo0
 {
 }
-class feesController extends BaseController
+class FeesController extends BaseController
 {
 
 	public function getsetup()
@@ -1831,7 +1831,7 @@ class feesController extends BaseController
 	{
 		$student_all = DB::table('Student')->where('regiNo', $regiNo)->where('class', $class)->where('isActive', 'Yes')->first();
 		if (!empty($student_all)) {
-			$ict     = new ictcoreController();
+			$ict     = new ICTCoreController();
 			$i       = 0;
 			$attendance_noti     = DB::table('notification_type')->where('notification', 'fess')->first();
 			$ictcore_fees        = Ictcore_fees::select("*")->first();
@@ -2530,7 +2530,7 @@ class feesController extends BaseController
 
 			$ictcore_integration = Ictcore_integration::select("*")->first();
 			if (!empty($ictcore_integration) && $ictcore_integration->ictcore_url && $ictcore_integration->ictcore_user && $ictcore_integration->ictcore_password) {
-				$ict  = new ictcoreController();
+				$ict  = new ICTCoreController();
 				$data = array(
 					'name' => 'Fee Notification',
 					'description' => 'this is Fee Notifacation Group',
@@ -2754,7 +2754,7 @@ class feesController extends BaseController
 		}
 
 		/*if(!empty($student_all)){
-			$ict  = new ictcoreController();
+			$ict  = new ICTCoreController();
 			$i=0;
 			$attendance_noti     = DB::table('notification_type')->where('notification','fess')->first();
 			$ictcore_fees        = Ictcore_fees::select("*")->first();
@@ -2856,7 +2856,7 @@ class feesController extends BaseController
 	public function send_sms_notification($student_all)
 	{
 		if (!empty($student_all)) {
-			$ict  = new ictcoreController();
+			$ict  = new ICTCoreController();
 			$i = 0;
 			$attendance_noti     = DB::table('notification_type')->where('notification', 'fess')->first();
 			$ictcore_fees        = Ictcore_fees::select("*")->first();
@@ -2963,7 +2963,7 @@ class feesController extends BaseController
 	public function send_voice_notification($student_all)
 	{
 		if (!empty($student_all)) {
-			$ict  = new ictcoreController();
+			$ict  = new ICTCoreController();
 			$i = 0;
 			$attendance_noti     = DB::table('notification_type')->where('notification', 'fess')->first();
 			$ictcore_fees        = Ictcore_fees::select("*")->first();

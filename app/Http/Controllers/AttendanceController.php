@@ -25,9 +25,9 @@ Class formfoo{
 }
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use App\Http\Controllers\ictcoreController;
+use App\Http\Controllers\ICTCoreController;
 
-class attendanceController extends BaseController {
+class AttendanceController extends BaseController {
 		public function __construct() {
 			/*$this->beforeFilter('csrf', array('on'=>'post'));
 			$this->beforeFilter('auth');
@@ -195,7 +195,7 @@ class attendanceController extends BaseController {
 					$student=array();
 					///////////////////////////////////////////////////////////////////////////////////////////////message Create in ictcore////////////////////////////////////////////////////////////////////////////////////////////
 				/*	$message = Message::find($request->input('message'));
-					$ict  = new ictcoreController();
+					$ict  = new ICTCoreController();
 					$result = $ict->ictcore_api('messages/recordings','GET',$data=array() );
 					$array= array();
 					foreach($result as $res){
@@ -239,7 +239,7 @@ class attendanceController extends BaseController {
                          $attendance_noti     = DB::table('notification_type')->where('notification','attendance')->first();
 						 $ictcore_attendance  = Ictcore_attendance::select("*")->first();
 						 $ictcore_integration = Ictcore_integration::select("*")->where('type',$attendance_noti->type)->first();
-						 $ict                 = new ictcoreController();
+						 $ict                 = new ICTCoreController();
 						if($ictcore_integration->method=="telenor"){
                           //  echo "telenor";
                             //exit;

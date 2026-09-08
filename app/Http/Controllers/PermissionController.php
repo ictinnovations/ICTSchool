@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Auth;
 use DB;
-class permissionController extends Controller
+class PermissionController extends Controller
 {
     /**
      * Display a listing of the resource.

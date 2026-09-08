@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Redirect;
 class Damidata
 {
 }
-class accountingController extends BaseController
+class AccountingController extends BaseController
 {
 
 	public function __construct()

@@ -8,7 +8,7 @@ use App\Models\Institute;
 use App\Models\Branch;
 use DB;
 use Storage;
-class instituteController extends BaseController {
+class InstituteController extends BaseController {
 
 	public function __construct() {
 		/*$this->beforeFilter('csrf', array('on'=>'post'));

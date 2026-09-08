@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 use Illuminate\Console\Command;
-use App\Http\Controllers\cronjobController;
-use App\Http\Controllers\ictcoreController;
+use App\Http\Controllers\CronjobController;
+use App\Http\Controllers\ICTCoreController;
 use App\Student;
 use File;
 use App\Ictcore_integration;
@@ -97,7 +97,7 @@ class attendanceNotification extends Command
             $ictcore_attendance  = Ictcore_attendance::select("*")->first();
             $ictcore_integration = Ictcore_integration::select("*")->where('type',$attendance_noti->type)->first();
             //$ictcore_integration = Ictcore_integration::select("*")->first();
-             $ict                 = new ictcoreController();
+             $ict                 = new ICTCoreController();
             
             foreach($attendance as $student)
             { 

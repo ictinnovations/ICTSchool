@@ -17,10 +17,10 @@ use DB;
 use Illuminate\Console\Command;
 use App\Models\Ictcore_fees;
 use App\Models\Ictcore_integration;
-use App\Http\Controllers\ictcoreController;
+use App\Http\Controllers\ICTCoreController;
 use Carbon\Carbon;
 
-class cronjobController extends BaseController {
+class CronjobController extends BaseController {
 
 	public function __construct()
 	{
@@ -37,7 +37,7 @@ class cronjobController extends BaseController {
 
 		$student_all =	DB::table('Student')->select( '*')->get();
 		if(count($student_all)>0){
-			 $ict  = new ictcoreController();
+			 $ict  = new ICTCoreController();
 			$i=0;
 			$attendance_noti     = DB::table('notification_type')->where('notification','fess')->first();
 		    $ictcore_fees        = Ictcore_fees::select("*")->first();

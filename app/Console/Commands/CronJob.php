@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Http\Controllers\cronjobController;
+use App\Http\Controllers\CronjobController;
 
 class CronJob extends Command
 {
@@ -39,7 +39,7 @@ class CronJob extends Command
     public function handle()
     {
         //
-       $cron_job = new cronjobController();
+       $cron_job = new CronjobController();
 
         $cron_job->feenotification();
     }

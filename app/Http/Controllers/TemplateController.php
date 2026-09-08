@@ -8,9 +8,9 @@ use App\Models\Ictcore_integration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use App\Http\Controllers\ictcoreController;
+use App\Http\Controllers\ICTCoreController;
 
-class templateController extends BaseController {
+class TemplateController extends BaseController {
 
 	public function __construct() {
 		/*$this->beforeFilter('csrf', array('on'=>'post'));
@@ -105,7 +105,7 @@ class templateController extends BaseController {
                /*$ictcore_integration = Ictcore_integration::select("*")->first();
                    
 		    	if(!empty($ictcore_integration) && $ictcore_integration->ictcore_url && $ictcore_integration->ictcore_user && $ictcore_integration->ictcore_password){
-				$ictcore_api  = new ictcoreController();
+				$ictcore_api  = new ICTCoreController();
 				$sname = $request->input('title');
                 $remove_spaces =  str_replace(" ","_",$request->input('title'));
 				$fileName= $remove_spaces.'.'.Input::file('message')->getClientOriginalExtension();

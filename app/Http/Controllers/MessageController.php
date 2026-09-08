@@ -10,9 +10,9 @@ use Illuminate\Http\Request;
 use App\Models\Ictcore_integration;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use App\Http\Controllers\ictcoreController;
+use App\Http\Controllers\ICTCoreController;
 
-class messageController extends BaseController {
+class MessageController extends BaseController {
 
 	public function __construct() 
 	{
@@ -103,7 +103,7 @@ class messageController extends BaseController {
 			      //  echo "<pre>";print_r($phone);exit;
                   echo $type = $request->input('type');
                   $ictcore_integration = Ictcore_integration::select("*")->where('type',$type)->first();
-                  $ict  = new ictcoreController();
+                  $ict  = new ICTCoreController();
 					if($request->input('message')=='other'){
 
 						$drctry = storage_path('app/public/messages/');

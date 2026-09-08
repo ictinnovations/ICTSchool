@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Redirect;
 class formfoo7{
 }
 
-class libraryController extends BaseController {
+class LibraryController extends BaseController {
 	public function __construct() {
 		/*$this->beforeFilter('csrf', array('on'=>'post'));
 		$this->beforeFilter('auth');

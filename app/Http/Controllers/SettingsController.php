@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 
-class settingsController extends BaseController 
+class SettingsController extends BaseController 
 {
 	public function __construct() 
 	{

@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Http\Controllers\ictcoreController;
+use App\Http\Controllers\ICTCoreController;
 
 use App\Student;
 use App\Diary;
@@ -97,7 +97,7 @@ class DiaryJob extends Command
                 ///
 
                 $body    = $output;
-                $ict     = new ictcoreController();
+                $ict     = new ICTCoreController();
                 $i       = 0;
                 $attendance_noti     = DB::table('notification_type')->where('notification','fess')->first();
                 $ictcore_fees        = Ictcore_fees::select("*")->first();

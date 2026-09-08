@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use App\Http\Controllers\ictcoreController;
+use App\Http\Controllers\ICTCoreController;
 use App\Models\Institute;
 use App\Models\User;
 use App\Models\VerifyCode;
@@ -99,7 +99,7 @@ class UsersController extends BaseController
             ]
           );         //$code = $token->first()->generateCode;exit;
 
-          $ict     = new ictcoreController();
+          $ict     = new ICTCoreController();
 
           if (preg_match("~^0\d+$~", Auth()->user()->phone)) {
             $phone = preg_replace('/0/', '92', Auth()->user()->phone, 1);
@@ -177,7 +177,7 @@ class UsersController extends BaseController
     $verification_code->code = $verified_code;
     $verification_code->save();
 
-    /* $ict         = new ictcoreController();
+    /* $ict         = new ICTCoreController();
                     $contact = array(
                       'firstname' => 'admin',
                       'lastname' =>'',

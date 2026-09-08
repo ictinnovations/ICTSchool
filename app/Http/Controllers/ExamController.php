@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 
-class paperController extends BaseController {
+class ExamController extends BaseController {
 
 	public function __construct() {
 		/*$this->beforeFilter('csrf', array('on'=>'post'));
@@ -50,7 +50,8 @@ class paperController extends BaseController {
 		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
-			return Redirect::to('/exam/create')->withErrors($validator);
+			//return Redirect::to('/exam/create')->withErrors($validator);
+			return Redirect::to('/exam/list')->withErrors($validator);
 		}
 		else {
 			$type = $request->input('type');
@@ -64,7 +65,8 @@ class paperController extends BaseController {
 
 				$errorMessages = new \Illuminate\Support\MessageBag;
 				$errorMessages->add('deplicate', 'Exam all ready exists!!');
-				return Redirect::to('/exam/create')->withErrors($errorMessages);
+				//return Redirect::to('/exam/create')->withErrors($errorMessages);
+				return Redirect::to('/exam/list')->withErrors($errorMessages);
 			}
 			else {
 				//echo "<pre>";print_r($request->input('section'));exit;
@@ -76,7 +78,8 @@ class paperController extends BaseController {
 					$exam->section_id = $section_id;
 					$exam->save();
 			    }
-				return Redirect::to('/exam/create')->with("success", "Exam Created Succesfully.");
+				//return Redirect::to('/exam/create')->with("success", "Exam Created Succesfully.");
+				return Redirect::to('/exam/list')->with("success", "Exam Created Succesfully.");
 			}
 
 		}
@@ -95,12 +98,14 @@ class paperController extends BaseController {
 		/*$exams = DB::table('exam')
 		->select(DB::raw('*'))
 		->get();*/
-
          $exams = DB::table('exam')
           ->join('Class', 'exam.class_id', '=', 'Class.id')
           ->join('section', 'exam.section_id', '=', 'section.id')
           ->select('exam.id','exam.type', 'Class.name as class', 'section.name as section')
           ->get();
+          $exam = array();
+          $classes = DB::table('Class')->get();
+		  $sections = DB::table('section')->get();
 
 
        // echo "<pre>";print_r($exams);
@@ -109,7 +114,7 @@ class paperController extends BaseController {
          //exit;
 		//dd($sections);
 		//return View::Make('app.classList',compact('Classes'));
-		return View('app.examList',compact('exams'));
+		return View('app.examList',compact('exams','classes','sections','exam'));
 	}
 	/**
 	* Show the form for editing the specified resource.
@@ -119,14 +124,20 @@ class paperController extends BaseController {
 	*/
 	public function edit($id)
 	{
-		$exam = Exam::find($id);
+		 $exams = DB::table('exam')
+          ->join('Class', 'exam.class_id', '=', 'Class.id')
+          ->join('section', 'exam.section_id', '=', 'section.id')
+          ->select('exam.id','exam.type', 'Class.name as class', 'section.name as section')
+          ->get();
+		 $exam = Exam::find($id);
 		 $classes = DB::table('Class')->get();
 
 		  $getclsss_code = DB::table('Class')->select("*")->where('id','=',$exam->class_id)->first();
 		  
 		 $sections = DB::table('section')->where('class_code','=',$getclsss_code->code)->get();
 		//return View::Make('app.classEdit',compact('class'));
-		return View('app.examEdit',compact('exam','classes','sections'));
+		//return View('app.examEdit',compact('exam','classes','sections'));
+		return View('app.examList',compact('exams','exam','classes','sections'));
 	}
 
 
@@ -146,6 +157,7 @@ class paperController extends BaseController {
 		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails())
 		{
+			//return Redirect::to('/exam/edit/'.$request->input('id'))->withErrors($validator);
 			return Redirect::to('/exam/edit/'.$request->input('id'))->withErrors($validator);
 		}
 		else {
@@ -157,6 +169,7 @@ class paperController extends BaseController {
 			$exam->section_id = $request->input('section');
 
 			$exam->save();
+			//return Redirect::to('/exam/list')->with("success","Exam Updated Succesfully.");
 			return Redirect::to('/exam/list')->with("success","Exam Updated Succesfully.");
 
 		}
@@ -180,7 +193,12 @@ class paperController extends BaseController {
 	{
 		 $class_id = DB::table('Class')->select("*")->where('code','=',$class)->first();
                 
-		 $class_data = Exam::select('id','type')->where('class_id','=',$class_id->id)->get();
+		 $class_data = Exam::select('id','type')
+		 ->where('class_id','=',$class_id->id);
+		 if($request->input('section')!=''){
+		 	$class_data = $class_data->where('section_id','=',$request->input('section'));
+		 }
+		 $class_data =$class_data->get();
 	return $class_data;
 	}
 

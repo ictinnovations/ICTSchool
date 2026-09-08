@@ -13,14 +13,14 @@ use Illuminate\Http\Request;
 use App\Models\Ictcore_integration;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use App\Http\Controllers\ictcoreController;
+use App\Http\Controllers\ICTCoreController;
 Class formfoo5{
 
 }
 Class Meritdata{
 
 }
-class gradesheetController extends BaseController {
+class GradesheetController extends BaseController {
  public $data = array();
 	public function __construct() {
 		/*$this->beforeFilter('csrf', array('on'=>'post'));
@@ -279,7 +279,7 @@ public function send_sms($class,$section,$exam,$session)
 			$body = $message."\n". $message1  ;
 			//return  $body  ;
 			//exit;
-			$ict     = new ictcoreController();
+			$ict     = new ICTCoreController();
 			$i       =0;
 			$attendance_noti     = DB::table('notification_type')->where('notification','fess')->first();
 			$ictcore_fees        = Ictcore_fees::select("*")->first();

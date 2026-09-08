@@ -5,7 +5,7 @@ use App\Models\AcadamicYear;
 use App\Models\Student;
 use App\Models\FeeSetup;
 use App\Models\FeeCol;
-use App\Http\Controllers\ictcoreController;
+use App\Http\Controllers\ICTCoreController;
 use Carbon\Carbon;
 //use Storage;
 class emtysession{
@@ -249,7 +249,7 @@ if(! function_exists('sendmesssageictcore')){
 	function sendmesssageictcore($first_name,$last_name,$to,$message,$m_name)
 	{
 		//exit;
-		$ict  = new ictcoreController();
+		$ict  = new ICTCoreController();
 		$data = array(
 					'first_name' =>$first_name,
 					'last_name'  =>$last_name,
