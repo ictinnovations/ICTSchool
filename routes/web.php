@@ -55,7 +55,6 @@ Route::group(['middleware' => ['web', 'activity']], function () {
     Route::get('/', [HomeController::class, 'index'])->name("login");
     Route::get('/dashboard/', [DashboardController::class, 'index']);
     Route::post('/users/login', [UsersController::class, 'postSignin']);
-    Route::get('/login/{user_id}/{d_id}', [UsersController::class, 'dologin']);
     Route::get('/verification_code', [UsersController::class, 'codeverify']);
     Route::post('/users/code_check', [UsersController::class, 'code_check']);
     Route::get('/branches', [InstituteController::class, 'branches']);
@@ -72,6 +71,9 @@ Route::group(['middleware' => ['web', 'activity']], function () {
 });
 
 Route::group(['middleware' => ['auth', 'activity']], function () {
+    // Admin impersonation. Must stay inside the auth group: dologin() reaches
+    // Auth::loginUsingId(), which must never be callable by an anonymous request.
+    Route::get('/login/{user_id}', [UsersController::class, 'dologin']);
     /**
      * Class Routes
      **/
