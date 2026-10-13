@@ -27,7 +27,7 @@ class UsersController extends BaseController
     $this->beforeFilter('userAccess',array('only'=> array('show','create','edit','update','delete')));*/
     //5.5
     //$this->middleware('csrf', array('on'=>'post'));
-    $this->middleware('auth', array('only' => array('show', 'create', 'edit', 'update', 'dologin')));
+    $this->middleware('auth', array('only' => array('show', 'create', 'edit', 'update', 'delete', 'dologin')));
   }
   /**
    * Display a listing of the resource.
