@@ -130,7 +130,7 @@ $get_data = branchesapi($branch->username,$branch->password,$branch->branch_url,
 
                 <div class="col-md-12 col-sm-12 col-xs-12">
                   <div class="form-group">
-                      <a href="{{$branch->branch_url}}/login/{{$get_data->admin_id}}/{{Auth::user()->id}}" class="btn btn-primary btn-block btn-sm ml-1" target="_blank">More Detail</a>
+                      <a href="{{ rtrim($branch->branch_url, '/') }}/" class="btn btn-primary btn-block btn-sm ml-1" target="_blank">More Detail</a>
                   </div>
                 </div>
             </div>

@@ -31,6 +31,15 @@ class CronjobController extends BaseController {
 		 //$this->middleware('auth', array('only'=>array('index')));
 	}
 	
+    public function feenotificationUrl(\Illuminate\Http\Request $request)
+    {
+        $token = (string) env('CRON_TOKEN', '');
+        if ($token === '' || !hash_equals($token, (string) $request->query('token', ''))) {
+            abort(404);
+        }
+        return $this->feenotification();
+    }
+
     public function feenotification()
     {
      //$this->info('Notification sended successfully');
