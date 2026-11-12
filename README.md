@@ -1,8 +1,13 @@
+# ICTSchool
 
-School management system feature list
-====================================
+Open source school management software with SMS and voice notifications built in: admissions, attendance, exams and results, fees, teachers and multi-branch schools.
 
-**Website:** https://www.ict.vision &middot; ICTSchool is offered as an on-premises product by ICT Vision.
+**Website:** [www.ictschool.net](https://www.ictschool.net) · [Latest release](https://github.com/ictinnovations/ICTSchool/releases/latest) · ICTSchool is an ICT Vision product.
+
+<img src="screenshoot/Screenshot(21).png" alt="ICTSchool dashboard">
+
+## Features
+
 
 #### Features
 -------------
@@ -150,8 +155,7 @@ crontab -e
 * * * * * /usr/bin/php7.1 /path/artisan schedule:run 1>> /dev/null 2>&1
 
 ```
-# Screenshot
-============
+## Screenshots
 
 <img src="screenshoot/Screenshot(21).png" >
 <img src="screenshoot/Screenshot(22).png" >
