@@ -363,17 +363,17 @@ class DormitoryController extends BaseController {
 		$myquery="SELECT a.regiNo,a.roomNo,CONCAT(b.firstName,' ',b.middleName,' ',b.lastName) as name,c.name as class,'Paid' as isPaid FROM dormitory_student a
 		JOIN Student b ON a.regiNo=b.regiNo
 		JOIN Class c ON c.code=b.class
-		where a.dormitory=".$dormId."
-		and EXISTS (select b.feeMonth from dormitory_fee b where b.regiNo=a.regiNo and EXTRACT(YEAR_MONTH FROM b.feeMonth) = EXTRACT(YEAR_MONTH FROM '".$month."'))
+		where a.dormitory=?
+		and EXISTS (select b.feeMonth from dormitory_fee b where b.regiNo=a.regiNo and EXTRACT(YEAR_MONTH FROM b.feeMonth) = EXTRACT(YEAR_MONTH FROM ?))
 
 		UNION SELECT a.regiNo,a.roomNo,CONCAT(b.firstName,' ',b.middleName,' ',b.lastName) as name,c.name as class,'Due' as isPaid FROM dormitory_student a
 		JOIN Student b ON a.regiNo=b.regiNo
 		JOIN Class c ON c.code=b.class
-		WHERE a.dormitory=".$dormId."
-		and NOT EXISTS (select b.feeMonth from dormitory_fee b where b.regiNo=a.regiNo and EXTRACT(YEAR_MONTH FROM b.feeMonth) = EXTRACT(YEAR_MONTH FROM '".$month."'))
+		WHERE a.dormitory=?
+		and NOT EXISTS (select b.feeMonth from dormitory_fee b where b.regiNo=a.regiNo and EXTRACT(YEAR_MONTH FROM b.feeMonth) = EXTRACT(YEAR_MONTH FROM ?))
 		ORDER BY regiNo";
 
-		$datas = DB::select(DB::raw($myquery));
+		$datas = DB::select($myquery, [$dormId, $month, $dormId, $month]);
 
 
 
