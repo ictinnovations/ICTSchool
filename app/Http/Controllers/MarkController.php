@@ -674,8 +674,8 @@ class MarkController extends BaseController
 				//->leftjoin('Marks','Student.regiNo','=','Marks.regiNo')
 				->leftJoin('Marks', function ($join) use ($param1, $subject_id) {
 					$join->on('Student.regiNo', '=', 'Marks.regiNo');
-					$join->on('Marks.exam', '=', DB::raw("'" . $param1 . "'"));
-					$join->on('Marks.subject', '=', DB::raw("'" . $subject_id . "'"));
+					$join->where('Marks.exam', '=', $param1);
+					$join->where('Marks.subject', '=', $subject_id);
 				})
 
 				->select(DB::raw("CONCAT(Student.firstName,' ',Student.lastName) as fullname"), 'Student.regiNo as student_id', 'Marks.*')

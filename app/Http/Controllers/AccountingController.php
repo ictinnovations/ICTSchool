@@ -240,7 +240,7 @@ class AccountingController extends BaseController
 		}
 		if ($mn != '' && $year != '') {
 
-			$incomes = DB::select(DB::raw("SELECT * FROM accounting WHERE type ='Income' and YEAR(date)='" . $year . "'  and MONTH(date)='" . $month . "'"));
+			$incomes = DB::select("SELECT * FROM accounting WHERE type ='Income' and YEAR(date)=?  and MONTH(date)=?", [$year, $month]);
 		}
 		//echo "<pre>".$mn.$year;print_r($incomes);
 		//return View::Make('app.accountIncomeView',compact('incomes'));
@@ -254,7 +254,7 @@ class AccountingController extends BaseController
 
 
 
-		$incomes = DB::select(DB::raw("SELECT * FROM accounting WHERE type ='Income' and YEAR(date)='" . $year . "'  and MONTH(date)='" . $month . "'"));
+		$incomes = DB::select("SELECT * FROM accounting WHERE type ='Income' and YEAR(date)=?  and MONTH(date)=?", [$year, $month]);
 		//return View::Make('app.accountIncomeView',compact('incomes'));
 		return View('app.accountIncomeView', compact('incomes', 'year', 'mn'));
 	}
@@ -380,7 +380,7 @@ class AccountingController extends BaseController
 		}
 		if ($mn != '' && $year != '') {
 
-			$expences = DB::select(DB::raw("SELECT * FROM accounting WHERE type ='Expence' and YEAR(date)='" . $year . "'  and MONTH(date)='" . $month . "'"));
+			$expences = DB::select("SELECT * FROM accounting WHERE type ='Expence' and YEAR(date)=?  and MONTH(date)=?", [$year, $month]);
 		}
 		return View('app.accountExpenceView', compact('expences', 'year', 'mn'));
 	}
@@ -389,7 +389,7 @@ class AccountingController extends BaseController
 		$year     = trim($request->input('year'));
 		$mn       = trim($request->input('month'));
 		$month    = date('m', strtotime($mn));
-		$expences = DB::select(DB::raw("SELECT * FROM accounting WHERE type ='Expence' and YEAR(date)='" . $year . "' and MONTH(date)='" . $month . "'"));
+		$expences = DB::select("SELECT * FROM accounting WHERE type ='Expence' and YEAR(date)=? and MONTH(date)=?", [$year, $month]);
 		//return View::Make('app.accountExpenceView',compact('expences'));
 		return View('app.accountExpenceView', compact('expences', 'year', 'mn'));
 	}
@@ -451,7 +451,7 @@ class AccountingController extends BaseController
 		} else {
 
 			$datas = Accounting::select('name', 'amount', 'date', 'description')->where('type', '=', $rtype)->where('date', '>=', $fdate)->where('date', '<=', $tdate)->get();
-			$total = DB::select(DB::raw("SELECT sum(amount) as total FROM accounting where type='" . $rtype . "' and date >='" . $fdate . "' and date <='" . $tdate . "'"));
+			$total = DB::select("SELECT sum(amount) as total FROM accounting where type=? and date >=? and date <=?", [$rtype, $fdate, $tdate]);
 
 			if ($rtype == 'Income') {
 				$tutionfees = FeeCol::join('billHistory', 'stdBill.billNo', '=', 'billHistory.billNo')->select(DB::RAW('sum(stdBill.payableAmount) as payTotal,IFNULL(sum(paidAmount),0) as paiTotal,(IFNULL(sum(payableAmount),0)- IFNULL(sum(paidAmount),0)) as dueamount'))
@@ -497,7 +497,7 @@ class AccountingController extends BaseController
 
 			$incomes = Accounting::select('name', 'amount', 'description', 'date')->where('type', '=', 'Income')->where('date', '>=', $fdate)->where('date', '<=', $tdate)->get();
 
-			$intotal = DB::select(DB::raw("SELECT sum(amount) as total FROM accounting where type='Income' and date >='" . $fdate . "' and date <='" . $tdate . "'"));
+			$intotal = DB::select("SELECT sum(amount) as total FROM accounting where type='Income' and date >=? and date <=?", [$fdate, $tdate]);
 
 			$tutionfees = FeeCol::join('billHistory', 'stdBill.billNo', '=', 'billHistory.billNo')->select(DB::RAW('sum(stdBill.payableAmount) as payTotal,IFNULL(sum(paidAmount),0) as paiTotal,(IFNULL(sum(payableAmount),0)- IFNULL(sum(paidAmount),0)) as dueamount'))
 				//->where('class',$request->input('class'))
@@ -516,7 +516,7 @@ class AccountingController extends BaseController
 			//echo "<pre>";print_r($tutionfees->toArray());exit;
 
 			$expences = Accounting::select('name', 'amount', 'description', 'date')->where('type', '=', 'Expence')->where('date', '>=', $fdate)->where('date', '<=', $tdate)->get();
-			$extotal = DB::select(DB::raw("SELECT sum(amount) as total FROM accounting where type='Expence' and date >='" . $fdate . "' and date <='" . $tdate . "'"));
+			$extotal = DB::select("SELECT sum(amount) as total FROM accounting where type='Expence' and date >=? and date <=?", [$fdate, $tdate]);
 			$intotals = $intotal[0]->total + $tutionfees->paiTotal + $otherfees->paiTotal;
 			//$balance = array($intotal[0]->total-$extotal[0]->total);
 			$balance = array($intotals - $extotal[0]->total);

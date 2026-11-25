@@ -235,7 +235,7 @@ class SectionController extends BaseController {
 		$section= DB::table('section')
 		//->select(DB::raw('section.id,section.class_code,section.name,section.description'))
 
-		->select(DB::raw('section.id,section.name,(select count(Student.id) from Student where  section=section.id And class=section.class_code  AND session='.$session. ' AND isActive='.'"yes"'.')as students'))
+		->selectRaw('section.id,section.name,(select count(Student.id) from Student where  section=section.id And class=section.class_code  AND session=? AND isActive="yes")as students', [$session])
        ->where('section.class_code','=',$class)
       // ->where('isActive','yes')
 		->get();
