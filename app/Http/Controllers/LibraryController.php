@@ -500,8 +500,8 @@ public function getReportsFine()
 }
 public function ReportsFineprint($month)
 {
-	$sqlraw="select sum(fine) as totalFine from issueBook where Status='Returned' and EXTRACT(YEAR_MONTH FROM returnDAte) = EXTRACT(YEAR_MONTH FROM '".$month."')";
-	$fines = DB::select(DB::RAW($sqlraw));
+	$sqlraw="select sum(fine) as totalFine from issueBook where Status='Returned' and EXTRACT(YEAR_MONTH FROM returnDAte) = EXTRACT(YEAR_MONTH FROM ?)";
+	$fines = DB::select($sqlraw, [$month]);
 	if($fines[0]->totalFine)
 	{
 

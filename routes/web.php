@@ -523,7 +523,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
     //library routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/library/addbook', [LibraryController::class, 'getAddbook']);
     Route::post('/library/addbook', [LibraryController::class, 'postAddbook']);
     Route::get('/library/view', [LibraryController::class, 'getviewbook']);
