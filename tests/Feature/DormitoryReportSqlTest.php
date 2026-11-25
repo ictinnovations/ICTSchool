@@ -21,8 +21,8 @@ class DormitoryReportSqlTest extends TestCase
     private function reportQuery($dormId, $month)
     {
         $user = User::create([
-            'firstname' => 'Test', 'lastname' => 'Student', 'login' => 'student',
-            'email' => 'student@example.test', 'desc' => '', 'group' => 'Student',
+            'firstname' => 'Test', 'lastname' => 'Admin', 'login' => 'admin',
+            'email' => 'admin@example.test', 'desc' => '', 'group' => 'Admin',
             'password' => bcrypt('secret'),
         ]);
 

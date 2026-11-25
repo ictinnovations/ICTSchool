@@ -553,7 +553,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 //Hostal Routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/dormitory', [DormitoryController::class, 'index']);
     Route::post('/dormitory/create', [DormitoryController::class, 'create']);
     Route::get('/dormitory/edit/{id}', [DormitoryController::class, 'edit']);
