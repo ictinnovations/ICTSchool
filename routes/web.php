@@ -121,12 +121,12 @@ Route::group(['middleware' => ['auth', 'activity']], function () {
     Route::get('/section/view-timetable/{id}', [SectionController::class, 'view_timetable']);
 
     //level routes
-    Route::get('/level/create', [LevelController::class, 'index']);
-    Route::post('/level/create', [LevelController::class, 'create']);
-    Route::get('/level/list', [LevelController::class, 'show']);
-    Route::get('/level/edit/{id}', [LevelController::class, 'edit']);
-    Route::post('/level/update', [LevelController::class, 'update']);
-    Route::get('/level/delete/{id}', [LevelController::class, 'delete']);
+    Route::get('/level/create', [LevelController::class, 'index'])->middleware('admin');
+    Route::post('/level/create', [LevelController::class, 'create'])->middleware('admin');
+    Route::get('/level/list', [LevelController::class, 'show'])->middleware('admin');
+    Route::get('/level/edit/{id}', [LevelController::class, 'edit'])->middleware('admin');
+    Route::post('/level/update', [LevelController::class, 'update'])->middleware('admin');
+    Route::get('/level/delete/{id}', [LevelController::class, 'delete'])->middleware('admin');
 
 
     Route::get('/subject/create', [SubjectController::class, 'index'])->middleware('checkPermission:subject_add');
@@ -313,14 +313,14 @@ Route::group(['middleware' => ['auth', 'activity']], function () {
 
 
 // Acadamic Year
-Route::get('/academicYear', [AcadamicYearController::class, 'index']);
-Route::get('/academicYear/create', [AcadamicYearController::class, 'add'])->name('year.add');
-Route::post('/academicYear/create', [AcadamicYearController::class, 'create'])->name('year.create');
-Route::get('/academicYear/list', [AcadamicYearController::class, 'show']);
-Route::get('/academicYear/edit/{id}', [AcadamicYearController::class, 'edit']);
-Route::post('/academicYear/update', [AcadamicYearController::class, 'update'])->name('year.update');
-Route::get('/academicYear/delete/{id}', [AcadamicYearController::class, 'delete']);
-Route::get('/academicYear/status/{id}', [AcadamicYearController::class, 'status']);
+Route::get('/academicYear', [AcadamicYearController::class, 'index'])->middleware('admin');
+Route::get('/academicYear/create', [AcadamicYearController::class, 'add'])->name('year.add')->middleware('admin');
+Route::post('/academicYear/create', [AcadamicYearController::class, 'create'])->name('year.create')->middleware('admin');
+Route::get('/academicYear/list', [AcadamicYearController::class, 'show'])->middleware('admin');
+Route::get('/academicYear/edit/{id}', [AcadamicYearController::class, 'edit'])->middleware('admin');
+Route::post('/academicYear/update', [AcadamicYearController::class, 'update'])->name('year.update')->middleware('admin');
+Route::get('/academicYear/delete/{id}', [AcadamicYearController::class, 'delete'])->middleware('admin');
+Route::get('/academicYear/status/{id}', [AcadamicYearController::class, 'status'])->middleware('admin');
 
 // GPA Routes
 Route::get('/gpa', [GpaController::class, 'index'])->middleware('checkPermission:gpa_rule_add');
@@ -337,7 +337,7 @@ Route::group(['middleware' => 'auth'], function () {
         Log::info('Executed at ' . date('Y-m-d H:i:s'));
         Artisan::call("Invoice:genrate");
         return Redirect::to('/dashboard')->with('success', "Invoice Created Successfully");
-    })->name('cron.run');
+    })->name('cron.run')->middleware('admin');
 
     Route::get('/cron/invoices/months', function () {
         $months = Input::get('month');
@@ -345,11 +345,11 @@ Route::group(['middleware' => 'auth'], function () {
         Log::info('Executed at ' . date('Y-m-d H:i:s'));
         Artisan::call("Invoice:months", ['arg_name' => ['month' => $months, 'family_id' => $f_id]]);
         return Redirect::to('/dashboard')->with('success', "Invoice Created Successfully");
-    })->name('cron.run1');
+    })->name('cron.run1')->middleware('admin');
 
-    Route::get('/smslog', [SmsController::class, 'getsmsLog']);
-    Route::post('/smslog', [SmsController::class, 'postsmsLog']);
-    Route::get('/smslog/delete/{id}', [SmsController::class, 'deleteLog']);
+    Route::get('/smslog', [SmsController::class, 'getsmsLog'])->middleware('admin');
+    Route::post('/smslog', [SmsController::class, 'postsmsLog'])->middleware('admin');
+    Route::get('/smslog/delete/{id}', [SmsController::class, 'deleteLog'])->middleware('admin');
 });
 
 
@@ -395,37 +395,37 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/tabulation', [TabulationController::class, 'getsheet']);
 
     // Settings
-    Route::get('/settings', [SettingsController::class, 'index']);
-    Route::post('/settings', [SettingsController::class, 'save']);
-    Route::get('/institute', [InstituteController::class, 'index']);
-    Route::post('/institute', [InstituteController::class, 'save']);
-    Route::get('/ictcore', [ICTCoreController::class, 'index']);
-    Route::post('/ictcore', [ICTCoreController::class, 'create']);
-    Route::post('/notification_type', [ICTCoreController::class, 'noti_create']);
-    Route::get('/notification_type', [ICTCoreController::class, 'noti_index']);
-    Route::get('/ictcore/attendance', [ICTCoreController::class, 'attendance_index']);
-    Route::post('/ictcore/attendance', [ICTCoreController::class, 'post_attendance']);
-    Route::get('/ictcore/fees', [ICTCoreController::class, 'fee_message_index']);
-    Route::post('/ictcore/fees', [ICTCoreController::class, 'post_fees']);
+    Route::get('/settings', [SettingsController::class, 'index'])->middleware('admin');
+    Route::post('/settings', [SettingsController::class, 'save'])->middleware('admin');
+    Route::get('/institute', [InstituteController::class, 'index'])->middleware('admin');
+    Route::post('/institute', [InstituteController::class, 'save'])->middleware('admin');
+    Route::get('/ictcore', [ICTCoreController::class, 'index'])->middleware('admin');
+    Route::post('/ictcore', [ICTCoreController::class, 'create'])->middleware('admin');
+    Route::post('/notification_type', [ICTCoreController::class, 'noti_create'])->middleware('admin');
+    Route::get('/notification_type', [ICTCoreController::class, 'noti_index'])->middleware('admin');
+    Route::get('/ictcore/attendance', [ICTCoreController::class, 'attendance_index'])->middleware('admin');
+    Route::post('/ictcore/attendance', [ICTCoreController::class, 'post_attendance'])->middleware('admin');
+    Route::get('/ictcore/fees', [ICTCoreController::class, 'fee_message_index'])->middleware('admin');
+    Route::post('/ictcore/fees', [ICTCoreController::class, 'post_fees'])->middleware('admin');
 
     //promotion
-    Route::get('/promotion', [PromotionController::class, 'index']);
-    Route::post('/promotion', [PromotionController::class, 'store']);
-    Route::get('/template/create', [TemplateController::class, 'index']);
-    Route::post('/template/create', [TemplateController::class, 'create']);
-    Route::get('/template/list', [TemplateController::class, 'show']);
-    Route::get('/message/edit/{id}', [TemplateController::class, 'edit']);
-    Route::post('/message/update', [TemplateController::class, 'update']);
-    Route::get('/message/delete/{id}', [TemplateController::class, 'delete']);
-    Route::get('/message', [MessageController::class, 'index']);
-    Route::post('/message', [MessageController::class, 'create']);
+    Route::get('/promotion', [PromotionController::class, 'index'])->middleware('admin');
+    Route::post('/promotion', [PromotionController::class, 'store'])->middleware('admin');
+    Route::get('/template/create', [TemplateController::class, 'index'])->middleware('admin');
+    Route::post('/template/create', [TemplateController::class, 'create'])->middleware('admin');
+    Route::get('/template/list', [TemplateController::class, 'show'])->middleware('admin');
+    Route::get('/message/edit/{id}', [TemplateController::class, 'edit'])->middleware('admin');
+    Route::post('/message/update', [TemplateController::class, 'update'])->middleware('admin');
+    Route::get('/message/delete/{id}', [TemplateController::class, 'delete'])->middleware('admin');
+    Route::get('/message', [MessageController::class, 'index'])->middleware('admin');
+    Route::post('/message', [MessageController::class, 'create'])->middleware('admin');
 });
 
 
-Route::get('/settings', [SettingsController::class, 'index']);
-Route::post('/settings', [SettingsController::class, 'save']);
-Route::get('/schedule', [SettingsController::class, 'get_schedule']);
-Route::post('/schedule', [SettingsController::class, 'post_schedule']);
+Route::get('/settings', [SettingsController::class, 'index'])->middleware('admin');
+Route::post('/settings', [SettingsController::class, 'save'])->middleware('admin');
+Route::get('/schedule', [SettingsController::class, 'get_schedule'])->middleware('admin');
+Route::post('/schedule', [SettingsController::class, 'post_schedule'])->middleware('admin');
 
     // Accounting
 Route::group(['middleware' => 'auth'], function () {
@@ -513,11 +513,11 @@ Route::group(['middleware' => 'auth'], function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/regonline', [AdmissionController::class, 'regonline']);
     Route::post('/regonline', [AdmissionController::class, 'Postregonline']);
-    Route::get('/applicants', [AdmissionController::class, 'applicants']);
-    Route::post('/applicants', [AdmissionController::class, 'postapplicants']);
-    Route::get('/applicants/view/{id}', [AdmissionController::class, 'applicantview']);
-    Route::get('/applicants/payment', [AdmissionController::class, 'payment']);
-    Route::get('/applicants/delete/{id}', [AdmissionController::class, 'delete']);
+    Route::get('/applicants', [AdmissionController::class, 'applicants'])->middleware('admin');
+    Route::post('/applicants', [AdmissionController::class, 'postapplicants'])->middleware('admin');
+    Route::get('/applicants/view/{id}', [AdmissionController::class, 'applicantview'])->middleware('admin');
+    Route::get('/applicants/payment', [AdmissionController::class, 'payment'])->middleware('admin');
+    Route::get('/applicants/delete/{id}', [AdmissionController::class, 'delete'])->middleware('admin');
     Route::get('/admitcard', [AdmissionController::class, 'admitcard']);
     Route::post('/printadmitcard', [AdmissionController::class, 'printAdmitCard']);
 });
@@ -583,32 +583,32 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/barcode', [BarcodeController::class, 'generate']);
 
     // Holiday Routes
-    Route::get('/holidays', [AttendanceController::class, 'holidayIndex']);
-    Route::post('/holidays/create', [AttendanceController::class, 'holidayCreate']);
-    Route::get('/holidays/delete/{id}', [AttendanceController::class, 'holidayDelete']);
+    Route::get('/holidays', [AttendanceController::class, 'holidayIndex'])->middleware('admin');
+    Route::post('/holidays/create', [AttendanceController::class, 'holidayCreate'])->middleware('admin');
+    Route::get('/holidays/delete/{id}', [AttendanceController::class, 'holidayDelete'])->middleware('admin');
 
     // Class Off Routes
-    Route::get('/class-off', [AttendanceController::class, 'classOffIndex']);
-    Route::post('/class-off/store', [AttendanceController::class, 'classOffStore']);
-    Route::get('/class-off/delete/{id}', [AttendanceController::class, 'classOffDelete']);
+    Route::get('/class-off', [AttendanceController::class, 'classOffIndex'])->middleware('admin');
+    Route::post('/class-off/store', [AttendanceController::class, 'classOffStore'])->middleware('admin');
+    Route::get('/class-off/delete/{id}', [AttendanceController::class, 'classOffDelete'])->middleware('admin');
 
     // Website Contents Routes
-    Route::get('/site/dashboard', [SiteController::class, 'dashboard'])->name('site.dashboard');
-    Route::resource('slider', SliderController::class);
-    Route::get('/site/about-content', [SiteController::class, 'aboutContent'])->name('site.about_content');
-    Route::post('/site/about-content', [SiteController::class, 'aboutContent']);
-    Route::get('site/about-content/images', [SiteController::class, 'aboutContentImage'])->name('site.about_content_image');
-    Route::post('site/about-content/images', [SiteController::class, 'aboutContentImage']);
-    Route::post('site/about-content/images/{id}', [SiteController::class, 'aboutContentImageDelete'])->name('site.about_content_image_delete');
-    Route::get('site/service', [SiteController::class, 'serviceContent'])->name('site.service');
-    Route::post('site/service', [SiteController::class, 'serviceContent']);
-    Route::get('site/statistic', [SiteController::class, 'statisticContent'])->name('site.statistic');
-    Route::post('site/statistic', [SiteController::class, 'statisticContent']);
-    Route::get('site/testimonial', [SiteController::class, 'testimonialIndex'])->name('site.testimonial');
-    Route::post('site/testimonial', [SiteController::class, 'testimonialIndex']);
-    Route::get('site/testimonial/create', [SiteController::class, 'testimonialCreate'])->name('site.testimonial_create');
-    Route::post('site/testimonial/create', [SiteController::class, 'testimonialCreate']);
-    Route::get('site/subscribe', [SiteController::class, 'subscribe'])->name('site.subscribe');
+    Route::get('/site/dashboard', [SiteController::class, 'dashboard'])->name('site.dashboard')->middleware('admin');
+    Route::resource('slider', SliderController::class)->middleware('admin');
+    Route::get('/site/about-content', [SiteController::class, 'aboutContent'])->name('site.about_content')->middleware('admin');
+    Route::post('/site/about-content', [SiteController::class, 'aboutContent'])->middleware('admin');
+    Route::get('site/about-content/images', [SiteController::class, 'aboutContentImage'])->name('site.about_content_image')->middleware('admin');
+    Route::post('site/about-content/images', [SiteController::class, 'aboutContentImage'])->middleware('admin');
+    Route::post('site/about-content/images/{id}', [SiteController::class, 'aboutContentImageDelete'])->name('site.about_content_image_delete')->middleware('admin');
+    Route::get('site/service', [SiteController::class, 'serviceContent'])->name('site.service')->middleware('admin');
+    Route::post('site/service', [SiteController::class, 'serviceContent'])->middleware('admin');
+    Route::get('site/statistic', [SiteController::class, 'statisticContent'])->name('site.statistic')->middleware('admin');
+    Route::post('site/statistic', [SiteController::class, 'statisticContent'])->middleware('admin');
+    Route::get('site/testimonial', [SiteController::class, 'testimonialIndex'])->name('site.testimonial')->middleware('admin');
+    Route::post('site/testimonial', [SiteController::class, 'testimonialIndex'])->middleware('admin');
+    Route::get('site/testimonial/create', [SiteController::class, 'testimonialCreate'])->name('site.testimonial_create')->middleware('admin');
+    Route::post('site/testimonial/create', [SiteController::class, 'testimonialCreate'])->middleware('admin');
+    Route::get('site/subscribe', [SiteController::class, 'subscribe'])->name('site.subscribe')->middleware('admin');
 });
 
 

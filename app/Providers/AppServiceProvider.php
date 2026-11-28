@@ -19,6 +19,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // The activity log shows every user's requests and can be cleared, so only
+        // an Admin may open it. The package applies rolesMiddlware when enabled.
+        config([
+            'LaravelLogger.rolesEnabled' => true,
+            'LaravelLogger.rolesMiddlware' => 'admin',
+        ]);
+
         //
     }
 }
